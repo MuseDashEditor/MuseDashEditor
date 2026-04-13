@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MuseDashEditor.Desktop", "MuseDashEditor\MuseDashEditor.Desktop\MuseDashEditor.Desktop.csproj", "{93AF3D1D-120F-4720-B341-559ADB5EA731}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MuseDashEditor.Game", "MuseDashEditor\MuseDashEditor.Game\MuseDashEditor.Game.csproj", "{E873B063-3227-4E97-88AA-34D2BF8DEA09}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MuseDashEditor.Game.Tests", "MuseDashEditor\MuseDashEditor.Game.Tests\MuseDashEditor.Game.Tests.csproj", "{059A15E3-D354-41B0-B453-F1E3354F4B65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MuseDashEditor.Resources", "MuseDashEditor\MuseDashEditor.Resources\MuseDashEditor.Resources.csproj", "{A99D44C3-E32A-48DA-AD9B-5343329F701F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{93AF3D1D-120F-4720-B341-559ADB5EA731}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93AF3D1D-120F-4720-B341-559ADB5EA731}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93AF3D1D-120F-4720-B341-559ADB5EA731}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93AF3D1D-120F-4720-B341-559ADB5EA731}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E873B063-3227-4E97-88AA-34D2BF8DEA09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E873B063-3227-4E97-88AA-34D2BF8DEA09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E873B063-3227-4E97-88AA-34D2BF8DEA09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E873B063-3227-4E97-88AA-34D2BF8DEA09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{059A15E3-D354-41B0-B453-F1E3354F4B65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{059A15E3-D354-41B0-B453-F1E3354F4B65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{059A15E3-D354-41B0-B453-F1E3354F4B65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{059A15E3-D354-41B0-B453-F1E3354F4B65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A99D44C3-E32A-48DA-AD9B-5343329F701F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A99D44C3-E32A-48DA-AD9B-5343329F701F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A99D44C3-E32A-48DA-AD9B-5343329F701F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A99D44C3-E32A-48DA-AD9B-5343329F701F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

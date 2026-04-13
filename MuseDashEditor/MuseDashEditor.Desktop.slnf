@@ -1,0 +1,11 @@
+﻿{
+  "solution": {
+    "path": "MuseDashEditor.sln",
+    "projects": [
+      "MuseDashEditor.Desktop\\MuseDashEditor.Desktop.csproj",
+      "MuseDashEditor.Game\\MuseDashEditor.Game.csproj",
+      "MuseDashEditor.Game.Tests\\MuseDashEditor.Game.Tests.csproj",
+      "MuseDashEditor.Resources\\MuseDashEditor.Resources.csproj"
+    ]
+  }
+}

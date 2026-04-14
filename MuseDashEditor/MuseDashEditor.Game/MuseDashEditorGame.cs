@@ -7,18 +7,18 @@ namespace MuseDashEditor.Game;
 
 public partial class MuseDashEditorGame : MuseDashEditorGameBase
 {
-    private ScreenStack screenStack;
+    [Cached] protected readonly ScreenStack ScreenStack = new() { RelativeSizeAxes = Axes.Both };
 
     [BackgroundDependencyLoader]
     private void load()
     {
-        Child = screenStack = new ScreenStack { RelativeSizeAxes = Axes.Both };
+        Child = ScreenStack;
     }
 
     protected override void LoadComplete()
     {
         base.LoadComplete();
 
-        screenStack.Push(new MainScreen());
+        ScreenStack.Push(new MainScreen());
     }
 }

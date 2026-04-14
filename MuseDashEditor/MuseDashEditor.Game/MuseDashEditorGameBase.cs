@@ -1,9 +1,14 @@
+using System.Drawing;
+using System.Linq;
+using MuseDashEditor.Resources;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osuTK;
-using MuseDashEditor.Resources;
 
 namespace MuseDashEditor.Game;
 
@@ -15,14 +20,29 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
     {
         base.Content.Add(Content = new DrawSizePreservingFillContainer
         {
-            Strategy = DrawSizePreservationStrategy.Maximum,
-            TargetDrawSize = new Vector2(1920, 1080)
+            TargetDrawSize = new Vector2(1920, 1080),
+            Strategy = DrawSizePreservationStrategy.Minimum
         });
     }
 
     [BackgroundDependencyLoader]
-    private void load()
+    private void load(FrameworkConfigManager config)
     {
         Resources.AddStore(new DllResourceStore(typeof(MuseDashEditorResources).Assembly));
+
+        config.GetBindable<WindowMode>(FrameworkSetting.WindowMode).Value = WindowMode.Windowed;
+        config.GetBindable<Size>(FrameworkSetting.WindowedSize).Value = new Size(1920, 1080);
+        config.GetBindable<double>(FrameworkSetting.WindowedPositionX).Value = 0.5;
+        config.GetBindable<double>(FrameworkSetting.WindowedPositionY).Value = 0.5;
+        config.GetBindable<FrameSync>(FrameworkSetting.FrameSync).Value = FrameSync.Limit2x;
+        config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode).Value = ExecutionMode.MultiThreaded;
+        config.GetBindable<bool>(FrameworkSetting.ShowUnicode).Value = true;
+
+        ITabletHandler tablet = Host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
+
+        if (tablet != null)
+        {
+            tablet.Enabled.Value = false;
+        }
     }
 }

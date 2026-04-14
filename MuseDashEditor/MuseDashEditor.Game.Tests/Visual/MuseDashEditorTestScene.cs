@@ -1,22 +1,21 @@
 using osu.Framework.Testing;
 
-namespace MuseDashEditor.Game.Tests.Visual
+namespace MuseDashEditor.Game.Tests.Visual;
+
+public abstract partial class MuseDashEditorTestScene : TestScene
 {
-    public abstract partial class MuseDashEditorTestScene : TestScene
+    protected override ITestSceneTestRunner CreateRunner() => new MuseDashEditorTestSceneTestRunner();
+
+    private partial class MuseDashEditorTestSceneTestRunner : MuseDashEditorGameBase, ITestSceneTestRunner
     {
-        protected override ITestSceneTestRunner CreateRunner() => new MuseDashEditorTestSceneTestRunner();
+        private TestSceneTestRunner.TestRunner runner;
 
-        private partial class MuseDashEditorTestSceneTestRunner : MuseDashEditorGameBase, ITestSceneTestRunner
+        protected override void LoadAsyncComplete()
         {
-            private TestSceneTestRunner.TestRunner runner;
-
-            protected override void LoadAsyncComplete()
-            {
-                base.LoadAsyncComplete();
-                Add(runner = new TestSceneTestRunner.TestRunner());
-            }
-
-            public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);
+            base.LoadAsyncComplete();
+            Add(runner = new TestSceneTestRunner.TestRunner());
         }
+
+        public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);
     }
 }

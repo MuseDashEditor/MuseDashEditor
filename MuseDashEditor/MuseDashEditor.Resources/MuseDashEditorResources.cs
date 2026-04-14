@@ -1,9 +1,8 @@
 ﻿using System.Reflection;
 
-namespace MuseDashEditor.Resources
+namespace MuseDashEditor.Resources;
+
+public static class MuseDashEditorResources
 {
-    public static class MuseDashEditorResources
-    {
-        public static Assembly ResourceAssembly => typeof(MuseDashEditorResources).Assembly;
-    }
+    public static Assembly ResourceAssembly => typeof(MuseDashEditorResources).Assembly;
 }

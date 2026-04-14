@@ -2,15 +2,14 @@
 using osu.Framework;
 using MuseDashEditor.Game;
 
-namespace MuseDashEditor.Desktop
+namespace MuseDashEditor.Desktop;
+
+public static class Program
 {
-    public static class Program
+    public static void Main()
     {
-        public static void Main()
-        {
-            using GameHost host = Host.GetSuitableDesktopHost(@"MuseDashEditor");
-            using osu.Framework.Game game = new MuseDashEditorGame();
-            host.Run(game);
-        }
+        using GameHost host = Host.GetSuitableDesktopHost(@"MuseDashEditor");
+        using osu.Framework.Game game = new MuseDashEditorGame();
+        host.Run(game);
     }
 }

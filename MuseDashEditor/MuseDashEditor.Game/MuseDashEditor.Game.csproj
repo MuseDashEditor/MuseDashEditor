@@ -8,4 +8,8 @@
     <ItemGroup>
         <PackageReference Include="ppy.osu.Framework" Version="2026.406.0"/>
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Data\Object\" />
+      <Folder Include="Screens\Editor\" />
+    </ItemGroup>
 </Project>

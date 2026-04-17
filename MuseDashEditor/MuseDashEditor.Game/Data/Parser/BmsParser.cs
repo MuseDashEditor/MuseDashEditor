@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using MuseDashEditor.Game.Chart.Type;
+using MuseDashEditor.Game.Data.Chart;
+using MuseDashEditor.Game.Data.Type;
 using osu.Framework.Logging;
 
-namespace MuseDashEditor.Game.Chart.Parser;
+namespace MuseDashEditor.Game.Data.Parser;
 
-public static class ChartParser
+public static class BmsParser
 {
     private static readonly List<char> base36_chars =
     [
@@ -15,11 +16,11 @@ public static class ChartParser
         'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
     ];
 
-    public static async Task<Chart> Parse(FileInfo file)
+    public static async Task<Map> Parse(FileInfo file)
     {
         Logger.Log($"Parsing chart from file: {file.FullName}...");
 
-        Chart chart = new();
+        Map chart = new(file);
 
         using var stream = file.OpenText();
         var content = await stream.ReadToEndAsync();
@@ -29,7 +30,7 @@ public static class ChartParser
         return chart;
     }
 
-    private static void parseChartContent(string content, Chart chart)
+    private static void parseChartContent(string content, Map map)
     {
         var lines = content.Split(Environment.NewLine);
 
@@ -37,11 +38,11 @@ public static class ChartParser
 
         foreach (var line in lines)
         {
-            parseLineContent(line, chart);
+            parseLineContent(line, map);
         }
     }
 
-    private static void parseLineContent(string line, Chart chart)
+    private static void parseLineContent(string line, Map map)
     {
         if (!line.StartsWith('#'))
             return;
@@ -51,17 +52,17 @@ public static class ChartParser
 
         if (metadataParts.Length == 2)
         {
-            parseMetadataHeader(metadataParts, chart);
+            parseMetadataHeader(metadataParts, map);
             return;
         }
 
         if (dataParts.Length < 2)
             return;
 
-        parseDataLine(dataParts, chart);
+        parseDataLine(dataParts, map);
     }
 
-    private static void parseDataLine(string[] dataParts, Chart chart)
+    private static void parseDataLine(string[] dataParts, Map map)
     {
         Logger.Log($"Parsing data line: {dataParts[0]}:{dataParts[1]}");
 
@@ -77,35 +78,50 @@ public static class ChartParser
         if (!int.TryParse(laneDeclaration.AsSpan(0, 3), out var trackNumber))
             return;
 
-        var laneModifier = (LaneModifier)parseBase36(laneDeclaration.AsSpan(3, 1));
-        var laneType = (LaneType)parseBase36(laneDeclaration.AsSpan(4, 1));
+        var laneModifierValue = parseBase36(laneDeclaration.AsSpan(3, 1));
+        var laneTypeValue = parseBase36(laneDeclaration.AsSpan(4, 1));
+
+        if (!Enum.IsDefined(typeof(LaneModifierType), laneModifierValue))
+        {
+            Logger.Log($"Unknown lane modifier: {laneModifierValue}", level: LogLevel.Important);
+            return;
+        }
+
+        if (!Enum.IsDefined(typeof(ObjectType), laneTypeValue))
+        {
+            Logger.Log($"Unknown lane type: {laneTypeValue}", level: LogLevel.Important);
+            return;
+        }
+
+        var laneModifier = (LaneModifierType)laneModifierValue;
+        var laneType = (LaneType)laneTypeValue;
 
         var dataCount = data.Length / 2;
-        var dataArray = new EnemyType[dataCount];
+        var dataArray = new ObjectType[dataCount];
 
         for (var i = 0; i < dataCount; i++)
         {
-            dataArray[i] = (EnemyType)parseBase36(data.AsSpan(i * 2, 2));
+            dataArray[i] = (ObjectType)parseBase36(data.AsSpan(i * 2, 2));
         }
 
         Logger.Log(
-            $"Parsed data: lane n°{trackNumber} with modifier {laneModifier} and type {laneType}: {string.Join(", ", dataArray)}");
+            $"Parsed data: track n°{trackNumber} with lane modifier {laneModifier} and type {laneType}: {string.Join(", ", dataArray)}");
 
         // TODO: save lane data
     }
 
-    private static int parseBase36(ReadOnlySpan<char> asSpan)
+    private static int parseBase36(ReadOnlySpan<char> span)
     {
-        if (asSpan.Length < 2)
-            return parseBase36($"0{asSpan[0]}");
+        if (span.Length < 2)
+            span = $"0{span[0]}";
 
-        var char1 = asSpan[0];
-        var char2 = asSpan[1];
+        var char1 = span[0];
+        var char2 = span[1];
 
         return base36_chars.IndexOf(char1) * 36 + base36_chars.IndexOf(char2);
     }
 
-    private static void parseMetadataHeader(string[] metadataParts, Chart chart)
+    private static void parseMetadataHeader(string[] metadataParts, Map map)
     {
         Logger.Log($"Parsing metadata header: {metadataParts[0]} = {metadataParts[1]}");
 

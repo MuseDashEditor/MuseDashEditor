@@ -1,6 +1,6 @@
-namespace MuseDashEditor.Game.Chart.Type;
+namespace MuseDashEditor.Game.Data.Type;
 
-public enum LaneModifier
+public enum LaneModifierType
 {
     Music = 0,
     Normal = 1,

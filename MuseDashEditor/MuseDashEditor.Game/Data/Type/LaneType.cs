@@ -1,4 +1,4 @@
-namespace MuseDashEditor.Game.Chart.Type;
+namespace MuseDashEditor.Game.Data.Type;
 
 public enum LaneType
 {

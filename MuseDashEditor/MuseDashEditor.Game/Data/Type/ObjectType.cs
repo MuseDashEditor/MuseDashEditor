@@ -1,9 +1,10 @@
-namespace MuseDashEditor.Game.Chart.Type;
+namespace MuseDashEditor.Game.Data.Type;
 
-public enum EnemyType
+public enum ObjectType
 {
     //@formatter:off
     Empty = 0,                        // Used only for parsing and saving
+
     Small = 1,                        // 01
     SmallUp = 2,                      // 02
     SmallDown = 3,                    // 03

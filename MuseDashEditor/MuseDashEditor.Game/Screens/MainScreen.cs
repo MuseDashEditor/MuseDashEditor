@@ -1,12 +1,13 @@
+using MuseDashEditor.Game.Screens.Open;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osuTK;
 
-namespace MuseDashEditor.Game.Screen;
+namespace MuseDashEditor.Game.Screens;
 
-public partial class MainScreen : osu.Framework.Screens.Screen
+public partial class MainScreen : Screen
 {
     [Resolved] protected ScreenStack MainScreenStack { get; private set; } = null!;
 
@@ -22,7 +23,7 @@ public partial class MainScreen : osu.Framework.Screens.Screen
                 Colour = Colour4.AliceBlue,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Action = () => MainScreenStack.Push(new OpenChartScreen())
+                Action = () => MainScreenStack.Push(new FolderSelectorScreen())
             }
         ];
     }

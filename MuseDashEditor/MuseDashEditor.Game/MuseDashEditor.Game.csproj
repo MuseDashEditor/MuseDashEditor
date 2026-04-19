@@ -10,6 +10,5 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Data\Object\" />
-      <Folder Include="Screens\Editor\" />
     </ItemGroup>
 </Project>

@@ -4,7 +4,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Design;
 
-public partial class DesignSubscreen : EditorSubscreen
+public partial class DesignSubscreen : PlayableEditorSubscreen
 {
     [BackgroundDependencyLoader]
     private void load()

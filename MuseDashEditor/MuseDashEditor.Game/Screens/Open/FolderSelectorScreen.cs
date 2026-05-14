@@ -1,9 +1,13 @@
 using System;
+using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Parser;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osuTK;
 
@@ -12,7 +16,7 @@ namespace MuseDashEditor.Game.Screens.Open;
 public partial class FolderSelectorScreen : Screen
 {
     [BackgroundDependencyLoader]
-    private void load(ScreenStack screenStack)
+    private void load(GameHost host, ScreenStack screenStack, AudioManager audioManager, EditorDataHolder dataHolder)
     {
         var fileSelector = new BasicFileSelector(null, [".bms", ".json", ".ogg", ".mp3"])
         {
@@ -36,11 +40,30 @@ public partial class FolderSelectorScreen : Screen
                 {
                     try
                     {
-                        Logger.Log($"Opening chart from {fileSelector.CurrentPath.Value.FullName}...");
+                        var pathValue = fileSelector.CurrentPath.Value;
+                        Logger.Log($"Opening chart from {pathValue.FullName}...");
 
-                        var chart = await ChartParser.Parse(fileSelector.CurrentPath.Value);
+                        var chart = await ChartParser.Parse(pathValue);
+                        if (chart == null) return;
 
+                        // Create backing storage
+                        var storage = new NativeStorage(pathValue.FullName, host);
+                        var resourcesStore = new StorageBackedResourceStore(storage);
 
+                        var trackStore = audioManager.GetTrackStore(resourcesStore);
+
+                        var musicFile = chart.MusicFileBindable.Value;
+                        var demoFile = chart.DemoFileBindable.Value;
+
+                        // Load audio files
+                        if (musicFile != null)
+                        {
+                            var loadedTrack = await trackStore.GetAsync(musicFile.Name);
+                            if (loadedTrack != null)
+                                dataHolder.CurrentTrack.Value = loadedTrack;
+                        }
+
+                        dataHolder.CurrentChart.Value = chart;
 
                         this.Exit();
                         screenStack.Push(new DifficultySelectorScreen());

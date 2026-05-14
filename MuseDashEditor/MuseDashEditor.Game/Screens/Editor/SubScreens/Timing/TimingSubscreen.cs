@@ -4,7 +4,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Timing;
 
-public partial class TimingSubscreen : EditorSubscreen
+public partial class TimingSubscreen : PlayableEditorSubscreen
 {
     [BackgroundDependencyLoader]
     private void load()

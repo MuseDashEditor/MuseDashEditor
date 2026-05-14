@@ -1,11 +1,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Screens;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Design;
 
-public partial class DesignSubscreen : Screen
+public partial class DesignSubscreen : EditorSubscreen
 {
     [BackgroundDependencyLoader]
     private void load()

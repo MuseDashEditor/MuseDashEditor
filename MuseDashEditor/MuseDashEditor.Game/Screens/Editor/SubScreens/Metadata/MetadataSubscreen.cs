@@ -2,11 +2,10 @@ using MuseDashEditor.Game.Data.Holder;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Screens;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Metadata;
 
-public partial class MetadataSubscreen : Screen
+public partial class MetadataSubscreen : EditorSubscreen
 {
     [BackgroundDependencyLoader]
     private void load(EditorDataHolder dataHolder)

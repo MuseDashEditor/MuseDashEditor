@@ -1,5 +1,6 @@
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Type;
+using MuseDashEditor.Game.Screens.Editor;
 using MuseDashEditor.Game.Screens.Open.Components;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,8 +13,11 @@ namespace MuseDashEditor.Game.Screens.Open;
 
 public partial class DifficultySelectorScreen : Screen
 {
+    [Resolved] protected ScreenStack MainScreenStack { get; private set; } = null!;
+    [Resolved] protected EditorDataHolder DataHolder { get; private set; } = null!;
+
     [BackgroundDependencyLoader]
-    private void load(EditorDataHolder dataHolder)
+    private void load()
     {
         // if (dataHolder.CurrentChart.Value == null) return; // TODO
 
@@ -54,27 +58,39 @@ public partial class DifficultySelectorScreen : Screen
                             new DifficultyDisplay
                             {
                                 StarColour = Color4.Green,
-                                Difficulty = DifficultyType.Easy
+                                Difficulty = DifficultyType.Easy,
+                                OnClickAction = () => OnDifficultySelected(DifficultyType.Easy)
                             },
                             new DifficultyDisplay
                             {
                                 StarColour = Color4.Aqua,
-                                Difficulty = DifficultyType.Hard
+                                Difficulty = DifficultyType.Hard,
+                                OnClickAction = () => OnDifficultySelected(DifficultyType.Hard)
                             },
                             new DifficultyDisplay
                             {
                                 StarColour = Color4.Magenta,
-                                Difficulty = DifficultyType.Master
+                                Difficulty = DifficultyType.Master,
+                                OnClickAction = () => OnDifficultySelected(DifficultyType.Master)
                             },
                             new DifficultyDisplay
                             {
                                 StarColour = Color4.Gray,
-                                Difficulty = DifficultyType.Hidden
+                                Difficulty = DifficultyType.Hidden,
+                                OnClickAction = () => OnDifficultySelected(DifficultyType.Hidden)
                             },
                         ]
                     }
                 ]
             }
         ];
+    }
+
+    private void OnDifficultySelected(DifficultyType difficulty)
+    {
+        DataHolder.SelectedDifficulty.Value = difficulty;
+
+        this.Exit();
+        MainScreenStack.Push(new EditorScreen());
     }
 }

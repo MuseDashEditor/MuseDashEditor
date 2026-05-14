@@ -1,3 +1,4 @@
+using System;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Type;
 using osu.Framework.Allocation;
@@ -7,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osuTK;
 
 namespace MuseDashEditor.Game.Screens.Open.Components;
@@ -15,6 +17,7 @@ public partial class DifficultyDisplay : BasicButton
 {
     public ColourInfo StarColour { get; init; }
     public DifficultyType Difficulty { get; init; }
+    public Action OnClickAction { get; init; }
 
     [BackgroundDependencyLoader]
     private void load(EditorDataHolder dataHolder)
@@ -43,5 +46,11 @@ public partial class DifficultyDisplay : BasicButton
                 }
             ]
         };
+    }
+
+    protected override bool OnClick(ClickEvent e)
+    {
+        OnClickAction?.Invoke();
+        return true;
     }
 }

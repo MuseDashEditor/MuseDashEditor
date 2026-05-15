@@ -15,10 +15,10 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens;
 public partial class EditorSubscreenContainer : Container<EditorSubscreen>
 {
     // Editor subscreens
-    private readonly ComposeSubscreen composeSubscreen = new();
-    private readonly DesignSubscreen designSubscreen = new();
     private readonly MetadataSubscreen metadataSubscreen = new();
     private readonly TimingSubscreen timingSubscreen = new();
+    private readonly ComposeSubscreen composeSubscreen = new();
+    private readonly DesignSubscreen designSubscreen = new();
     private readonly ValidationSubscreen validationSubscreen = new();
     private EditorSubscreenType currentScreen;
 
@@ -35,12 +35,13 @@ public partial class EditorSubscreenContainer : Container<EditorSubscreen>
             validationSubscreen
         ]);
 
+        metadataSubscreen.Show();
         timingSubscreen.Hide();
         composeSubscreen.Hide();
         designSubscreen.Hide();
         validationSubscreen.Hide();
 
-        dataHolder.SelectedSubscreen.ValueChanged += SelectedSubscreenOnValueChanged;
+        dataHolder.SelectedSubscreen.BindValueChanged(SelectedSubscreenOnValueChanged, true);
     }
 
     private void SelectedSubscreenOnValueChanged(ValueChangedEvent<EditorSubscreenType> evt)

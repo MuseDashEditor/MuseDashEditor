@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Screens.Editor.SubScreens;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -16,6 +18,7 @@ public partial class SubscreenSwitcher : TabControl<EditorSubscreenType>
     private void load(EditorDataHolder editorDataHolder)
     {
         Current = editorDataHolder.SelectedSubscreen;
+        SelectFirstTabByDefault = false;
         Origin = Anchor.CentreRight;
         Anchor = Anchor.CentreRight;
         AutoSizeAxes = Axes.X;

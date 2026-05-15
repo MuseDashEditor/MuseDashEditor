@@ -11,4 +11,5 @@ public class EditorDataHolder
     public Bindable<Track> CurrentTrack { get; } = new();
     public Bindable<DifficultyType> SelectedDifficulty { get; } = new();
     public Bindable<EditorSubscreenType> SelectedSubscreen { get; } = new();
+    public Bindable<SceneType> CurrentScene { get; } = new();
 };

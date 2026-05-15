@@ -2,6 +2,7 @@ namespace MuseDashEditor.Game.Data.Type;
 
 public enum SceneType
 {
+    Unknown = 0,
     SpaceStation = 1,
     Retrocity = 2,
     Castle = 3,

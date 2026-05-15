@@ -16,6 +16,7 @@ public partial class EditorScreen : Screen
         InternalChildren =
         [
             // UI
+            new EditorBackground(),
             new Toolbar(),
             new EditorSubscreenContainer(),
             new PlayBar(),

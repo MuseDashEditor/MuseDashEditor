@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Type;
@@ -32,7 +33,10 @@ public static class ChartParser
         }
 
         var chartInfoFile = new FileInfo(Path.Combine(directory.FullName, "info.json"));
-        ChartInfo chartInfo = null; // TODO: parse chart data file
+        var infoFileData = chartInfoFile.OpenText().BaseStream;
+        ChartInfoRaw chartInfoRaw = await JsonSerializer.DeserializeAsync<ChartInfoRaw>(infoFileData);
+
+        ChartInfo chartInfo = new ChartInfo(chartInfoRaw);
 
         var mp3AudioFiles = directory.GetFiles("*.mp3");
         var oggAudioFiles = directory.GetFiles("*.ogg");

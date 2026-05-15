@@ -20,7 +20,7 @@ public static class BmsParser
     {
         Logger.Log($"Parsing chart from file: {file.FullName}...");
 
-        Map chart = new(file);
+        Map chart = new(file, new Dictionary<string, string>());
 
         using var stream = file.OpenText();
         var content = await stream.ReadToEndAsync();
@@ -145,6 +145,6 @@ public static class BmsParser
                 return;
         }
 
-        // TODO: save metadata
+        map.Metadata.Add(key, value);
     }
 }

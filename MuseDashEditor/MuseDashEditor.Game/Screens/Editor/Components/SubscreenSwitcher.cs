@@ -1,9 +1,8 @@
 using System;
-using System.Linq;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Screens.Editor.SubScreens;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -53,7 +52,7 @@ public partial class SubscreenSwitcher : TabControl<EditorSubscreenType>
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = new Vector2(1, 1),
-                    Colour = FrameworkColour.BlueGreen,
+                    Colour = MdeColors.Background4,
                 },
                 new SpriteText
                 {

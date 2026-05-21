@@ -1,3 +1,4 @@
+using System.IO;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Screens.Editor.SubScreens;
 using osu.Framework.Audio.Track;
@@ -9,7 +10,8 @@ public class EditorDataHolder
 {
     public Bindable<Chart.Chart> CurrentChart { get; } = new();
     public Bindable<Track> CurrentTrack { get; } = new();
+    public Bindable<Stream> CurrentTrackStream { get; } = new();
     public Bindable<DifficultyType> SelectedDifficulty { get; } = new();
     public Bindable<EditorSubscreenType> SelectedSubscreen { get; } = new();
     public Bindable<SceneType> CurrentScene { get; } = new();
-};
+}

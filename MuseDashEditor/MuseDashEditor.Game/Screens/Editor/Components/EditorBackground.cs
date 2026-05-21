@@ -1,8 +1,10 @@
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Type;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osuTK;
@@ -29,12 +31,13 @@ public partial class EditorBackground : Sprite
     private void OnSceneChange(ValueChangedEvent<SceneType> valueChangedEvent)
     {
         var newScene = valueChangedEvent.NewValue;
+        var sceneData = SceneUtils.GetSceneData(newScene);
 
-        if (newScene == SceneType.Unknown)
+        if (sceneData is null)
             Texture = Textures.Get("HomeScreen/background");
         else
         {
-            var textureName = $"Scenes/{(int)newScene}_{newScene.ToString().ToLowerInvariant()}/background";
+            var textureName = $"Scenes/{sceneData.ResourcePath}/background";
             Texture = Textures.Get(textureName);
         }
     }

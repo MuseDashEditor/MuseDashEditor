@@ -61,6 +61,10 @@ public partial class FolderSelectorScreen : Screen
                             var loadedTrack = await trackStore.GetAsync(musicFile.Name);
                             if (loadedTrack != null)
                                 dataHolder.CurrentTrack.Value = loadedTrack;
+
+                            var loadedTrackStream = trackStore.GetStream(musicFile.Name);
+                            if (loadedTrackStream != null)
+                                dataHolder.CurrentTrackStream.Value = loadedTrackStream;
                         }
 
                         dataHolder.CurrentChart.Value = chart;

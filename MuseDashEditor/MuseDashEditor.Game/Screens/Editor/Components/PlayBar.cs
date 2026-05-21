@@ -1,5 +1,6 @@
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Editor.Clock;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,7 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osuTK;
-using Color4 = osuTK.Graphics.Color4;
 
 namespace MuseDashEditor.Game.Screens.Editor.Components;
 
@@ -34,7 +34,7 @@ public partial class PlayBar : CompositeDrawable
             {
                 RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(1f, 1f),
-                Colour = Color4.Black,
+                Colour = MdeColors.Background5,
             },
 
             // Text

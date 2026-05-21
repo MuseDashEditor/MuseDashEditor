@@ -1,6 +1,6 @@
-using JetBrains.Annotations;
 using MuseDashEditor.Game.Data.Holder;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 
@@ -10,6 +10,7 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
 {
     private readonly DecouplingFramedClock decouplingClock;
     private readonly IFrameBasedClock interpolatingClock;
+    private double currentTrackLength;
 
     public EditorClock()
     {
@@ -36,6 +37,10 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
     public void Stop()
     {
         decouplingClock.Stop();
+
+        if (CurrentTime > currentTrackLength)
+            Seek(currentTrackLength);
+
         interpolatingClock.ProcessFrame();
     }
 
@@ -47,6 +52,13 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
 
     public bool Seek(double position)
     {
+        if (position < 0)
+            return false;
+        if (position > currentTrackLength)
+            return false;
+
+        if (IsRunning) Stop(); // Maybe add an option to keep running?
+
         var result = decouplingClock.Seek(position);
         interpolatingClock.ProcessFrame();
         return result;
@@ -74,8 +86,17 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
 
     public IClock Source => decouplingClock.Source;
 
-    public void ChangeSource([CanBeNull] IClock source)
+    public void ChangeSource(IClock source)
     {
+        if (source is Track track)
+        {
+            currentTrackLength = track.Length;
+        }
+        else
+        {
+            currentTrackLength = 0;
+        }
+
         decouplingClock.ChangeSource(source);
     }
 

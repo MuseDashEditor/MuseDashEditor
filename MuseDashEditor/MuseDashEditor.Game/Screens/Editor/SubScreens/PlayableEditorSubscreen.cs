@@ -31,17 +31,32 @@ public partial class PlayableEditorSubscreen : EditorSubscreen
         if (e.Repeat) return false;
         if (EditorClock == null) return false;
 
-        if (e.Key != Key.Space) return base.OnKeyDown(e);
-
-        if (EditorClock.IsRunning)
+        // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+        switch (e.Key)
         {
-            EditorClock.Stop();
-        }
-        else
-        {
-            EditorClock.Start();
-        }
+            case Key.Space:
+            {
+                if (EditorClock.IsRunning)
+                {
+                    EditorClock.Stop();
+                }
+                else
+                {
+                    EditorClock.Start();
+                }
 
-        return true;
+                return true;
+            }
+            case Key.Left:
+                var amountLeft = e.ShiftPressed ? 10 : e.ControlPressed ? 10000 : 1000;
+                EditorClock.Seek(EditorClock.CurrentTime - amountLeft);
+                return true;
+            case Key.Right:
+                var amountRight = e.ShiftPressed ? 10 : e.ControlPressed ? 10000 : 1000;
+                EditorClock.Seek(EditorClock.CurrentTime + amountRight);
+                return true;
+            default:
+                return base.OnKeyDown(e);
+        }
     }
 }

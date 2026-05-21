@@ -1,6 +1,6 @@
 using osu.Framework.Testing;
 
-namespace MuseDashEditor.Game.Tests.Visual;
+namespace MuseDashEditor.Game.Tests;
 
 public abstract partial class MuseDashEditorTestScene : TestScene
 {

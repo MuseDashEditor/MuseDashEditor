@@ -1,10 +1,9 @@
-using MuseDashEditor.Game.Data.Holder;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
 using Box = osu.Framework.Graphics.Shapes.Box;
-using Color4 = osuTK.Graphics.Color4;
 
 namespace MuseDashEditor.Game.Screens.Editor.Components;
 
@@ -28,7 +27,7 @@ public partial class Toolbar : Container
                 Size = new Vector2(1, 1),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Colour = Color4.AliceBlue,
+                Colour = MdeColors.Background5,
             },
 
             // Left part // TODO

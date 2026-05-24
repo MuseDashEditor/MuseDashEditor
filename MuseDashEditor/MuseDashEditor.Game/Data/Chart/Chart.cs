@@ -17,10 +17,10 @@ public class Chart(
     public ChartInfo ChartInfo => info;
 
     public Dictionary<DifficultyType, Map> Maps => maps;
-    public Map EasyMap = maps.GetValueOrDefault(DifficultyType.Easy);
-    public Map HardMap = maps.GetValueOrDefault(DifficultyType.Hard);
-    public Map MasterMap = maps.GetValueOrDefault(DifficultyType.Master);
-    public Map HiddenMap = maps.GetValueOrDefault(DifficultyType.Hidden);
+    public Map EasyMap => maps.GetValueOrDefault(DifficultyType.Easy);
+    public Map HardMap => maps.GetValueOrDefault(DifficultyType.Hard);
+    public Map MasterMap => maps.GetValueOrDefault(DifficultyType.Master);
+    public Map HiddenMap => maps.GetValueOrDefault(DifficultyType.Hidden);
 
     private readonly Bindable<FileInfo> musicFileBindableInternal = new(musicFile);
     public IBindable<FileInfo> MusicFileBindable => musicFileBindableInternal;

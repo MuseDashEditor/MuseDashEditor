@@ -90,6 +90,7 @@ public partial class DifficultySelectorScreen : Screen
     {
         DataHolder.SelectedDifficulty.Value = difficulty;
         DataHolder.CurrentChart.Value.ChartInfo.LoadDataFromMap((int)difficulty);
+        DataHolder.CurrentMap.Value = DataHolder.CurrentChart.Value.Maps[difficulty];
 
         this.Exit();
         MainScreenStack.Push(new EditorScreen());

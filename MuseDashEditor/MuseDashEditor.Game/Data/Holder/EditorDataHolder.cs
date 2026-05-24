@@ -8,10 +8,11 @@ namespace MuseDashEditor.Game.Data.Holder;
 
 public class EditorDataHolder
 {
-    public Bindable<Chart.Chart> CurrentChart { get; } = new();
-    public Bindable<Track> CurrentTrack { get; } = new();
-    public Bindable<Stream> CurrentTrackStream { get; } = new();
-    public Bindable<DifficultyType> SelectedDifficulty { get; } = new();
-    public Bindable<EditorSubscreenType> SelectedSubscreen { get; } = new();
-    public Bindable<SceneType> CurrentScene { get; } = new();
+    public readonly Bindable<Chart.Chart> CurrentChart = new();
+    public readonly Bindable<Chart.Map> CurrentMap = new();
+    public readonly Bindable<Track> CurrentTrack = new();
+    public readonly Bindable<Stream> CurrentTrackStream = new();
+    public readonly Bindable<DifficultyType> SelectedDifficulty = new();
+    public readonly Bindable<EditorSubscreenType> SelectedSubscreen = new();
+    public readonly Bindable<SceneType> CurrentScene = new();
 }

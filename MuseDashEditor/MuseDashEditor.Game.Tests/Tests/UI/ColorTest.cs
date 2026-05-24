@@ -1,5 +1,4 @@
 using MuseDashEditor.Game.Utils;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -10,12 +9,11 @@ namespace MuseDashEditor.Game.Tests.Tests.UI;
 
 public partial class ColorTest : MuseDashEditorTestScene
 {
-    [BackgroundDependencyLoader]
-    private void load()
+    public ColorTest()
     {
-        Children =
-        [
-            new FillFlowContainer
+        AddStep("Add color patterns", () =>
+        {
+            Child = new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -197,7 +195,7 @@ public partial class ColorTest : MuseDashEditorTestScene
                         ]
                     }
                 ]
-            }
-        ];
+            };
+        });
     }
 }

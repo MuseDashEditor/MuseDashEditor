@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Type;
+using osu.Framework.Logging;
 
 namespace MuseDashEditor.Game.Data.Parser;
 
@@ -19,7 +20,11 @@ public static class ChartParser
         var bmsFiles = directory.GetFiles("*.bms");
         foreach (var file in bmsFiles)
         {
-            if (!int.TryParse(file.Name.AsSpan(4, 2), out var mapNumber)) continue;
+            if (!int.TryParse(file.Name.AsSpan(3, 1), out var mapNumber))
+            {
+                Logger.Log($"Invalid map number in file name: {file.Name}", level: LogLevel.Important);
+                continue;
+            }
 
             if (!Enum.IsDefined(typeof(DifficultyType), mapNumber))
             {

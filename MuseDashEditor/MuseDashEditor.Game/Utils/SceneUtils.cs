@@ -15,6 +15,8 @@ public static class SceneUtils
 
     public static SceneType GetSceneType(string sceneName)
     {
+        sceneName = sceneName.ToLowerInvariant();
+
         const string prefix = "scene_";
         if (!sceneName.StartsWith(prefix) || !int.TryParse(sceneName[prefix.Length..], out var sceneId))
             return SceneType.Unknown;

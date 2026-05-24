@@ -12,6 +12,11 @@
         <PackageReference Include="NUnit3TestAdapter" Version="4.4.2"/>
     </ItemGroup>
     <ItemGroup>
+      <Folder Include="Data\" />
       <Folder Include="Tests\Screens\" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Remove="Resources\WACCA_ULTRA_DREAM_MEGAMIX.mdm" />
+      <EmbeddedResource Include="Resources\WACCA_ULTRA_DREAM_MEGAMIX.mdm" />
     </ItemGroup>
 </Project>

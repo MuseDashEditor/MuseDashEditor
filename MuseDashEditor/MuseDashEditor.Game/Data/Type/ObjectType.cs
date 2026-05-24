@@ -5,6 +5,10 @@ public enum ObjectType
     //@formatter:off
     Empty = 0,                        // Used only for parsing and saving
 
+    // MapObjects
+    Music = 36,                       // 10
+
+    // HitObjects
     Small = 1,                        // 01
     SmallUp = 2,                      // 02
     SmallDown = 3,                    // 03
@@ -24,6 +28,54 @@ public enum ObjectType
     Gear = 17,                        // 0H
     RaiderUpsideDown = 18,            // 0I
     HammerUpsideDown = 19,            // 0J
+    PItem = 72,                       // 20 // IDK what this is
+    Ghost = 73,                       // 21
+    MediumBullet = 108,               // 30
+    MediumBulletUp = 109,             // 31
+    MediumBulletDown = 110,           // 32
+    MediumBulletLaneshift = 111,      // 33
+    SmallBullet = 112,                // 34
+    SmallBulletUp = 113,              // 35
+    SmallBulletDown = 114,            // 36
+    SmallBulletLaneshift = 115,       // 37
+    LargeBullet = 116,                // 38
+    LargeBulletUp = 117,              // 39
+    LargeBulletDown = 118,            // 3A
+    LargeBulletLaneshift = 119,       // 3B
+
+    // Collectibles
+    Heart = 74,                       // 22
+    Note = 75,                        // 23
+
+    // BossHitObjects
+    BossMelee1 = 37,                  // 11
+    BossMelee2 = 38,                  // 12
+    BossProjectile1 = 39,             // 13
+    BossProjectile2 = 40,             // 14
+    BossProjectile3 = 41,             // 15
+    BossMasher1 = 42,                 // 16
+    BossMasher2 = 43,                 // 17
+    BossGear = 44,                    // 18
+    BossBullet1 = 120,                // 3C
+    BossBullet1Laneshift = 121,       // 3D
+    BossBullet2 = 122,                // 3E
+    BossBullet2Laneshift = 123,       // 3F
+
+    // BossSpecialObjects
+    BossEntrance = 46,                // 1A
+    BossExit = 47,                    // 1B
+    BossReadyPhase1 = 48,             // 1C
+    BossEndPhase1 = 49,               // 1D
+    BossReadyPhase2 = 50,             // 1E
+    BossEndPhase2 = 51,               // 1F
+    BossSwapPhase1To2 = 52,           // 1G
+    BossSwapPhase2To1 = 53,           // 1H
+    HideBoss = 57,                    // 1L
+    UnhideBoss = 58,                  // 1M
+
+    // SpecialObjects
+
+    // SpeedChangeObjects
     Speed1Both = 24,                  // 0O
     Speed2Both = 25,                  // 0P
     Speed3Both = 26,                  // 0Q
@@ -33,27 +85,8 @@ public enum ObjectType
     Speed1High = 30,                  // 0U
     Speed2High = 31,                  // 0V
     Speed3High = 32,                  // 0W
-    Music = 36,                       // 10
-    BossMelee1 = 37,                  // 11
-    BossMelee2 = 38,                  // 12
-    BossProjectile1 = 39,             // 13
-    BossProjectile2 = 40,             // 14
-    BossProjectile3 = 41,             // 15
-    BossMasher1 = 42,                 // 16
-    BossMasher2 = 43,                 // 17
-    BossGear = 44,                    // 18
-    BossEntrance = 46,                // 1A
-    BossExit = 47,                    // 1B
-    BossReadyPhase1 = 48,             // 1C
-    BossEndPhase1 = 49,               // 1D
-    BossReadyPhase2 = 50,             // 1E
-    BossEndPhase2 = 51,               // 1F
-    BossSwapPhase1To2 = 52,           // 1G
-    BossSwapPhase2To1 = 53,           // 1H
-    HideNotes = 55,                   // 1J
-    UnhideNotes = 56,                 // 1K
-    HideBoss = 57,                    // 1L
-    UnhideBoss = 58,                  // 1M
+
+    // SceneSwitchObjects
     SceneSwitchSpaceStation = 60,     // 1O
     SceneSwitchRetrocity = 61,        // 1P
     SceneSwitchCastle = 62,           // 1Q
@@ -64,10 +97,10 @@ public enum ObjectType
     SceneSwitchTouhou = 67,           // 1V
     SceneSwitchDjmax = 68,            // 1W
     SceneSwitchMiku = 69,             // 1X
-    PItem = 72,                       // 20
-    Ghost = 73,                       // 21
-    Heart = 74,                       // 22
-    Note = 75,                        // 23
+
+    // DesignObjects
+    HideNotes = 55,                   // 1J
+    UnhideNotes = 56,                 // 1K
     HideBackground = 77,              // 25
     UnhideBackground = 78,            // 26
     ScreenScrollUp = 79,              // 27
@@ -95,24 +128,6 @@ public enum ObjectType
     FocusLinesOff = 103,              // 2V
     FilmGrainOn = 104,                // 2W
     FilmGrainOff = 105,               // 2X
-    AutoplayOn = 106,                 // 2Y
-    AutoplayOff = 107,                // 2Z
-    MediumBullet = 108,               // 30
-    MediumBulletUp = 109,             // 31
-    MediumBulletDown = 110,           // 32
-    MediumBulletLaneshift = 111,      // 33
-    SmallBullet = 112,                // 34
-    SmallBulletUp = 113,              // 35
-    SmallBulletDown = 114,            // 36
-    SmallBulletLaneshift = 115,       // 37
-    LargeBullet = 116,                // 38
-    LargeBulletUp = 117,              // 39
-    LargeBulletDown = 118,            // 3A
-    LargeBulletLaneshift = 119,       // 3B
-    BossBullet1 = 120,                // 3C
-    BossBullet1Laneshift = 121,       // 3D
-    BossBullet2 = 122,                // 3E
-    BossBullet2Laneshift = 123,       // 3F
     FlashbangColorWhite = 454,        // CM
     FlashbangColorBlack = 455,        // CN
     FlashbangColorRed = 456,          // CO
@@ -121,5 +136,9 @@ public enum ObjectType
     FlashbangColorCyan = 459,         // CR
     FlashbangColorMagenta = 460,      // CS
     FlashbangColorYellow = 461,       // CT
+
+    // Other
+    AutoplayOn = 106,                 // 2Y
+    AutoplayOff = 107,                // 2Z
     //@formatter:on
 }

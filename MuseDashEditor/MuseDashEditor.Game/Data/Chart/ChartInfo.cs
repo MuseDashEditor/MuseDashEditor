@@ -31,15 +31,15 @@ public record ChartInfoRaw(
 public class ChartInfo(ChartInfoRaw raw)
 {
     // Global chart info
-    public Bindable<string> NameBindable { get; } = new(raw.name);
-    public Bindable<string> NameRomanizedBindable { get; } = new(raw.name_romanized);
-    public Bindable<string> AuthorBindable { get; } = new(raw.author);
-    public Bindable<string> BpmBindable { get; } = new(raw.bpm);
+    public readonly Bindable<string> NameBindable = new(raw.name);
+    public readonly Bindable<string> NameRomanizedBindable = new(raw.name_romanized);
+    public readonly Bindable<string> AuthorBindable = new(raw.author);
+    public readonly Bindable<string> BpmBindable = new(raw.bpm);
 
     // Current difficulty info
-    public Bindable<string> LevelDesignerBindable { get; } = new(raw.levelDesigner);
-    public Bindable<string> LevelDifficultyBindable { get; } = new();
-    public Bindable<SceneType> DefaultSceneBindable { get; } = new(SceneUtils.GetSceneType(raw.scene));
+    public readonly Bindable<string> LevelDesignerBindable = new(raw.levelDesigner);
+    public readonly Bindable<string> LevelDifficultyBindable = new();
+    public readonly Bindable<SceneType> DefaultSceneBindable = new(SceneUtils.GetSceneType(raw.scene));
 
     // TODO
     // public string HideBmsMode { get; set; } = hideBmsMode; // TODO: enum

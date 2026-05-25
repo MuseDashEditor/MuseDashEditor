@@ -4,28 +4,23 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using MuseDashEditor.Game.Data.Scene;
+using System;
+using MuseDashEditor.Game.Data.Type;
 
-namespace MuseDashEditor.Game.Data.Type;
+namespace MuseDashEditor.Game.Data.Object;
 
-public enum SceneType
+[AttributeUsage(AttributeTargets.Field)]
+public class ObjectData(
+    LaneType[] validLanes,
+    SceneType[] validScenes
+) : Attribute
 {
-    Unknown = 0,
-
-    [SceneData("01_space_station")] SpaceStation = 1,
-
-    [SceneData("02_retrocity")] Retrocity = 2,
-
-    [SceneData("03_castle")] Castle = 3,
-
-    [SceneData("05_candyland")] Candyland = 5,
-
-    [SceneData("08_touhou")] Touhou = 8,
-    // TODO: add all scenes
+    public LaneType[] ValidLaneTypes => validLanes;
+    public SceneType[] ValidSceneTypes => validScenes;
 }

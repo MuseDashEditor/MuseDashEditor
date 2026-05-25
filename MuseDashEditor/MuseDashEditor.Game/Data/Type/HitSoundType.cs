@@ -14,4 +14,15 @@ namespace MuseDashEditor.Game.Data.Type;
 
 public enum HitSoundType
 {
+    Small,
+    Large1,
+    Large2,
+    Raider,
+    Hammer,
+    Ghost,
+    Note,
+    Heart,
+    Hold,
+    Gear,
+    Masher
 }

@@ -1,3 +1,15 @@
+// Copyright 2026 Axel "Azn9" Joly <contact@azn9.dev>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
 using System;
 using MuseDashEditor.Game.Editor.Clock;
 using osu.Framework.Allocation;
@@ -29,7 +41,7 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
         base.Content.Add(zoomedContent = new Container
         {
             RelativeSizeAxes = Axes.Y,
-            Alpha = 0,
+            Alpha = 0
         });
 
         AddLayout(zoomedContentWidthCache);
@@ -50,16 +62,13 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
     {
         if (!e.ControlPressed) return base.OnScroll(e);
 
-        if (editorClock?.IsRunning == true)
-        {
-            editorClock.Stop();
-        }
+        if (editorClock?.IsRunning == true) editorClock.Stop();
 
         var newZoom = Math.Clamp(currentZoom + e.ScrollDelta.Y * (maxZoom - minZoom) * zoom_speed, minZoom, maxZoom);
         var focusPoint = zoomedContent.ToLocalSpace(ToScreenSpace(new Vector2(DrawWidth / 2, 0))).X;
-        float focusOffset = focusPoint - (float)Current;
-        float expectedWidth = DrawWidth * newZoom;
-        float targetOffset = expectedWidth * (focusPoint / zoomedContent.DrawWidth) - focusOffset;
+        var focusOffset = focusPoint - (float)Current;
+        var expectedWidth = DrawWidth * newZoom;
+        var targetOffset = expectedWidth * (focusPoint / zoomedContent.DrawWidth) - focusOffset;
 
         currentZoom = newZoom;
         updateZoomedContentWidth();

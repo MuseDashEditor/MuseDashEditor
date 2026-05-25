@@ -1,3 +1,15 @@
+// Copyright 2026 Axel "Azn9" Joly <contact@azn9.dev>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
 using System;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Parser;
@@ -23,13 +35,13 @@ public partial class FolderSelectorScreen : Screen
             RelativeSizeAxes = Axes.X,
             Size = new Vector2(1, 1030),
             Origin = Anchor.TopLeft,
-            Anchor = Anchor.TopLeft,
+            Anchor = Anchor.TopLeft
         };
 
         InternalChildren =
         [
             fileSelector,
-            new BasicButton()
+            new BasicButton
             {
                 Text = "Open chart",
                 Size = new Vector2(200, 50),

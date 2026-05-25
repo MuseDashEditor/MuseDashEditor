@@ -1,3 +1,15 @@
+// Copyright 2026 Axel "Azn9" Joly <contact@azn9.dev>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
 using System;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Screens.Editor.SubScreens;
@@ -47,12 +59,13 @@ public partial class SubscreenSwitcher : TabControl<EditorSubscreenType>
             AutoSizeAxes = Axes.X,
             RelativeSizeAxes = Axes.Y,
 
-            Children = [
+            Children =
+            [
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = new Vector2(1, 1),
-                    Colour = MdeColors.Background4,
+                    Colour = MdeColors.Background4
                 },
                 new SpriteText
                 {
@@ -61,7 +74,7 @@ public partial class SubscreenSwitcher : TabControl<EditorSubscreenType>
                     Text = value.ToString(),
                     Font = FontUsage.Default.With(size: 20),
                     Colour = Colour4.White,
-                    Margin = new MarginPadding(10),
+                    Margin = new MarginPadding(10)
                 }
             ]
         };

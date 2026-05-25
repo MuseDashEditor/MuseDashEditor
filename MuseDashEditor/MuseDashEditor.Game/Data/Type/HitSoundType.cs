@@ -10,20 +10,8 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using MuseDashEditor.Game.Data.Scene;
-
 namespace MuseDashEditor.Game.Data.Type;
 
-public enum SceneType
+public enum HitSoundType
 {
-    Unknown = 0,
-
-    [SceneData("01_space_station")] SpaceStation = 1,
-
-    [SceneData("02_retrocity")] Retrocity = 2,
-
-    [SceneData("03_castle")] Castle = 3,
-
-    [SceneData("05_candyland")] Candyland = 5
-    // TODO: add all scenes
 }

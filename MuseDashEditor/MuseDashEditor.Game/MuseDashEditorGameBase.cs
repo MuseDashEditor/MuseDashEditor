@@ -1,3 +1,15 @@
+// Copyright 2026 Axel "Azn9" Joly <contact@azn9.dev>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
 using System.Drawing;
 using System.Linq;
 using MuseDashEditor.Resources;
@@ -46,14 +58,13 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
         config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode).Value = ExecutionMode.MultiThreaded;
         config.GetBindable<bool>(FrameworkSetting.ShowUnicode).Value = true;
 
-        ITabletHandler tablet = Host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
+        var tablet = Host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
 
-        if (tablet != null)
-        {
-            tablet.Enabled.Value = false;
-        }
+        if (tablet != null) tablet.Enabled.Value = false;
     }
 
     protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+    {
+        return dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+    }
 }

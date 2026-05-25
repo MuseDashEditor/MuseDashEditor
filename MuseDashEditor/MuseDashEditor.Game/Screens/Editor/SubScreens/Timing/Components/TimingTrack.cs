@@ -1,3 +1,15 @@
+// Copyright 2026 Axel "Azn9" Joly <contact@azn9.dev>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Screens.Editor.Components;
 using osu.Framework.Allocation;
@@ -30,7 +42,7 @@ public partial class TimingTrack : Container
                 Anchor = Anchor.Centre,
                 Size = new Vector2(1, 250),
                 Colour = Color4.White,
-                Depth = 10,
+                Depth = 10
             },
             zoomableScrollContainer = new ZoomableScrollContainer
             {
@@ -39,7 +51,7 @@ public partial class TimingTrack : Container
                 RelativeSizeAxes = Axes.X,
                 Width = 0.8f,
                 Height = 250,
-                Depth = 20,
+                Depth = 20
             }
         ];
 

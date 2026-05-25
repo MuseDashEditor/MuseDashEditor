@@ -1,3 +1,15 @@
+// Copyright 2026 Axel "Azn9" Joly <contact@azn9.dev>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
 using osu.Framework.Graphics;
 
 namespace MuseDashEditor.Game.Utils;
@@ -36,6 +48,8 @@ public static class MdeColors
     public static Colour4 Background5 => getColour(0.1f, 0.15f);
     public static Colour4 Background6 => getColour(0.1f, 0.1f);
 
-    private static Colour4 getColour(float saturation, float lightness) =>
-        Colour4.FromHSL(base_hue / 360f, saturation, lightness);
+    private static Colour4 getColour(float saturation, float lightness)
+    {
+        return Colour4.FromHSL(base_hue / 360f, saturation, lightness);
+    }
 }

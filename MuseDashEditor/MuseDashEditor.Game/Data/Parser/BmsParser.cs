@@ -1,3 +1,15 @@
+// Copyright 2026 Axel "Azn9" Joly <contact@azn9.dev>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,41 +55,34 @@ public static class BmsParser
 
         // 1. Parse bpm changes
         foreach (var (trackId, trackDataDictionary) in map.RawMapData)
+        foreach (var ((laneModifier, laneType), data) in trackDataDictionary)
         {
-            foreach (var ((laneModifier, laneType), data) in trackDataDictionary)
+            if (laneModifier != LaneModifierType.Music) continue;
+            if ((int)laneType != 8) continue;
+
+            var dataCount = data.Length;
+
+            for (var i = 0; i < dataCount; i++)
             {
-                if (laneModifier != LaneModifierType.Music) continue;
-                if ((int)laneType != 8) continue;
+                var objectData = data[i];
+                if (objectData == 0) continue;
 
-                var dataCount = data.Length;
+                var globalIndex = trackId * maxDataLength + i / dataCount * maxDataLength;
 
-                for (var i = 0; i < dataCount; i++)
+                if (globalIndex == 0)
                 {
-                    var objectData = data[i];
-                    if (objectData == 0) continue;
-
-                    var globalIndex = trackId * maxDataLength + i / dataCount * maxDataLength;
-
-                    if (globalIndex == 0)
-                    {
-                        Logger.Log("Found bpm change at index 0!", level: LogLevel.Error);
-                        continue;
-                    }
-
-                    if (!map.Metadata.BpmChangeKeys.TryGetValue(objectData, out var bpmChangeValue)) continue;
-
-                    if (!bpmChangesInTrack.TryAdd(globalIndex, bpmChangeValue))
-                    {
-                        Logger.Log($"Duplicate bpm change at index {globalIndex}", level: LogLevel.Important);
-                    }
+                    Logger.Log("Found bpm change at index 0!", level: LogLevel.Error);
+                    continue;
                 }
+
+                if (!map.Metadata.BpmChangeKeys.TryGetValue(objectData, out var bpmChangeValue)) continue;
+
+                if (!bpmChangesInTrack.TryAdd(globalIndex, bpmChangeValue))
+                    Logger.Log($"Duplicate bpm change at index {globalIndex}", level: LogLevel.Important);
             }
         }
 
-        if (!bpmChangesInTrack.ContainsKey(0))
-        {
-            bpmChangesInTrack[0] = map.Metadata.InitialBpm.Value;
-        }
+        if (!bpmChangesInTrack.ContainsKey(0)) bpmChangesInTrack[0] = map.Metadata.InitialBpm.Value;
 
         var knownOffsets = new SortedDictionary<int, double> { { 0, 0 } };
 
@@ -93,7 +98,7 @@ public static class BmsParser
             var bpmAtLastKnownOffset = bpmChangesInTrack[lastKnownOffsetIndex];
 
             var elapsedGlobalIndexes = index - lastKnownOffsetIndex;
-            var elapsedDuration = (240_000 / bpmAtLastKnownOffset) / maxDataLength * elapsedGlobalIndexes;
+            var elapsedDuration = 240_000 / bpmAtLastKnownOffset / maxDataLength * elapsedGlobalIndexes;
             var newOffset = lastKnownOffsetValue + elapsedDuration;
 
             Logger.Log($"Adding offset for index {index} with value {newOffset}");
@@ -111,47 +116,44 @@ public static class BmsParser
 
         // 3. Parse everything else now that we can get the timing of any object
         foreach (var (trackId, trackDataDictionary) in map.RawMapData)
+        foreach (var ((laneModifier, laneType), data) in trackDataDictionary)
         {
-            foreach (var ((laneModifier, laneType), data) in trackDataDictionary)
+            if (laneModifier == LaneModifierType.Music) continue;
+
+            var dataCount = data.Length;
+
+            for (var i = 0; i < dataCount; i++)
             {
-                if (laneModifier == LaneModifierType.Music) continue;
+                var objectData = data[i];
+                if (objectData == 0) continue;
 
-                var dataCount = data.Length;
+                var globalIndex = Math.Round(trackId * maxDataLength + i / (double)dataCount * maxDataLength);
 
-                for (var i = 0; i < dataCount; i++)
-                {
-                    var objectData = data[i];
-                    if (objectData == 0) continue;
+                // Find last known offset before current index
+                var lastKnownOffsetIndex = 0;
+                foreach (var index in knownOffsets.Keys)
+                    if (index <= globalIndex)
+                        lastKnownOffsetIndex = index;
+                    else
+                        break;
 
-                    var globalIndex = Math.Round(trackId * maxDataLength + i / (double)dataCount * maxDataLength);
+                var offsetAtIndex = knownOffsets[lastKnownOffsetIndex];
+                var bpmAtIndex = bpmChangesInTrack[lastKnownOffsetIndex];
+                var elapsedDuration = 240_000 / bpmAtIndex / maxDataLength * (globalIndex - lastKnownOffsetIndex);
+                var objectOffset = Math.Round(offsetAtIndex + elapsedDuration);
 
-                    // Find last known offset before current index
-                    int lastKnownOffsetIndex = 0;
-                    foreach (var index in knownOffsets.Keys)
-                    {
-                        if (index <= globalIndex)
-                            lastKnownOffsetIndex = index;
-                        else
-                            break;
-                    }
+                var objectType = (ObjectType)objectData;
 
-                    var offsetAtIndex = knownOffsets[lastKnownOffsetIndex];
-                    var bpmAtIndex = bpmChangesInTrack[lastKnownOffsetIndex];
-                    var elapsedDuration = (240_000 / bpmAtIndex) / maxDataLength * (globalIndex - lastKnownOffsetIndex);
-                    var objectOffset = Math.Round(offsetAtIndex + elapsedDuration);
+                var gameObject = new GameObject(
+                    objectOffset,
+                    objectType,
+                    laneType,
+                    laneModifier
+                );
+                map.GameObjects.Add(gameObject);
 
-                    var objectType = (ObjectType)objectData;
-
-                    var gameObject = new GameObject(
-                        objectOffset,
-                        objectType,
-                        laneType,
-                        laneModifier
-                    );
-                    map.GameObjects.Add(gameObject);
-
-                    Logger.Log($"Adding object at offset {objectOffset} ({globalIndex} / {trackId}#{i}) with type {objectType} in lane {laneType} ({laneModifier})");
-                }
+                Logger.Log(
+                    $"Adding object at offset {objectOffset} ({globalIndex} / {trackId}#{i}) with type {objectType} in lane {laneType} ({laneModifier})");
             }
         }
 
@@ -165,10 +167,7 @@ public static class BmsParser
 
         Logger.Log($"Parsing {lines.Length} lines...");
 
-        foreach (var line in lines)
-        {
-            parseLineContent(line, map);
-        }
+        foreach (var line in lines) parseLineContent(line, map);
     }
 
     private static void parseLineContent(string line, Map map)
@@ -228,10 +227,7 @@ public static class BmsParser
         var dataCount = data.Length / 2;
         var dataArray = new int[dataCount];
 
-        for (var i = 0; i < dataCount; i++)
-        {
-            dataArray[i] = parseBase36(data.AsSpan(i * 2, 2));
-        }
+        for (var i = 0; i < dataCount; i++) dataArray[i] = parseBase36(data.AsSpan(i * 2, 2));
 
         map.RawMapData.ComputeIfAbsent(trackNumber, _ => new Dictionary<(LaneModifierType, LaneType), int[]>())
             .Add((laneModifier, laneType), dataArray);

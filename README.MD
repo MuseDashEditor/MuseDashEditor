@@ -19,6 +19,10 @@ Contributions are welcome, but with a few restrictions:
 4. I know that I don't really do it myself, but please try to write tests when adding things
 5. Keep your changes simple, if you change many parts of the code, split them into multiple PRs
 
+> [!IMPORTANT]  
+> Due to copyright reasons, the assets used in the editor are not included in this repository, and belong to their respective owners.
+> If you want to build the editor yourself, please contact a maintainer to get access to the private repository.
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0.

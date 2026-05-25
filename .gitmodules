@@ -1,0 +1,3 @@
+[submodule "MuseDashEditor/MuseDashEditor.Resources/MuseDashResources"]
+	path = MuseDashEditor/MuseDashEditor.Resources/MuseDashResources
+	url = git@github.com:MuseDashEditor/MuseDashResources.git

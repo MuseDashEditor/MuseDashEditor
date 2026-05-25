@@ -34,7 +34,7 @@ public partial class EditorBackground : Sprite
         var sceneData = SceneUtils.GetSceneData(newScene);
 
         if (sceneData is null)
-            Texture = Textures.Get("HomeScreen/background");
+            Texture = Textures.Get("default_background");
         else
         {
             var textureName = $"Scenes/{sceneData.ResourcePath}/background";

@@ -10,6 +10,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Editor.Clock;
 using MuseDashEditor.Game.Utils;
@@ -74,11 +75,31 @@ public partial class PlayBar : CompositeDrawable
                 Origin = Anchor.Centre,
                 Size = new Vector2(1320, 20),
 
+                BackgroundColour = MdeColors.Dark4,
+                SelectionColour = MdeColors.Dark2,
+                FocusColour = MdeColors.Dark1,
+
                 Current = new BindableNumber<float> { MinValue = 0, MaxValue = 1, Precision = .01f }
             }
 
             // Play button
             // TODO
         ];
+
+        clock.OnTimeChanged += time =>
+        {
+            double minutes = Math.Floor(time / 60000);
+            double seconds = Math.Floor(time / 1000) % 60;
+            double miliseconds = Math.Floor(time % 1000);
+
+            var timerString = $"{minutes:00}:{seconds:00}.{miliseconds:000}";
+            timerText.Text = timerString;
+
+            percentText.Text = $"{(time / clock.TrackLength) * 100:0.00} %";
+            var sliderValue = (float)(time / clock.TrackLength);
+            if (sliderValue < 0) sliderValue = 0;
+            if (sliderValue > 1) sliderValue = 1;
+            slider.Current.Value = sliderValue;
+        };
     }
 }

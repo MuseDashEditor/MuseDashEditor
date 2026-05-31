@@ -18,6 +18,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osuTK;
+using osuTK.Input;
 
 namespace MuseDashEditor.Game.Screens.Editor.Components;
 
@@ -27,14 +28,19 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
 
     [Resolved] private EditorClock editorClock { get; set; } = null!;
 
+    public Action OnDrawWidthChanged = () => {};
+
     private readonly Container zoomedContent;
     protected override Container<Drawable> Content => zoomedContent;
 
     private readonly LayoutValue zoomedContentWidthCache = new(Invalidation.DrawSize);
 
+    private float? xCenter;
     private float currentZoom = 1;
     private float minZoom;
     private float maxZoom;
+    private bool handlingDragInput;
+    private bool trackWasPlaying;
 
     public ZoomableScrollContainer(Direction direction = Direction.Horizontal) : base(direction)
     {
@@ -65,7 +71,7 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
         if (editorClock?.IsRunning == true) editorClock.Stop();
 
         var newZoom = Math.Clamp(currentZoom + e.ScrollDelta.Y * (maxZoom - minZoom) * zoom_speed, minZoom, maxZoom);
-        var focusPoint = zoomedContent.ToLocalSpace(ToScreenSpace(new Vector2(DrawWidth / 2, 0))).X;
+        var focusPoint = xCenter ?? zoomedContent.ToLocalSpace(ToScreenSpace(new Vector2(DrawWidth / 2, 0))).X;
         var focusOffset = focusPoint - (float)Current;
         var expectedWidth = DrawWidth * newZoom;
         var targetOffset = expectedWidth * (focusPoint / zoomedContent.DrawWidth) - focusOffset;
@@ -74,8 +80,8 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
         updateZoomedContentWidth();
 
         Invalidate(Invalidation.DrawSize);
-        ScrollTo(targetOffset, false);
 
+        Schedule(scrollToTrackTime); // Re-scroll to track time after zooming
         return true;
     }
 
@@ -84,6 +90,21 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
         base.Update();
 
         Content.Margin = new MarginPadding { Horizontal = DrawWidth / 2 };
+
+        if (editorClock is { IsRunning: true })
+            scrollToTrackTime();
+    }
+
+    private void scrollToTrackTime()
+    {
+        if (editorClock.TrackLength == 0)
+            return;
+
+        float position = PositionAtTime(editorClock.CurrentTime);
+        ScrollTo(position, false);
+
+        xCenter = position;
+        // OnTimeChange(editorClock.CurrentTime);
     }
 
     protected override void UpdateAfterChildren()
@@ -98,6 +119,56 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
     {
         zoomedContent.Width = DrawWidth * currentZoom;
         zoomedContentWidthCache.Validate();
+
+        OnDrawWidthChanged();
+    }
+
+    protected override bool OnMouseDown(MouseDownEvent e)
+    {
+        beginUserDrag();
+        return e.Button == MouseButton.Left;
+    }
+
+    protected override void OnMouseUp(MouseUpEvent e)
+    {
+        endUserDrag();
+        base.OnMouseUp(e);
+    }
+
+    private void beginUserDrag()
+    {
+        if (handlingDragInput) return;
+
+        handlingDragInput = true;
+        trackWasPlaying = editorClock.IsRunning;
+        editorClock.Stop();
+    }
+
+    private void endUserDrag()
+    {
+        if (!handlingDragInput) return;
+
+        handlingDragInput = false;
+
+        var time = TimeAtPosition(Current);
+        editorClock.Seek(Math.Min(editorClock.TrackLength, time));
+
+        var position = PositionAtTime(editorClock.CurrentTime);
+        ScrollTo(position, false);
+        xCenter = position;
+
+        if (trackWasPlaying)
+            editorClock.Start();
+    }
+
+    public double TimeAtPosition(double x)
+    {
+        return x / Content.DrawWidth * editorClock.TrackLength;
+    }
+
+    public float PositionAtTime(double time)
+    {
+        return (float)(time / editorClock.TrackLength * Content.DrawWidth);
     }
 }
 

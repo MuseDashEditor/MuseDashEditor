@@ -10,19 +10,28 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System;
 using MuseDashEditor.Game.Data.Holder;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Timing;
 
 namespace MuseDashEditor.Game.Editor.Clock;
 
 public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
 {
+    public double CurrentTime => interpolatingClock.CurrentTime;
+    public bool IsRunning => interpolatingClock.IsRunning;
+    public double ElapsedFrameTime => interpolatingClock.ElapsedFrameTime;
+    public double FramesPerSecond => interpolatingClock.FramesPerSecond;
+    public double TrackLength { get; private set; }
+
+    public Action<double> OnTimeChanged;
+
     private readonly DecouplingFramedClock decouplingClock;
     private readonly IFrameBasedClock interpolatingClock;
-    private double currentTrackLength;
 
     public EditorClock()
     {
@@ -49,11 +58,10 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
     public void Stop()
     {
         decouplingClock.Stop();
-
-        if (CurrentTime > currentTrackLength)
-            Seek(currentTrackLength);
-
         interpolatingClock.ProcessFrame();
+
+        if (CurrentTime > TrackLength)
+            Seek(TrackLength);
     }
 
     public void Reset()
@@ -66,13 +74,16 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
     {
         if (position < 0)
             return false;
-        if (position > currentTrackLength)
+        if (position > TrackLength)
             return false;
 
         if (IsRunning) Stop(); // Maybe add an option to keep running?
 
         var result = decouplingClock.Seek(position);
         interpolatingClock.ProcessFrame();
+
+        OnTimeChanged?.Invoke(CurrentTime);
+
         return result;
     }
 
@@ -94,6 +105,9 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
         base.Update();
 
         interpolatingClock.ProcessFrame();
+
+        if (IsRunning)
+            OnTimeChanged?.Invoke(CurrentTime);
     }
 
     public IClock Source => decouplingClock.Source;
@@ -101,20 +115,13 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
     public void ChangeSource(IClock source)
     {
         if (source is Track track)
-            currentTrackLength = track.Length;
+            TrackLength = track.Length;
         else
-            currentTrackLength = 0;
+            TrackLength = 0;
 
         decouplingClock.ChangeSource(source);
+        interpolatingClock.ProcessFrame();
     }
-
-    public double CurrentTime => interpolatingClock.CurrentTime;
-
-    public bool IsRunning => interpolatingClock.IsRunning;
-
-    public double ElapsedFrameTime => interpolatingClock.ElapsedFrameTime;
-
-    public double FramesPerSecond => interpolatingClock.FramesPerSecond;
 
     public void ProcessFrame()
     {

@@ -10,11 +10,15 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Timing.Components;
 
-public partial class TimingPointsTableColumn(LocalisableString name, Anchor anchor = Anchor.Centre)
-    : TableColumn(name, anchor);
+public partial class TimingPointsTableColumn(
+    LocalisableString? name = null,
+    Anchor anchor = Anchor.Centre,
+    [CanBeNull] Dimension dimension = null)
+    : TableColumn(name, anchor, dimension);

@@ -12,6 +12,7 @@
 
 using System.Linq;
 using MuseDashEditor.Game.Data.Holder;
+using MuseDashEditor.Game.Editor.Clock;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -19,43 +20,70 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osuTK;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Timing.Components;
 
 public partial class TimingPointsTableContainer : TableContainer
 {
     [BackgroundDependencyLoader]
-    private void load(EditorDataHolder dataHolder)
+    private void load(EditorDataHolder dataHolder, EditorClock clock)
     {
         RowSize = new Dimension(GridSizeMode.Absolute, 30);
         RelativeSizeAxes = Axes.Both;
         Columns =
         [
+            new TimingPointsTableColumn(dimension: new Dimension(GridSizeMode.Absolute, 40)),
             new TimingPointsTableColumn("Point name", Anchor.CentreLeft),
             new TimingPointsTableColumn("Offset"),
             new TimingPointsTableColumn("Bpm"),
             new TimingPointsTableColumn("Actions")
         ];
-        Content = buildRows(dataHolder);
+        Content = buildRows(dataHolder, clock);
     }
 
-    private static Drawable[,] buildRows(EditorDataHolder dataHolder)
+    private static Drawable[,] buildRows(EditorDataHolder dataHolder, EditorClock editorClock)
     {
-        return dataHolder.CurrentMap.Value.TimingPoints.Select((timingPoint, index) => (Drawable[])[
-            new SpriteText
+        return dataHolder.CurrentMap.Value.TimingPoints.Select((timingPoint, index) =>
+        {
+            var icon = new SpriteIcon
             {
-                Text = $"Timing point #{index + 1}"
-            },
-            new SpriteText
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(0.5f, 0.5f),
+                Icon = FontAwesome.Solid.AngleRight,
+                Alpha = 0
+            };
+
+            editorClock.OnTimeChanged += (time) =>
             {
-                Text = timingPoint.Offset.ToString("0.0000")
-            },
-            new SpriteText
-            {
-                Text = timingPoint.NewBpm.ToString("0.0000")
-            },
-            new Box() // TODO
-        ]).ToArray().ToRectangular();
+                var nextPoint = index < dataHolder.CurrentMap.Value.TimingPoints.Count - 1 ? dataHolder.CurrentMap.Value.TimingPoints[index + 1] : null;
+
+                if (time >= timingPoint.Offset && time < (nextPoint?.Offset ?? editorClock.TrackLength))
+                    icon.FadeTo(1, 100);
+                else
+                    icon.FadeTo(0, 100);
+            };
+
+            return (Drawable[])
+            [
+                icon,
+                new SpriteText
+                {
+                    Text = $"Timing point #{index + 1}"
+                },
+                new SpriteText
+                {
+                    Text = timingPoint.Offset.ToString("0.0000")
+                },
+                new SpriteText
+                {
+                    Text = timingPoint.NewBpm.ToString("0.0000")
+                },
+                new Box() // TODO
+            ];
+        }).ToArray().ToRectangular();
     }
 
     protected override Drawable CreateHeader(int index, TableColumn column)

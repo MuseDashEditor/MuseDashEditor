@@ -151,6 +151,9 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
         handlingDragInput = false;
 
         var time = TimeAtPosition(Current);
+        if (time < 0) time = 0;
+        if (time > editorClock.TrackLength) time = editorClock.TrackLength;
+
         editorClock.Seek(Math.Min(editorClock.TrackLength, time));
 
         var position = PositionAtTime(editorClock.CurrentTime);

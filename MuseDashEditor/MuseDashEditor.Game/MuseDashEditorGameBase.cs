@@ -57,6 +57,7 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
         config.GetBindable<FrameSync>(FrameworkSetting.FrameSync).Value = FrameSync.Limit2x;
         config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode).Value = ExecutionMode.MultiThreaded;
         config.GetBindable<bool>(FrameworkSetting.ShowUnicode).Value = true;
+        config.GetBindable<bool>(FrameworkSetting.AudioUseExperimentalWasapi).Value = true;
 
         var tablet = Host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
 

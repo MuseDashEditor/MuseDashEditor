@@ -10,6 +10,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Screens.Editor.SubScreens.Timing.Components;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
@@ -20,6 +21,8 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Timing;
 
 public partial class TimingSubscreen : PlayableEditorSubscreen
 {
+    [Resolved] private EditorDataHolder dataHolder { get; set; } = null!;
+
     [BackgroundDependencyLoader]
     private void load()
     {
@@ -38,5 +41,23 @@ public partial class TimingSubscreen : PlayableEditorSubscreen
             new TimingTrack(),
             new TimingPointsTable()
         ];
+    }
+
+    public override void Show()
+    {
+        base.Show();
+
+        var currentTrackValue = dataHolder.CurrentTrack.Value;
+        if (currentTrackValue == null) return;
+        currentTrackValue.Volume.Value = 0.6;
+    }
+
+    public override void Hide()
+    {
+        base.Hide();
+
+        var currentTrackValue = dataHolder.CurrentTrack.Value;
+        if (currentTrackValue == null) return;
+        currentTrackValue.Volume.Value = 1;
     }
 }

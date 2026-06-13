@@ -24,4 +24,7 @@
     <EmbeddedResource Include="Tracks\**\*"/>
     <EmbeddedResource Include="MuseDashResources\**\*"/>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Samples\" />
+  </ItemGroup>
 </Project>

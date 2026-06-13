@@ -25,18 +25,22 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
     public double CurrentTime => interpolatingClock.CurrentTime;
     public bool IsRunning => interpolatingClock.IsRunning;
     public double ElapsedFrameTime => interpolatingClock.ElapsedFrameTime;
-    public double FramesPerSecond => interpolatingClock.FramesPerSecond;
+    public double FramesPerSecond => (interpolatingClock as IFrameBasedClock).FramesPerSecond;
     public double TrackLength { get; private set; }
 
     public Action<double> OnTimeChanged;
 
     private readonly DecouplingFramedClock decouplingClock;
-    private readonly IFrameBasedClock interpolatingClock;
+    private readonly InterpolatingFramedClock interpolatingClock;
 
     public EditorClock()
     {
         decouplingClock = new DecouplingFramedClock();
-        interpolatingClock = new InterpolatingFramedClock(decouplingClock);
+        interpolatingClock = new InterpolatingFramedClock(decouplingClock)
+        {
+            AllowableErrorMilliseconds = 1,
+            DriftRecoveryHalfLife = 10
+        };
     }
 
     [BackgroundDependencyLoader]
@@ -107,7 +111,7 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
         interpolatingClock.ProcessFrame();
 
         if (IsRunning)
-            OnTimeChanged?.Invoke(CurrentTime);
+            OnTimeChanged?.Invoke(CurrentTime + interpolatingClock.Drift);
     }
 
     public IClock Source => decouplingClock.Source;

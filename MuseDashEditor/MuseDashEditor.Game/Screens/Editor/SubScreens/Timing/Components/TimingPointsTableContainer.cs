@@ -56,9 +56,11 @@ public partial class TimingPointsTableContainer : TableContainer
                 Alpha = 0
             };
 
-            editorClock.OnTimeChanged += (time) =>
+            editorClock.OnTimeChanged += time =>
             {
-                var nextPoint = index < dataHolder.CurrentMap.Value.TimingPoints.Count - 1 ? dataHolder.CurrentMap.Value.TimingPoints[index + 1] : null;
+                var nextPoint = index < dataHolder.CurrentMap.Value.TimingPoints.Count - 1
+                    ? dataHolder.CurrentMap.Value.TimingPoints[index + 1]
+                    : null;
 
                 if (time >= timingPoint.Offset && time < (nextPoint?.Offset ?? editorClock.TrackLength))
                     icon.FadeTo(1, 100);
@@ -86,7 +88,7 @@ public partial class TimingPointsTableContainer : TableContainer
         }).ToArray().ToRectangular();
     }
 
-    protected override Drawable CreateHeader(int index, TableColumn column)
+    protected override Drawable CreateHeader(int index, TableColumn? column)
     {
         return new Container
         {

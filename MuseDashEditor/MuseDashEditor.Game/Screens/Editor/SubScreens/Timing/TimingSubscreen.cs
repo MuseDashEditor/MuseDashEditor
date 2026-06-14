@@ -16,6 +16,9 @@ using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
+using osuTK;
+using osuTK.Input;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Timing;
 
@@ -26,6 +29,14 @@ public partial class TimingSubscreen : PlayableEditorSubscreen
     [BackgroundDependencyLoader]
     private void load()
     {
+        var timingTrack = new TimingTrack
+        {
+            Height = 250,
+            Origin = Anchor.TopCentre,
+            Anchor = Anchor.TopCentre,
+            Position = new Vector2(0, 100)
+        };
+
         Children =
         [
             // Background
@@ -37,10 +48,11 @@ public partial class TimingSubscreen : PlayableEditorSubscreen
                 Colour = MdeColors.Background6,
                 Depth = float.MaxValue
             },
-
-            new TimingTrack(),
+            timingTrack,
             new TimingPointsTable()
         ];
+
+        ScrollContainer = timingTrack.ZoomableScrollContainer;
     }
 
     public override void Show()
@@ -49,7 +61,7 @@ public partial class TimingSubscreen : PlayableEditorSubscreen
 
         var currentTrackValue = dataHolder.CurrentTrack.Value;
         if (currentTrackValue == null) return;
-        currentTrackValue.Volume.Value = 0.6;
+        currentTrackValue.Volume.Value = 0.5f;
     }
 
     public override void Hide()
@@ -59,5 +71,27 @@ public partial class TimingSubscreen : PlayableEditorSubscreen
         var currentTrackValue = dataHolder.CurrentTrack.Value;
         if (currentTrackValue == null) return;
         currentTrackValue.Volume.Value = 1;
+    }
+
+    protected override bool OnKeyDown(KeyDownEvent e)
+    {
+        if (!e.ControlPressed)
+            return base.OnKeyDown(e);
+
+        var amount = e.AltPressed ? 1 : 10;
+        var currentTime = EditorClock.CurrentTime;
+
+        switch (e.Key)
+        {
+            case Key.Left:
+                ScrollContainer?.ScrollToTime(currentTime - amount);
+                break;
+            case Key.Right:
+                ScrollContainer?.ScrollToTime(currentTime + amount);
+                break;
+            default: return base.OnKeyDown(e);
+        }
+
+        return true;
     }
 }

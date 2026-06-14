@@ -17,7 +17,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
-using osuTK;
 using osuTK.Input;
 
 namespace MuseDashEditor.Game.Screens.Editor.Components;
@@ -28,22 +27,28 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
 
     [Resolved] private EditorClock editorClock { get; set; } = null!;
 
-    public Action OnDrawWidthChanged = () => {};
-
-    private readonly Container zoomedContent;
     protected override Container<Drawable> Content => zoomedContent;
+
+    public Action OnDrawWidthChanged = () => { };
+
+    private readonly float? xCenter;
+    private readonly Container zoomedContent;
 
     private readonly LayoutValue zoomedContentWidthCache = new(Invalidation.DrawSize);
 
-    private float? xCenter;
     private float currentZoom = 1;
     private float minZoom;
     private float maxZoom;
     private bool handlingDragInput;
     private bool trackWasPlaying;
 
-    public ZoomableScrollContainer(Direction direction = Direction.Horizontal) : base(direction)
+    public ZoomableScrollContainer(
+        Direction direction = Direction.Horizontal,
+        float? xCenter = null
+    ) : base(direction)
     {
+        this.xCenter = xCenter;
+
         base.Content.Add(zoomedContent = new Container
         {
             RelativeSizeAxes = Axes.Y,
@@ -68,13 +73,13 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
     {
         if (!e.ControlPressed) return base.OnScroll(e);
 
-        if (editorClock?.IsRunning == true) editorClock.Stop();
+        if (editorClock.IsRunning) editorClock.Stop();
 
         var newZoom = Math.Clamp(currentZoom + e.ScrollDelta.Y * (maxZoom - minZoom) * zoom_speed, minZoom, maxZoom);
-        var focusPoint = xCenter ?? zoomedContent.ToLocalSpace(ToScreenSpace(new Vector2(DrawWidth / 2, 0))).X;
-        var focusOffset = focusPoint - (float)Current;
-        var expectedWidth = DrawWidth * newZoom;
-        var targetOffset = expectedWidth * (focusPoint / zoomedContent.DrawWidth) - focusOffset;
+        // var focusPoint = xCenter ?? zoomedContent.ToLocalSpace(ToScreenSpace(new Vector2(DrawWidth / 2, 0))).X;
+        // var focusOffset = focusPoint - (float)Current;
+        // var expectedWidth = DrawWidth * newZoom;
+        // var targetOffset = expectedWidth * (focusPoint / zoomedContent.DrawWidth) - focusOffset;
 
         currentZoom = newZoom;
         updateZoomedContentWidth();
@@ -102,9 +107,6 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
 
         float position = PositionAtTime(editorClock.CurrentTime);
         ScrollTo(position, false);
-
-        xCenter = position;
-        // OnTimeChange(editorClock.CurrentTime);
     }
 
     protected override void UpdateAfterChildren()
@@ -118,6 +120,7 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
     private void updateZoomedContentWidth()
     {
         zoomedContent.Width = DrawWidth * currentZoom;
+        zoomedContent.X = xCenter ?? 0;
         zoomedContentWidthCache.Validate();
 
         OnDrawWidthChanged();
@@ -135,6 +138,11 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
         base.OnMouseUp(e);
     }
 
+    protected override bool OnKeyDown(KeyDownEvent e)
+    {
+        return false;
+    }
+
     private void beginUserDrag()
     {
         if (handlingDragInput) return;
@@ -150,18 +158,21 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
 
         handlingDragInput = false;
 
-        var time = TimeAtPosition(Current);
-        if (time < 0) time = 0;
-        if (time > editorClock.TrackLength) time = editorClock.TrackLength;
-
-        editorClock.Seek(Math.Min(editorClock.TrackLength, time));
-
-        var position = PositionAtTime(editorClock.CurrentTime);
-        ScrollTo(position, false);
-        xCenter = position;
+        ScrollToTime(TimeAtPosition(Current));
 
         if (trackWasPlaying)
             editorClock.Start();
+    }
+
+    public void ScrollToTime(double time)
+    {
+        if (time < 0) time = 0;
+        if (time > editorClock.TrackLength) time = editorClock.TrackLength;
+
+        editorClock.Seek(time);
+
+        var position = PositionAtTime(editorClock.CurrentTime);
+        ScrollTo(position, false);
     }
 
     public double TimeAtPosition(double x)

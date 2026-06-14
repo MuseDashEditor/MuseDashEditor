@@ -28,16 +28,46 @@ public partial class TimingTrack : Container
 {
     [Resolved] protected EditorDataHolder DataHolder { get; private set; } = null!;
 
-    private ZoomableScrollContainer zoomableScrollContainer = null!;
+    public readonly ZoomableScrollContainer ZoomableScrollContainer;
+    public readonly WaveformGraph WaveformGraph;
+    public readonly TimingTrackTickDisplay TimingTrackTickDisplay;
+
+    private readonly float xCenter;
+
+    public TimingTrack(float xCenter = 0f)
+    {
+        this.xCenter = xCenter;
+
+        ZoomableScrollContainer = new ZoomableScrollContainer(xCenter: xCenter)
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            RelativeSizeAxes = Axes.Both,
+            Width = 0.9f,
+            Height = 1f,
+            Depth = 20
+        };
+        WaveformGraph = new WaveformGraph
+        {
+            RelativeSizeAxes = Axes.Both,
+            HighColour = MdeColors.Light1,
+            LowColour = MdeColors.Light2,
+            MidColour = MdeColors.Light3,
+            BaseColour = MdeColors.Light4,
+            Depth = 10
+        };
+        TimingTrackTickDisplay = new TimingTrackTickDisplay
+        {
+            ScrollContainer = ZoomableScrollContainer,
+            RelativeSizeAxes = Axes.Both,
+            Depth = 0
+        };
+    }
 
     [BackgroundDependencyLoader]
     private void load()
     {
         RelativeSizeAxes = Axes.X;
-        Height = 250;
-        Origin = Anchor.TopCentre;
-        Anchor = Anchor.TopCentre;
-        Position = new Vector2(0, 100);
 
         Masking = true;
 
@@ -49,17 +79,10 @@ public partial class TimingTrack : Container
                 Anchor = Anchor.Centre,
                 Size = new Vector2(1, 250),
                 Colour = Color4.White,
-                Depth = 10
+                Depth = 10,
+                X = xCenter
             },
-            zoomableScrollContainer = new ZoomableScrollContainer
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.X,
-                Width = 0.9f,
-                Height = 250,
-                Depth = 20
-            }
+            ZoomableScrollContainer
         ];
 
         Schedule(loadTrack);
@@ -67,22 +90,10 @@ public partial class TimingTrack : Container
 
     private void loadTrack()
     {
-        zoomableScrollContainer.Add(new WaveformGraph
-        {
-            RelativeSizeAxes = Axes.Both,
-            Waveform = new Waveform(DataHolder.CurrentTrackStream.Value),
-            HighColour = MdeColors.Light1,
-            LowColour = MdeColors.Light2,
-            MidColour = MdeColors.Light3,
-            BaseColour = MdeColors.Light4,
-            Depth = 10
-        });
-        zoomableScrollContainer.Add(new TimingTrackTickDisplay
-        {
-            ScrollContainer = zoomableScrollContainer,
-            RelativeSizeAxes = Axes.Both,
-            Depth = 0
-        });
-        zoomableScrollContainer.SetupZoom(100, 1, 500);
+        WaveformGraph.Waveform = new Waveform(DataHolder.CurrentTrackStreamGetter.Value());
+
+        ZoomableScrollContainer.Add(WaveformGraph);
+        ZoomableScrollContainer.Add(TimingTrackTickDisplay);
+        ZoomableScrollContainer.SetupZoom(100, 1, 500);
     }
 }

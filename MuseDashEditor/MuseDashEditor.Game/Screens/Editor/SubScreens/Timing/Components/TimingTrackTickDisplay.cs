@@ -30,6 +30,7 @@ public partial class TimingTrackTickDisplay : Container<TimingPointTick>
     [Resolved] private EditorClock editorClock { get; set; } = null!;
 
     public required ZoomableScrollContainer ScrollContainer { get; set; }
+    public bool ShouldPlayTickSound { get; set; } = true;
 
     private readonly Cached tickCache = new();
 
@@ -46,9 +47,20 @@ public partial class TimingTrackTickDisplay : Container<TimingPointTick>
     private void load(AudioManager audio)
     {
         tickSample = audio.Samples.Get("tick");
+        tickSample.Volume.Value = 2f;
+
         dataHolder.CurrentMap.ValueChanged += _ => tickCache.Invalidate();
 
-        dataHolder.CurrentTrack.Value.Volume.Value = 0.1f;
+        editorClock.OnSeek += () =>
+        {
+            tickCache.Invalidate();
+            lastPlayedTickOffset = editorClock.CurrentTime;
+        };
+
+        ScrollContainer.OnDrawWidthChanged += () =>
+        {
+            tickCache.Invalidate();
+        };
 
         // TODO: OnTimingPointChanged
     }
@@ -89,6 +101,8 @@ public partial class TimingTrackTickDisplay : Container<TimingPointTick>
 
     private void playTickSound()
     {
+        if (!ShouldPlayTickSound) return;
+
         var currentTime = editorClock.CurrentTime;
         if (currentTime < 0)
             return;

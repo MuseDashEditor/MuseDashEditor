@@ -15,7 +15,6 @@ using MuseDashEditor.Game.Data.Holder;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Framework.Timing;
 
 namespace MuseDashEditor.Game.Editor.Clock;
@@ -28,7 +27,8 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
     public double FramesPerSecond => (interpolatingClock as IFrameBasedClock).FramesPerSecond;
     public double TrackLength { get; private set; }
 
-    public Action<double> OnTimeChanged;
+    public Action<double> OnTimeChanged = _ => {};
+    public Action OnSeek = () => {};
 
     private readonly DecouplingFramedClock decouplingClock;
     private readonly InterpolatingFramedClock interpolatingClock;
@@ -86,7 +86,8 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
         var result = decouplingClock.Seek(position);
         interpolatingClock.ProcessFrame();
 
-        OnTimeChanged?.Invoke(CurrentTime);
+        OnTimeChanged(CurrentTime);
+        OnSeek();
 
         return result;
     }
@@ -111,7 +112,7 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
         interpolatingClock.ProcessFrame();
 
         if (IsRunning)
-            OnTimeChanged?.Invoke(CurrentTime + interpolatingClock.Drift);
+            OnTimeChanged(CurrentTime);
     }
 
     public IClock Source => decouplingClock.Source;

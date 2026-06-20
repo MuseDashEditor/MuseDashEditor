@@ -49,6 +49,11 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
                 new NamespacedResourceStore<byte[]>(Resources, "Textures"),
                 new NamespacedResourceStore<byte[]>(Resources, "MuseDashResources/Textures")
             ]))));
+        dependencies.CacheAs(new TextureStore(renderer,
+            gameHost.CreateTextureLoaderStore(new ResourceStore<byte[]>([
+                new NamespacedResourceStore<byte[]>(Resources, "Textures"),
+                new NamespacedResourceStore<byte[]>(Resources, "MuseDashResources/Textures")
+            ]))));
 
         config.GetBindable<WindowMode>(FrameworkSetting.WindowMode).Value = WindowMode.Windowed;
         config.GetBindable<Size>(FrameworkSetting.WindowedSize).Value = new Size(1920, 1080);

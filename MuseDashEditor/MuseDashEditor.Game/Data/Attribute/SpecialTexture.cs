@@ -10,19 +10,13 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using MuseDashEditor.Game.Data.Type;
+namespace MuseDashEditor.Game.Data.Attribute;
 
-namespace MuseDashEditor.Game.Data.Object.GameObject;
-
-public class GameObjectData(
-    HitSoundType hitSoundType,
-    TextureType textureType,
-    MovementType movementType = MovementType.None,
-    LaneType[]? validLanes = null,
-    SceneType[]? validScenes = null
-) : ObjectData(validLanes, validScenes)
+public class SpecialTexture(
+    bool laneIndependent = false,
+    bool sceneIndependent = false
+) : System.Attribute
 {
-    public HitSoundType HitSoundType => hitSoundType;
-    public TextureType TextureType => textureType;
-    public MovementType MovementType => movementType;
+    public bool LaneIndependent { get; } = laneIndependent;
+    public bool SceneIndependent { get; } = sceneIndependent;
 }

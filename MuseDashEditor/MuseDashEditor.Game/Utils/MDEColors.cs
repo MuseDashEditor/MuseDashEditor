@@ -20,6 +20,7 @@ public static class MdeColors
 
     public static Colour4 TopLaneColor => Colour4.FromHex("#00defe");
     public static Colour4 BottomLaneColor => Colour4.FromHex("#fe64ee");
+    public static Colour4 BossLaneColor => Colour4.FromHex("#fdd835");
 
     // Using the same color scheme as osu!, because it works well :D
     public static Colour4 Highlight1 => getColour(1, 0.7f);

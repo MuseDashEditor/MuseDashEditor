@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using MuseDashEditor.Game.Data.Type;
+using MuseDashEditor.Game.Utils;
 
 namespace MuseDashEditor.Game.Data.Object.GameObject;
 
@@ -24,4 +25,6 @@ public class GameObject(
     public ObjectType ObjectType { get; } = objectType;
     public LaneType LaneType { get; set; } = laneType;
     public LaneModifierType LaneModifier { get; set; } = laneModifier;
+
+    public GameObjectData? GameObjectData => GameObjectUtils.GetGameObjectData(ObjectType);
 }

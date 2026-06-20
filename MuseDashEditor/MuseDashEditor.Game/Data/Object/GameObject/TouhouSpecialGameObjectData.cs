@@ -14,5 +14,8 @@ using MuseDashEditor.Game.Data.Type;
 
 namespace MuseDashEditor.Game.Data.Object.GameObject;
 
-public class TouhouSpecialGameObjectData(HitSoundType hitSoundType)
-    : GameObjectData(hitSoundType, null, [SceneType.Touhou]);
+public class TouhouSpecialGameObjectData(
+    HitSoundType hitSoundType,
+    TextureType textureType,
+    MovementType movementType = MovementType.None
+) : GameObjectData(hitSoundType, textureType, movementType, null, [SceneType.Touhou]);

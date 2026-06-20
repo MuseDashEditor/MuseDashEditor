@@ -10,6 +10,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System;
 using System.IO;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Screens.Editor.SubScreens;
@@ -23,7 +24,7 @@ public class EditorDataHolder
     public readonly Bindable<Chart.Chart> CurrentChart = new();
     public readonly Bindable<Chart.Map> CurrentMap = new();
     public readonly Bindable<Track> CurrentTrack = new();
-    public readonly Bindable<Stream> CurrentTrackStream = new();
+    public readonly Bindable<Func<Stream>> CurrentTrackStreamGetter = new();
     public readonly Bindable<DifficultyType> SelectedDifficulty = new();
     public readonly Bindable<EditorSubscreenType> SelectedSubscreen = new();
     public readonly Bindable<SceneType> CurrentScene = new();

@@ -24,59 +24,59 @@ public enum ObjectType
     Music = 36,                       // 10
 
     // === HitObjects ===
-    [GameObjectData(HitSoundType.Small)]  Small = 1,                        // 01
-    [GameObjectData(HitSoundType.Small)]  SmallUp = 2,                      // 02
-    [GameObjectData(HitSoundType.Small)]  SmallDown = 3,                    // 03
-    [GameObjectData(HitSoundType.Small)]  Medium1 = 4,                      // 04
-    [GameObjectData(HitSoundType.Small)]  Medium1Up = 5,                    // 05
-    [GameObjectData(HitSoundType.Small)]  Medium1Down = 6,                  // 06
-    [GameObjectData(HitSoundType.Small)]  Medium2 = 7,                      // 07
-    [GameObjectData(HitSoundType.Small)]  Medium2Up = 8,                    // 08
-    [GameObjectData(HitSoundType.Small)]  Medium2Down = 9,                  // 09
-    [GameObjectData(HitSoundType.Large1)] Large1 = 10,                      // 0A
-    [GameObjectData(HitSoundType.Large2)] Large2 = 11,                      // 0B
-    [GameObjectData(HitSoundType.Raider)] Raider = 12,                      // 0C
-    [GameObjectData(HitSoundType.Hammer)] Hammer = 13,                      // 0D
-    [GameObjectData(HitSoundType.Small)]  Gemini = 14,                      // 0E
-    [GameObjectData(HitSoundType.Hold)]   Hold = 15,                        // 0F
-    [GameObjectData(HitSoundType.Masher)] Masher = 16,                      // 0G
-    [GameObjectData(HitSoundType.Gear)]   Gear = 17,                        // 0H
-    [GameObjectData(HitSoundType.Raider)] RaiderUpsideDown = 18,            // 0I
-    [GameObjectData(HitSoundType.Hammer)] HammerUpsideDown = 19,            // 0J
-    [GameObjectData(HitSoundType.Ghost)]  Ghost = 73,                       // 21
+    [GameObjectData(HitSoundType.Small, TextureType.Small)]  Small = 1,                                      // 01
+    [GameObjectData(HitSoundType.Small, TextureType.Small, MovementType.Up)]  SmallUp = 2,                   // 02
+    [GameObjectData(HitSoundType.Small, TextureType.Small, MovementType.Down)]  SmallDown = 3,               // 03
+    [GameObjectData(HitSoundType.Small, TextureType.Medium1)]  Medium1 = 4,                                  // 04
+    [GameObjectData(HitSoundType.Small, TextureType.Medium1, MovementType.Up)]  Medium1Up = 5,               // 05
+    [GameObjectData(HitSoundType.Small, TextureType.Medium1, MovementType.Down)]  Medium1Down = 6,           // 06
+    [GameObjectData(HitSoundType.Small, TextureType.Medium2)]  Medium2 = 7,                                  // 07
+    [GameObjectData(HitSoundType.Small, TextureType.Medium2, MovementType.Up)]  Medium2Up = 8,               // 08
+    [GameObjectData(HitSoundType.Small, TextureType.Medium2, MovementType.Down)]  Medium2Down = 9,           // 09
+    [GameObjectData(HitSoundType.Large1, TextureType.Large1)] Large1 = 10,                                   // 0A
+    [GameObjectData(HitSoundType.Large2, TextureType.Large2)] Large2 = 11,                                   // 0B
+    [GameObjectData(HitSoundType.Raider, TextureType.Raider)] Raider = 12,                                   // 0C
+    [GameObjectData(HitSoundType.Hammer, TextureType.Hammer)] Hammer = 13,                                   // 0D
+    [GameObjectData(HitSoundType.Small, TextureType.Gemini)]  Gemini = 14,                                   // 0E
+    [GameObjectData(HitSoundType.Hold, TextureType.Hold)]   Hold = 15,                                       // 0F
+    [GameObjectData(HitSoundType.Masher, TextureType.Masher)] Masher = 16,                                   // 0G
+    [GameObjectData(HitSoundType.Gear, TextureType.Gear)]   Gear = 17,                                       // 0H
+    [GameObjectData(HitSoundType.Raider, TextureType.Raider, MovementType.Laneshift)] RaiderUpsideDown = 18, // 0I
+    [GameObjectData(HitSoundType.Hammer, TextureType.Hammer, MovementType.Laneshift)] HammerUpsideDown = 19, // 0J
+    [GameObjectData(HitSoundType.Ghost, TextureType.Ghost)]  Ghost = 73,                                     // 21
 
     // Collectibles
-    [GameObjectData(HitSoundType.Heart)] Heart = 74,                       // 22
-    [GameObjectData(HitSoundType.Note)]  Note = 75,                        // 23
+    [GameObjectData(HitSoundType.Heart, TextureType.Heart)] Heart = 74,                 // 22
+    [GameObjectData(HitSoundType.Note, TextureType.Note)]  Note = 75,                   // 23
 
     // Touhou special hit objects
-    [TouhouSpecialGameObjectData(HitSoundType.Note)]  PItem = 72,                       // 20
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  BossBullet1 = 120,                // 3C
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  BossBullet1Laneshift = 121,       // 3D
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  BossBullet2 = 122,                // 3E
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  BossBullet2Laneshift = 123,       // 3F
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  MediumBullet = 108,               // 30
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  MediumBulletUp = 109,             // 31
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  MediumBulletDown = 110,           // 32
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  MediumBulletLaneshift = 111,      // 33
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  SmallBullet = 112,                // 34
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  SmallBulletUp = 113,              // 35
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  SmallBulletDown = 114,            // 36
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  SmallBulletLaneshift = 115,       // 37
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  LargeBullet = 116,                // 38
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  LargeBulletUp = 117,              // 39
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  LargeBulletDown = 118,            // 3A
-    [TouhouSpecialGameObjectData(HitSoundType.Gear)]  LargeBulletLaneshift = 119,       // 3B
+    [TouhouSpecialGameObjectData(HitSoundType.Note, TextureType.PItem)]  PItem = 72,                                                 // 20
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.BossBullet1)]  BossBullet1 = 120,                                    // 3C
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.BossBullet1, MovementType.Laneshift)]  BossBullet1Laneshift = 121,   // 3D
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.BossBullet2)]  BossBullet2 = 122,                                    // 3E
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.BossBullet2, MovementType.Laneshift)]  BossBullet2Laneshift = 123,   // 3F
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.MediumBullet)]  MediumBullet = 108,                                  // 30
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.MediumBullet, MovementType.Up)]  MediumBulletUp = 109,               // 31
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.MediumBullet, MovementType.Down)]  MediumBulletDown = 110,           // 32
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.MediumBullet, MovementType.Laneshift)]  MediumBulletLaneshift = 111, // 33
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.SmallBullet)]  SmallBullet = 112,                                    // 34
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.SmallBullet, MovementType.Up)]  SmallBulletUp = 113,                 // 35
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.SmallBullet, MovementType.Down)]  SmallBulletDown = 114,             // 36
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.SmallBullet, MovementType.Laneshift)]  SmallBulletLaneshift = 115,   // 37
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.LargeBullet)]  LargeBullet = 116,                                    // 38
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.LargeBullet, MovementType.Up)]  LargeBulletUp = 117,                 // 39
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.LargeBullet, MovementType.Down)]  LargeBulletDown = 118,             // 3A
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.LargeBullet, MovementType.Laneshift)]  LargeBulletLaneshift = 119,   // 3B
 
     // BossHitObjects
-    [GameObjectData(HitSoundType.Small)]  BossMelee1 = 37,                  // 11
-    [GameObjectData(HitSoundType.Small)]  BossMelee2 = 38,                  // 12
-    [GameObjectData(HitSoundType.Small)]  BossProjectile1 = 39,             // 13
-    [GameObjectData(HitSoundType.Small)]  BossProjectile2 = 40,             // 14
-    [GameObjectData(HitSoundType.Small)]  BossProjectile3 = 41,             // 15
-    [GameObjectData(HitSoundType.Masher)] BossMasher1 = 42,                 // 16
-    [GameObjectData(HitSoundType.Masher)] BossMasher2 = 43,                 // 17
-    [GameObjectData(HitSoundType.Gear)]   BossGear = 44,                    // 18
+    [GameObjectData(HitSoundType.Small, TextureType.Boss)]  BossMelee1 = 37,                  // 11
+    [GameObjectData(HitSoundType.Small, TextureType.Boss)]  BossMelee2 = 38,                  // 12
+    [GameObjectData(HitSoundType.Small, TextureType.BossProjectile1)]  BossProjectile1 = 39,  // 13
+    [GameObjectData(HitSoundType.Small, TextureType.BossProjectile2)]  BossProjectile2 = 40,  // 14
+    [GameObjectData(HitSoundType.Small, TextureType.BossProjectile3)]  BossProjectile3 = 41,  // 15
+    [GameObjectData(HitSoundType.Masher, TextureType.Boss)] BossMasher1 = 42,                 // 16
+    [GameObjectData(HitSoundType.Masher, TextureType.Boss)] BossMasher2 = 43,                 // 17
+    [GameObjectData(HitSoundType.Gear, TextureType.Gear)]   BossGear = 44,                    // 18
 
     // === SpecialObjects ===
 
@@ -156,6 +156,9 @@ public enum ObjectType
 
     // Other
     AutoplayOn = 106,                 // 2Y
-    AutoplayOff = 107                 // 2Z
+    AutoplayOff = 107,                // 2Z
+
+    // Cheats
+    [GameObjectData(HitSoundType.Hold, TextureType.HoldBody)] HoldBody = 999
     //@formatter:on
 }

@@ -10,35 +10,23 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using System;
+using MuseDashEditor.Game.Component;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Object.MappingObject;
 using MuseDashEditor.Game.Editor.Clock;
-using MuseDashEditor.Game.Screens.Editor.Components;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Caching;
-using osu.Framework.Graphics.Containers;
 using osuTK.Graphics;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Timing.Components;
 
-public partial class TimingTrackTickDisplay : Container<TimingPointTick>
+public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPointTick>(TimingPointTick.MAX_WIDTH * 2)
 {
     [Resolved] private EditorDataHolder dataHolder { get; set; } = null!;
     [Resolved] private EditorClock editorClock { get; set; } = null!;
 
-    public required ZoomableScrollContainer ScrollContainer { get; set; }
     public bool ShouldPlayTickSound { get; set; } = true;
-
-    private readonly Cached tickCache = new();
-
-    private float currentMinRange = float.MinValue;
-    private float currentMaxRange = float.MaxValue;
-    private float? nextMinTick;
-    private float? nextMaxTick;
-    private int currentTickIndex;
 
     private Sample? tickSample;
     private double lastPlayedTickOffset;
@@ -49,18 +37,7 @@ public partial class TimingTrackTickDisplay : Container<TimingPointTick>
         tickSample = audio.Samples.Get("tick");
         tickSample.Volume.Value = 2f;
 
-        dataHolder.CurrentMap.ValueChanged += _ => tickCache.Invalidate();
-
-        editorClock.OnSeek += () =>
-        {
-            tickCache.Invalidate();
-            lastPlayedTickOffset = editorClock.CurrentTime;
-        };
-
-        ScrollContainer.OnDrawWidthChanged += () =>
-        {
-            tickCache.Invalidate();
-        };
+        dataHolder.CurrentMap.ValueChanged += _ => ContentCache.Invalidate();
 
         // TODO: OnTimingPointChanged
     }
@@ -69,29 +46,7 @@ public partial class TimingTrackTickDisplay : Container<TimingPointTick>
     {
         base.Update();
 
-        if (DrawWidth <= 0) return;
-
-        var screenSpacePosTopLeft = ScrollContainer.ScreenSpaceDrawQuad.TopLeft;
-        var screenSpacePosTopRight = ScrollContainer.ScreenSpaceDrawQuad.TopRight;
-
-        var localSpacePosTopLeft = ToLocalSpace(screenSpacePosTopLeft);
-        var localSpacePosTopRight = ToLocalSpace(screenSpacePosTopRight);
-
-        var minRange = localSpacePosTopLeft.X - TimingPointTick.MAX_WIDTH * 2;
-        var maxRange = localSpacePosTopRight.X + TimingPointTick.MAX_WIDTH * 2;
-
-        if ((minRange, maxRange) != (currentMinRange, currentMaxRange))
-        {
-            currentMinRange = minRange;
-            currentMaxRange = maxRange;
-
-            if (nextMinTick == null || nextMaxTick == null || minRange < nextMinTick || maxRange > nextMaxTick)
-                tickCache.Invalidate();
-        }
-
-        if (!tickCache.IsValid)
-            regenerateTicks();
-        else if (editorClock.IsRunning)
+        if (editorClock.IsRunning)
             playTickSound();
         else
         {
@@ -123,27 +78,12 @@ public partial class TimingTrackTickDisplay : Container<TimingPointTick>
         }
     }
 
-    private void regenerateTicks()
+    protected override void RegenerateContent()
     {
-        currentTickIndex = 0;
-
-        nextMinTick = null;
-        nextMaxTick = null;
-
         for (var i = 0; i < dataHolder.CurrentMap.Value.TimingPoints.Count; i++)
         {
             generateTickForTimingPoint(i, dataHolder.CurrentMap.Value.TimingPoints[i]);
         }
-
-        var usedTicks = currentTickIndex;
-
-        while (currentTickIndex < Math.Min(usedTicks + 16, Count))
-            Children[currentTickIndex++].Alpha = 0;
-
-        while (currentTickIndex < Count)
-            Children[currentTickIndex++].Expire();
-
-        tickCache.Validate();
     }
 
     private void generateTickForTimingPoint(int pointIndex, TimingPointObject currentTimingPoint)
@@ -158,7 +98,7 @@ public partial class TimingTrackTickDisplay : Container<TimingPointTick>
         var startPosition = ScrollContainer.PositionAtTime(startOffset);
         var endPosition = ScrollContainer.PositionAtTime(endOffset);
 
-        if (startPosition > currentMaxRange || endPosition < currentMinRange)
+        if (startPosition > CurrentMaxRange || endPosition < CurrentMinRange)
             return;
 
         var beatLength = 60_000 / currentTimingPoint.NewBpm;
@@ -175,23 +115,23 @@ public partial class TimingTrackTickDisplay : Container<TimingPointTick>
 
             var tickPosition = ScrollContainer.PositionAtTime(tickOffset);
 
-            if (tickPosition < currentMinRange)
+            if (tickPosition < CurrentMinRange)
             {
-                if (nextMinTick == null || tickPosition > nextMinTick)
-                    nextMinTick = tickPosition;
+                if (NextMinTick == null || tickPosition > NextMinTick)
+                    NextMinTick = tickPosition;
                 continue;
             }
 
-            if (tickPosition > currentMaxRange)
+            if (tickPosition > CurrentMaxRange)
             {
-                if (nextMaxTick == null || tickPosition < nextMaxTick)
-                    nextMaxTick = tickPosition;
+                if (NextMaxTick == null || tickPosition < NextMaxTick)
+                    NextMaxTick = tickPosition;
                 continue;
             }
 
             if (pointIndex == 0 && beatIndex == 0)
             {
-                nextMinTick = float.MinValue;
+                NextMinTick = float.MinValue;
             }
 
             var tick = getOrCreateTick();
@@ -227,17 +167,17 @@ public partial class TimingTrackTickDisplay : Container<TimingPointTick>
     {
         TimingPointTick tick;
 
-        if (currentTickIndex >= Count)
+        if (CurrentTickIndex >= Count)
         {
             tick = new TimingPointTick();
             Add(tick);
         }
         else
         {
-            tick = Children[currentTickIndex];
+            tick = Children[CurrentTickIndex];
         }
 
-        currentTickIndex++;
+        CurrentTickIndex++;
         return tick;
     }
 }

@@ -19,13 +19,12 @@ public enum SceneType
     Unknown = 0,
 
     [SceneData("01_space_station")] SpaceStation = 1,
-
     [SceneData("02_retrocity")] Retrocity = 2,
-
     [SceneData("03_castle")] Castle = 3,
-
+    [SceneData("04_rainy_night")] RainyNight = 4,
     [SceneData("05_candyland")] Candyland = 5,
-
+    [SceneData("06_oriental")] Oriental = 6,
+    [SceneData("07_lets_groove")] LetsGroove = 7,
     [SceneData("08_touhou")] Touhou = 8,
-    // TODO: add all scenes
+    [SceneData("09_djmax")] DjMax = 9,
 }

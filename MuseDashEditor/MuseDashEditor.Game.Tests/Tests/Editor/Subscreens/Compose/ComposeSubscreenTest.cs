@@ -10,33 +10,29 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using System;
-using MuseDashEditor.Game.Screens.Editor.SubScreens.Metadata;
+using MuseDashEditor.Game.Screens.Editor.SubScreens.Compose;
 using MuseDashEditor.Game.Tests.Resources;
 using NUnit.Framework;
 
-namespace MuseDashEditor.Game.Tests.Tests.Editor.Subscreens.Metadata;
+namespace MuseDashEditor.Game.Tests.Tests.Editor.Subscreens.Compose;
 
 [TestFixture]
-public partial class MetadataSubscreenTest : MuseDashEditorTestScene
+public partial class ComposeSubscreenTest : MuseDashEditorTestScene
 {
     [Test]
     public void TestScreenLoad()
     {
         var loadChartTask = TestResources.GetTestChart();
+        var loadEditorDataTask = InitializeEditorData(loadChartTask);
 
         AddUntilStep("Load test chart", () => loadChartTask.IsCompletedSuccessfully);
-        AddStep("Test metadata screen load", () =>
+        AddUntilStep("Initialize editor data", () => loadEditorDataTask.IsCompletedSuccessfully);
+        AddStep("Test compmose screen load", () =>
         {
-            if (!loadChartTask.IsCompletedSuccessfully)
-                throw new InvalidOperationException("Test chart failed to load");
-
-            EditorDataHolder.CurrentChart.Value = loadChartTask.Result;
-
-            Child = new MetadataSubscreen();
-            Child.Show();
-
-            // TODO: validate screen content
+            var timingSubscreen = new ComposeSubscreen();
+            Content.Add(timingSubscreen);
+            timingSubscreen.Show();
         });
+        RunAllSteps();
     }
 }

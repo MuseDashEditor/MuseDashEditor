@@ -74,9 +74,7 @@ public partial class FolderSelectorScreen : Screen
                             if (loadedTrack != null)
                                 dataHolder.CurrentTrack.Value = loadedTrack;
 
-                            var loadedTrackStream = trackStore.GetStream(musicFile.Name);
-                            if (loadedTrackStream != null)
-                                dataHolder.CurrentTrackStream.Value = loadedTrackStream;
+                            dataHolder.CurrentTrackStreamGetter.Value = () => trackStore.GetStream(musicFile.Name);
                         }
 
                         dataHolder.CurrentChart.Value = chart;

@@ -29,7 +29,7 @@ public partial class DifficultyDisplay : BasicButton
 {
     public ColourInfo StarColour { get; init; }
     public DifficultyType Difficulty { get; init; }
-    public Action OnClickAction { get; init; }
+    public Action OnClickAction { get; init; } = () => { };
 
     [BackgroundDependencyLoader]
     private void load(EditorDataHolder dataHolder)

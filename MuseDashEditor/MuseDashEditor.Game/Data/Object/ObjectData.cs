@@ -17,10 +17,10 @@ namespace MuseDashEditor.Game.Data.Object;
 
 [AttributeUsage(AttributeTargets.Field)]
 public class ObjectData(
-    LaneType[] validLanes,
-    SceneType[] validScenes
-) : Attribute
+    LaneType[]? validLanes,
+    SceneType[]? validScenes
+) : System.Attribute
 {
-    public LaneType[] ValidLaneTypes => validLanes;
-    public SceneType[] ValidSceneTypes => validScenes;
+    public LaneType[]? ValidLaneTypes => validLanes;
+    public SceneType[]? ValidSceneTypes => validScenes;
 }

@@ -32,7 +32,7 @@ public static class BmsParser
         'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
     ];
 
-    public static async Task<Map> Parse(FileInfo file)
+    public static async Task<Map?> Parse(FileInfo file)
     {
         Logger.Log($"Parsing map from file: {file.FullName}...");
 

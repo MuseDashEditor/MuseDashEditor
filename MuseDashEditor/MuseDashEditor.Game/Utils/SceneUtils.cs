@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using System.Reflection;
-using JetBrains.Annotations;
 using MuseDashEditor.Game.Data.Scene;
 using MuseDashEditor.Game.Data.Type;
 
@@ -19,8 +18,7 @@ namespace MuseDashEditor.Game.Utils;
 
 public static class SceneUtils
 {
-    [CanBeNull]
-    public static SceneData GetSceneData(SceneType sceneType)
+    public static SceneData? GetSceneData(SceneType sceneType)
     {
         return typeof(SceneType).GetField(sceneType.ToString())?.GetCustomAttribute<SceneData>();
     }

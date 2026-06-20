@@ -15,5 +15,5 @@ using MuseDashEditor.Game.Data.Type;
 namespace MuseDashEditor.Game.Data.Object.DesignObject;
 
 public class DesignObjectData(
-    SceneType[] validScenes = null
+    SceneType[]? validScenes = null
 ) : ObjectData([LaneType.Special, LaneType.Special2], validScenes);

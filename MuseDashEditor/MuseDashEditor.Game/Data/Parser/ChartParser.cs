@@ -23,7 +23,7 @@ namespace MuseDashEditor.Game.Data.Parser;
 
 public static class ChartParser
 {
-    public static async Task<Chart.Chart> Parse(DirectoryInfo directory)
+    public static async Task<Chart.Chart?> Parse(DirectoryInfo directory)
     {
         if (!directory.Exists) return null;
 

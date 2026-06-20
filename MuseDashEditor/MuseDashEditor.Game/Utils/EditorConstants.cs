@@ -10,19 +10,14 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using MuseDashEditor.Game.Data.Type;
+namespace MuseDashEditor.Game.Utils;
 
-namespace MuseDashEditor.Game.Data.Object.GameObject;
-
-public class GameObjectData(
-    HitSoundType hitSoundType,
-    TextureType textureType,
-    MovementType movementType = MovementType.None,
-    LaneType[]? validLanes = null,
-    SceneType[]? validScenes = null
-) : ObjectData(validLanes, validScenes)
+public static class EditorConstants
 {
-    public HitSoundType HitSoundType => hitSoundType;
-    public TextureType TextureType => textureType;
-    public MovementType MovementType => movementType;
+    public const int HIT_CIRCLE_X = -557;
+    public const int HIT_CIRCLE_Y = -14;
+    public const int TOP_LANE_Y = -166;
+    public const int BOTTOM_LANE_Y = 137;
+    public const int BOSS_LANE_Y = -14;
+    public const int SPECIAL_LANE_Y = 0; // TODO
 }

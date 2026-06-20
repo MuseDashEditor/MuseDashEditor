@@ -18,7 +18,7 @@ namespace MuseDashEditor.Game.Data.Scene;
 [AttributeUsage(AttributeTargets.Field)]
 public class SceneData(
     string resourcePath
-) : Attribute
+) : System.Attribute
 {
     public string ResourcePath => resourcePath;
 }

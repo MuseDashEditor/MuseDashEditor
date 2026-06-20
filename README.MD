@@ -4,7 +4,7 @@ An unofficial MuseDash chart editor for [MDMC](https://mdmc.moe/).
 
 ## Project Status
 
-This project is in early development.
+This project is in early (but active) development.
 
 It follows a simple guideline: "make it exist first, we can make it better later." Thus, the editor is really ugly currently. I'm a dev, not a designer :D.
 
@@ -26,3 +26,100 @@ Contributions are welcome, but with a few restrictions:
 ## License
 
 This project is licensed under the Apache License, Version 2.0.
+
+## Screenshots
+
+<details>
+<summary>Main menu</summary>
+
+> [!NOTE]
+> This menu is not implemented yet.
+> More information in https://github.com/MuseDashEditor/MuseDashEditor/issues/33
+
+![Screenshot of the main menu](docs/main-menu.png)
+
+</details>
+
+<details>
+<summary>New chart menu</summary>
+
+> [!NOTE]
+> This menu is not implemented yet.
+
+</details>
+
+<details>
+<summary>Open chart menu</summary>
+
+> [!NOTE]
+> This menu is not fully implemented yet.
+
+![Open menu](docs/open-menu.png)
+![Select difficulty menu](docs/open-menu2.png)
+
+</details>
+
+<details>
+<summary>Settings menu</summary>
+
+> [!NOTE]
+> This menu is not implemented yet.
+
+</details>
+
+<details>
+<summary>Editor - Metadata screen</summary>
+
+> [!NOTE]
+> This menu is not fully implemented yet.
+> More information in https://github.com/MuseDashEditor/MuseDashEditor/issues/1
+
+![Screenshot of the main menu](docs/metadata-screen.png)
+
+</details>
+
+<details>
+<summary>Editor - Timing screen</summary>
+
+> [!NOTE]
+> This menu is not fully implemented yet.
+> More information in https://github.com/MuseDashEditor/MuseDashEditor/issues/2
+
+![Screenshot of the main menu](docs/timing-screen.png)
+
+</details>
+
+<details>
+<summary>Editor - Compose screen</summary>
+
+> [!NOTE]
+> This menu is not fully implemented yet.
+> More information in https://github.com/MuseDashEditor/MuseDashEditor/issues/3
+
+![Screenshot of the main menu](docs/compose-screen.png)
+
+</details>
+
+<details>
+<summary>Editor - Design screen</summary>
+
+> [!NOTE]
+> This menu is not implemented yet.
+
+</details>
+
+<details>
+<summary>Editor - Dialog screen</summary>
+
+> [!NOTE]
+> This menu is not implemented yet.
+
+</details>
+
+<details>
+<summary>Editor - Validation screen</summary>
+
+> [!NOTE]
+> This menu is not implemented yet.
+
+</details>

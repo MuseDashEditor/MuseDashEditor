@@ -13,6 +13,7 @@
 using MuseDashEditor.Game.Screens.Open;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osuTK;
@@ -28,14 +29,51 @@ public partial class MainScreen : Screen
     {
         InternalChildren =
         [
-            new BasicButton
+            new FillFlowContainer
             {
-                Text = "Open chart",
-                Size = new Vector2(200, 50),
-                Colour = Colour4.AliceBlue,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 10),
+                AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Action = () => MainScreenStack.Push(new FolderSelectorScreen())
+                Children = [
+                    new BasicButton
+                    {
+                        Text = "New chart",
+                        Size = new Vector2(200, 50),
+                        Colour = Colour4.AliceBlue,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Action = () => {}
+                    },
+                    new BasicButton
+                    {
+                        Text = "Open project",
+                        Size = new Vector2(200, 50),
+                        Colour = Colour4.AliceBlue,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Action = () => {}
+                    },
+                    new BasicButton
+                    {
+                        Text = "Import chart",
+                        Size = new Vector2(200, 50),
+                        Colour = Colour4.AliceBlue,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Action = () => MainScreenStack.Push(new FolderSelectorScreen())
+                    },
+                    new BasicButton
+                    {
+                        Text = "Settings",
+                        Size = new Vector2(200, 50),
+                        Colour = Colour4.AliceBlue,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Action = () => {}
+                    }
+                ]
             }
         ];
     }

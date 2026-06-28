@@ -30,7 +30,7 @@ public partial class FolderSelectorScreen : Screen
     [BackgroundDependencyLoader]
     private void load(GameHost host, ScreenStack screenStack, AudioManager audioManager, EditorDataHolder dataHolder)
     {
-        var fileSelector = new BasicFileSelector(null, [".bms", ".json", ".ogg", ".mp3"])
+        var fileSelector = new BasicFileSelector(null, [".bms", ".json", ".ogg", ".mp3", ".mdm"])
         {
             RelativeSizeAxes = Axes.X,
             Size = new Vector2(1, 1030),
@@ -52,6 +52,12 @@ public partial class FolderSelectorScreen : Screen
                 {
                     try
                     {
+                        var selectedFile = fileSelector.CurrentFile.Value;
+                        if (selectedFile != null)
+                        {
+                            // TODO
+                        }
+
                         var pathValue = fileSelector.CurrentPath.Value;
                         Logger.Log($"Opening chart from {pathValue.FullName}...");
 

@@ -10,8 +10,10 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using MuseDashEditor.Game.Config;
 using MuseDashEditor.Resources;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -19,7 +21,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Handlers.Joystick;
+using osu.Framework.Input.Handlers.Midi;
+using osu.Framework.Input.Handlers.Pen;
 using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osuTK;
@@ -29,6 +35,8 @@ namespace MuseDashEditor.Game;
 public partial class MuseDashEditorGameBase : osu.Framework.Game
 {
     protected override Container<Drawable> Content { get; }
+
+    private MdeConfigManager localConfig = null!;
     private DependencyContainer dependencies = null!;
 
     protected MuseDashEditorGameBase()
@@ -40,8 +48,14 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
         });
     }
 
+    public override void SetHost(GameHost host)
+    {
+        base.SetHost(host);
+        localConfig = new MdeConfigManager(host.Storage);
+    }
+
     [BackgroundDependencyLoader]
-    private void load(FrameworkConfigManager config, IRenderer renderer, GameHost gameHost)
+    private void load(IRenderer renderer, GameHost gameHost)
     {
         Resources.AddStore(new DllResourceStore(typeof(MuseDashEditorResources).Assembly));
         dependencies.CacheAs(new LargeTextureStore(renderer,
@@ -55,18 +69,42 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
                 new NamespacedResourceStore<byte[]>(Resources, "MuseDashResources/Textures")
             ]))));
 
-        config.GetBindable<WindowMode>(FrameworkSetting.WindowMode).Value = WindowMode.Windowed;
-        config.GetBindable<Size>(FrameworkSetting.WindowedSize).Value = new Size(1920, 1080);
-        config.GetBindable<double>(FrameworkSetting.WindowedPositionX).Value = 0.5;
-        config.GetBindable<double>(FrameworkSetting.WindowedPositionY).Value = 0.5;
-        config.GetBindable<FrameSync>(FrameworkSetting.FrameSync).Value = FrameSync.Limit8x;
-        config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode).Value = ExecutionMode.MultiThreaded;
-        config.GetBindable<bool>(FrameworkSetting.ShowUnicode).Value = true;
-        config.GetBindable<bool>(FrameworkSetting.AudioUseExperimentalWasapi).Value = true;
+        dependencies.CacheAs(localConfig);
 
+        disableInputHandlers();
+    }
+
+    private void disableInputHandlers()
+    {
         var tablet = Host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
-
         if (tablet != null) tablet.Enabled.Value = false;
+
+        var pen = Host.AvailableInputHandlers.OfType<PenHandler>().SingleOrDefault();
+        if (pen != null) pen.Enabled.Value = false;
+
+        var touch = Host.AvailableInputHandlers.OfType<TouchHandler>().SingleOrDefault();
+        if (touch != null) touch.Enabled.Value = false;
+
+        var midi = Host.AvailableInputHandlers.OfType<MidiHandler>().SingleOrDefault();
+        if (midi != null) midi.Enabled.Value = false;
+
+        var joystick = Host.AvailableInputHandlers.OfType<JoystickHandler>().SingleOrDefault();
+        if (joystick != null) joystick.Enabled.Value = false;
+    }
+
+    protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults()
+    {
+        return new Dictionary<FrameworkSetting, object>
+        {
+            { FrameworkSetting.WindowMode, WindowMode.Windowed },
+            { FrameworkSetting.WindowedSize, new Size(1920, 1080) },
+            { FrameworkSetting.WindowedPositionX, 0.5 },
+            { FrameworkSetting.WindowedPositionY, 0.5 },
+            { FrameworkSetting.FrameSync, FrameSync.Limit8x },
+            { FrameworkSetting.ExecutionMode, ExecutionMode.MultiThreaded },
+            { FrameworkSetting.ShowUnicode, true },
+            { FrameworkSetting.AudioUseExperimentalWasapi, true },
+        };
     }
 
     protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)

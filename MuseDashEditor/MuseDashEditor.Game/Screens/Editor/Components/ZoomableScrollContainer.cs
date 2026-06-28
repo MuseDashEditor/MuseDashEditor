@@ -75,11 +75,8 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
 
         if (editorClock.IsRunning) editorClock.Stop();
 
+        // TODO: rework this, zoom should not be propotionnal to itself (flat zoom)
         var newZoom = Math.Clamp(currentZoom + e.ScrollDelta.Y * (maxZoom - minZoom) * zoom_speed, minZoom, maxZoom);
-        // var focusPoint = xCenter ?? zoomedContent.ToLocalSpace(ToScreenSpace(new Vector2(DrawWidth / 2, 0))).X;
-        // var focusOffset = focusPoint - (float)Current;
-        // var expectedWidth = DrawWidth * newZoom;
-        // var targetOffset = expectedWidth * (focusPoint / zoomedContent.DrawWidth) - focusOffset;
 
         currentZoom = newZoom;
         updateZoomedContentWidth();

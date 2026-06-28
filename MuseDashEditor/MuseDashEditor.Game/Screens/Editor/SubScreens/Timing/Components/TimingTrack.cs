@@ -94,6 +94,6 @@ public partial class TimingTrack : Container
 
         ZoomableScrollContainer.Add(WaveformGraph);
         ZoomableScrollContainer.Add(TimingTrackTickDisplay);
-        ZoomableScrollContainer.SetupZoom(100, 1, 500);
+        ZoomableScrollContainer.SetupZoom(100, 1, 500); // TODO
     }
 }

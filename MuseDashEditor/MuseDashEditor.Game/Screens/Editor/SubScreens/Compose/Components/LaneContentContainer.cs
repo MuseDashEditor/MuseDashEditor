@@ -10,16 +10,20 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System.Collections.Generic;
 using System.Linq;
 using MuseDashEditor.Game.Component;
 using MuseDashEditor.Game.Data.Holder;
+using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
+using MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneObject;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components;
 
-public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshContainer<LaneObject>(50)
+public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshContainer<BaseLaneObject>(50)
 {
     [Resolved] private EditorDataHolder dataHolder { get; set; } = null!;
 
@@ -32,52 +36,38 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
 
     protected override void RegenerateContent()
     {
-        var isPlacingHold = false;
+        generateBasicObjects();
+        generateHoldObjects();
+        generateGeminiObjects();
+    }
 
-        for (var index = 0; index < dataHolder.CurrentMap.Value.GameObjects.Count; index++)
+    private void generateBasicObjects()
+    {
+        foreach (var gameObject in dataHolder.CurrentMap.Value.GameObjects)
         {
-            var gameObject = dataHolder.CurrentMap.Value.GameObjects[index];
-            if (!laneTypes.Contains(gameObject.LaneType)) continue;
+            if (!laneTypes.Contains(gameObject.LaneType))
+                continue;
+
+            var objectType = gameObject.ObjectType;
+            if (objectType is ObjectType.Hold or ObjectType.Gemini or ObjectType.Masher or ObjectType.BossMasher1
+                or ObjectType.BossMasher2)
+            {
+                if (gameObject.LaneModifier != LaneModifierType.Landmine)
+                    continue;
+            }
 
             var gameObjectData = gameObject.GameObjectData;
-            if (gameObjectData == null) continue;
+            if (gameObjectData == null)
+                continue;
 
             var tickPosition = ScrollContainer.PositionAtTime(gameObject.Offset);
-
-            var isHold = gameObject.ObjectType == ObjectType.Hold;
-            float? holdEnd = null;
-            var shouldRender = false;
 
             if (tickPosition < CurrentMinRange)
             {
                 if (NextMinTick == null || tickPosition > NextMinTick)
                     NextMinTick = tickPosition;
 
-                if (!isHold)
-                    continue;
-
-                for (int nextIndex = index + 1;
-                     nextIndex < dataHolder.CurrentMap.Value.GameObjects.Count;
-                     nextIndex++)
-                {
-                    var nextObject = dataHolder.CurrentMap.Value.GameObjects[nextIndex];
-                    if (!laneTypes.Contains(nextObject.LaneType)) continue;
-
-                    if (nextObject.ObjectType != ObjectType.Hold) continue;
-
-                    var nextPosition = ScrollContainer.PositionAtTime(nextObject.Offset);
-                    if (nextPosition < CurrentMinRange)
-                    {
-                        break;
-                    }
-
-                    shouldRender = true;
-                    holdEnd = nextPosition;
-                    break;
-                }
-
-                if (!shouldRender)
-                    continue;
+                continue;
             }
 
             if (tickPosition > CurrentMaxRange)
@@ -90,72 +80,153 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
 
             var laneObject = getOrCreateObject();
             laneObject.X = tickPosition;
-            laneObject.Alpha = 1;
-            laneObject.AlwaysPresent = shouldRender;
 
             laneObject.GameObject = gameObject;
             laneObject.SceneType = SceneType.SpaceStation; // TODO: scene at time
-            laneObject.MovementType = gameObject.GameObjectData?.MovementType;
+            laneObject.MovementType = gameObjectData.MovementType;
             laneObject.LaneType = gameObject.LaneType;
             laneObject.LaneModifier = gameObject.LaneModifier;
-            laneObject.HoldLength = null;
-
-            if (!isHold)
-                continue;
-
-            if (isPlacingHold) // End of hold
-            {
-                isPlacingHold = false;
-                continue;
-            }
-
-            if (holdEnd == null)
-            {
-                for (int nextIndex = index + 1;
-                     nextIndex < dataHolder.CurrentMap.Value.GameObjects.Count;
-                     nextIndex++)
-                {
-                    var nextObject = dataHolder.CurrentMap.Value.GameObjects[nextIndex];
-                    if (!laneTypes.Contains(nextObject.LaneType)) continue;
-
-                    if (nextObject.ObjectType != ObjectType.Hold) continue;
-
-                    var nextPosition = ScrollContainer.PositionAtTime(nextObject.Offset);
-                    if (nextPosition < CurrentMinRange)
-                    {
-                        break;
-                    }
-
-                    holdEnd = nextPosition;
-                    break;
-                }
-
-                if (holdEnd == null)
-                {
-                    // Single hold
-                }
-            }
-
-            isPlacingHold = true;
-            laneObject.HoldLength = holdEnd - tickPosition;
         }
     }
 
-    private LaneObject getOrCreateObject()
+    private void generateHoldObjects()
     {
-        LaneObject laneObject;
+        generateHoldObjectsOfType(ObjectType.Hold);
+        generateHoldObjectsOfType(ObjectType.Masher);
+        generateHoldObjectsOfType(ObjectType.BossMasher1);
+        generateHoldObjectsOfType(ObjectType.BossMasher2);
+    }
+
+    private void generateHoldObjectsOfType(ObjectType allowedObjectType)
+    {
+        var gameObjects = dataHolder.CurrentMap.Value.GameObjects;
+        var isPlacing = false;
+
+        for (var index = 0; index < gameObjects.Count; index++)
+        {
+            var gameObject = gameObjects[index];
+            if (!laneTypes.Contains(gameObject.LaneType))
+                continue;
+
+            var objectType = gameObject.ObjectType;
+            if (objectType != allowedObjectType || gameObject.LaneModifier == LaneModifierType.Landmine)
+                continue;
+
+            var gameObjectData = gameObject.GameObjectData;
+            if (gameObjectData == null)
+                continue;
+
+            if (isPlacing)
+            {
+                isPlacing = false;
+                continue;
+            }
+
+            isPlacing = true;
+
+            var tickPosition = ScrollContainer.PositionAtTime(gameObject.Offset);
+            var nextObject = getNextObjectOfType(gameObjects, allowedObjectType, index);
+
+            if (nextObject == null)
+            {
+                // TODO: popup for the user : the imported map has issues
+                Logger.Log("Cannot find next object of type " + allowedObjectType, level: LogLevel.Error);
+                continue;
+            }
+
+            var endPosition = ScrollContainer.PositionAtTime(nextObject.Offset);
+
+            if (tickPosition < CurrentMinRange)
+            {
+                if (NextMinTick == null || tickPosition > NextMinTick)
+                    NextMinTick = tickPosition;
+
+                if (endPosition < CurrentMinRange)
+                {
+                    if (endPosition > NextMinTick)
+                        NextMinTick = endPosition;
+
+                    continue;
+                }
+            }
+
+            if (tickPosition > CurrentMaxRange)
+            {
+                if (NextMaxTick == null || tickPosition < NextMaxTick)
+                    NextMaxTick = tickPosition;
+
+                continue;
+            }
+
+            var laneObject = getOrCreateObject();
+            laneObject.X = tickPosition;
+
+            laneObject.GameObject = gameObject;
+            laneObject.SceneType = SceneType.SpaceStation; // TODO: scene at time
+            laneObject.MovementType = gameObjectData.MovementType;
+            laneObject.LaneType = gameObject.LaneType;
+            laneObject.LaneModifier = gameObject.LaneModifier;
+            laneObject.HoldLength = endPosition - tickPosition;
+        }
+    }
+
+    private GameObject? getNextObjectOfType(List<GameObject> gameObjects, ObjectType allowedObjectType, int startIndex)
+    {
+        for (var index = startIndex + 1; index < gameObjects.Count; index++)
+        {
+            var gameObject = gameObjects[index];
+            if (!laneTypes.Contains(gameObject.LaneType))
+                continue;
+
+            if (gameObject.ObjectType != allowedObjectType || gameObject.LaneModifier == LaneModifierType.Landmine)
+                continue;
+
+            return gameObject;
+        }
+
+        return null;
+    }
+
+    private void generateGeminiObjects()
+    {
+        var gameObjects = dataHolder.CurrentMap.Value.GameObjects;
+
+        for (var index = 0; index < gameObjects.Count; index++)
+        {
+            var gameObject = gameObjects[index];
+            if (!laneTypes.Contains(gameObject.LaneType)) continue;
+
+            var objectType = gameObject.ObjectType;
+            if (objectType is not ObjectType.Gemini)
+                continue;
+
+            var gameObjectData = gameObject.GameObjectData;
+            if (gameObjectData == null) continue;
+
+            var tickPosition = ScrollContainer.PositionAtTime(gameObject.Offset);
+
+            // TODO
+        }
+    }
+
+    private BaseLaneObject getOrCreateObject()
+    {
+        BaseLaneObject baseLaneObject;
 
         if (CurrentTickIndex >= Count)
         {
-            laneObject = new LaneObject();
-            Add(laneObject);
+            baseLaneObject = new BaseLaneObject();
+            Add(baseLaneObject);
         }
         else
         {
-            laneObject = Children[CurrentTickIndex];
+            baseLaneObject = Children[CurrentTickIndex];
         }
 
+        baseLaneObject.Alpha = 1;
+        baseLaneObject.HoldLength = null;
+
         CurrentTickIndex++;
-        return laneObject;
+        return baseLaneObject;
     }
 }

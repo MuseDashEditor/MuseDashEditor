@@ -2,6 +2,14 @@
 
 An unofficial MuseDash chart editor for [MDMC](https://mdmc.moe/).
 
+## Builds
+
+### Last nightly build: ![TeamCity build status](https://teamcity.azn9.dev/app/rest/builds/buildType:id:public_MuseDashEditor_BuildNightly/statusIcon.svg)
+[Download](https://teamcity.azn9.dev/repository/downloadAll/public_MuseDashEditor_BuildNightly/lastSuccessful/artifacts.zip) (Click "Login as guest" below the login form)
+
+### Last release build:
+No release builds yet.
+
 ## Project Status
 
 This project is in early (but active) development.

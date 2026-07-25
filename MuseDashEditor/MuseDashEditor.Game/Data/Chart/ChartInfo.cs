@@ -37,11 +37,16 @@ public record ChartInfoRaw(
     string hideBmsDifficulty,
     string hideBmsMessage,
     List<string> searchTags
-);
+)
+{
+    public static readonly ChartInfoRaw Empty = new("No name", "", "No author", "120", "0", "?", "?", "?", "?", "?", "0", "0", "0", "0", "", "", "", []);
+}
 // ReSharper restore InconsistentNaming
 
 public class ChartInfo(ChartInfoRaw raw)
 {
+    public ChartInfoRaw Raw { get; } = raw;
+
     // Global chart info
     public readonly Bindable<string> NameBindable = new(raw.name);
     public readonly Bindable<string> NameRomanizedBindable = new(raw.name_romanized);
@@ -63,19 +68,19 @@ public class ChartInfo(ChartInfoRaw raw)
     {
         LevelDesignerBindable.Value = mapId switch
         {
-            1 => raw.levelDesigner1,
-            2 => raw.levelDesigner2,
-            3 => raw.levelDesigner3,
-            4 => raw.levelDesigner4,
+            1 => Raw.levelDesigner1,
+            2 => Raw.levelDesigner2,
+            3 => Raw.levelDesigner3,
+            4 => Raw.levelDesigner4,
             _ => LevelDesignerBindable.Value
         };
 
         LevelDifficultyBindable.Value = mapId switch
         {
-            1 => raw.difficulty1,
-            2 => raw.difficulty2,
-            3 => raw.difficulty3,
-            4 => raw.difficulty4,
+            1 => Raw.difficulty1,
+            2 => Raw.difficulty2,
+            3 => Raw.difficulty3,
+            4 => Raw.difficulty4,
             _ => LevelDifficultyBindable.Value
         };
     }

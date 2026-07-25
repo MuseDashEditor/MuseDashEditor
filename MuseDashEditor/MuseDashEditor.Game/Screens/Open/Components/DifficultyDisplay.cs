@@ -19,6 +19,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osuTK;
@@ -27,33 +28,60 @@ namespace MuseDashEditor.Game.Screens.Open.Components;
 
 public partial class DifficultyDisplay : BasicButton
 {
-    public ColourInfo StarColour { get; init; }
-    public DifficultyType Difficulty { get; init; }
+    public required string DifficultyName { get; init; }
     public Action OnClickAction { get; init; } = () => { };
 
     [BackgroundDependencyLoader]
-    private void load(EditorDataHolder dataHolder)
+    private void load(TextureStore textureStore, EditorDataHolder dataHolder)
     {
         Margin = new MarginPadding(50);
         AutoSizeAxes = Axes.Both;
         Colour = Colour4.White;
 
-        InternalChild = new FillFlowContainer
+        var chartInfoRaw = dataHolder.CurrentChart.Value.ChartInfo.Raw;
+        string difficultyValue = DifficultyName switch
         {
-            Direction = FillDirection.Vertical,
+            "Easy" => chartInfoRaw.difficulty1,
+            "Hard" => chartInfoRaw.difficulty2,
+            "Master" => chartInfoRaw.difficulty3,
+            "Hidden" => chartInfoRaw.difficulty4,
+            _ => "?"
+        };
+
+        InternalChild = new Container
+        {
             AutoSizeAxes = Axes.Both,
 
             Children =
             [
-                new Box
+                new Container
                 {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     Size = new Vector2(100, 100),
-                    Colour = StarColour,
-                    Margin = new MarginPadding(10)
+                    Children = [
+                        new Sprite
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            Texture = textureStore.Get($"Icons/difficulty/{DifficultyName.ToLowerInvariant()}"),
+                        },
+                        new SpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = difficultyValue,
+                            Font = FontUsage.Default.With(size: 20),
+                        }
+                    ]
                 },
                 new SpriteText
                 {
-                    Text = "DIFF NAME",
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Y = 120,
+                    Text = DifficultyName,
                     Font = FontUsage.Default.With(size: 30)
                 }
             ]
@@ -62,7 +90,7 @@ public partial class DifficultyDisplay : BasicButton
 
     protected override bool OnClick(ClickEvent e)
     {
-        OnClickAction?.Invoke();
+        OnClickAction();
         return true;
     }
 }

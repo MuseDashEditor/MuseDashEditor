@@ -14,6 +14,7 @@ using System;
 using MuseDashEditor.Game.Data.Holder;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 
@@ -26,6 +27,14 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
     public double ElapsedFrameTime => interpolatingClock.ElapsedFrameTime;
     public double FramesPerSecond => (interpolatingClock as IFrameBasedClock).FramesPerSecond;
     public double TrackLength { get; private set; }
+
+    public BindableDouble CurrentTimeBindable { get; } = new()
+    {
+        MinValue = 0,
+        MaxValue = 1,
+        Value = 0,
+        Precision = 1
+    };
 
     public Action<double> OnTimeChanged = _ => {};
     public Action OnSeek = () => {};
@@ -86,6 +95,7 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
         var result = decouplingClock.Seek(position);
         interpolatingClock.ProcessFrame();
 
+        CurrentTimeBindable.Value = CurrentTime;
         OnTimeChanged(CurrentTime);
         OnSeek();
 
@@ -112,7 +122,16 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
         interpolatingClock.ProcessFrame();
 
         if (IsRunning)
+        {
+            CurrentTimeBindable.Value = CurrentTime;
             OnTimeChanged(CurrentTime);
+        }
+
+        if (!(CurrentTime >= TrackLength))
+            return;
+
+        if (IsRunning)
+            Stop();
     }
 
     public IClock Source => decouplingClock.Source;
@@ -123,6 +142,8 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
             TrackLength = track.Length;
         else
             TrackLength = 0;
+
+        CurrentTimeBindable.MaxValue = TrackLength;
 
         decouplingClock.ChangeSource(source);
         interpolatingClock.ProcessFrame();

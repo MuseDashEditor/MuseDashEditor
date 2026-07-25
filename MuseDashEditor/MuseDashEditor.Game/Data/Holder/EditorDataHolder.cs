@@ -12,15 +12,23 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
+using MuseDashEditor.Game.Data.Parser;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Screens.Editor.SubScreens;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 
 namespace MuseDashEditor.Game.Data.Holder;
 
-public class EditorDataHolder
+public partial class EditorDataHolder : IDependencyInjectionCandidate
 {
+    [Resolved] protected AudioManager AudioManager { get; private set; } = null!;
+
     public readonly Bindable<Chart.Chart> CurrentChart = new();
     public readonly Bindable<Chart.Map> CurrentMap = new();
     public readonly Bindable<Track> CurrentTrack = new();
@@ -28,4 +36,34 @@ public class EditorDataHolder
     public readonly Bindable<DifficultyType> SelectedDifficulty = new();
     public readonly Bindable<EditorSubscreenType> SelectedSubscreen = new();
     public readonly Bindable<SceneType> CurrentScene = new();
+
+    public async Task Initialize(Storage? storage)
+    {
+        if (storage == null)
+            throw new InvalidOperationException("Storage is null");
+
+        var storagePath = storage.GetFullPath(".");
+        var storageDirectory = new DirectoryInfo(storagePath);
+
+        var chart = await ChartParser.Parse(storageDirectory);
+        if (chart == null)
+            throw new InvalidOperationException("Chart could not be parsed");
+
+        var resourcesStore = new StorageBackedResourceStore(storage);
+        var trackStore = AudioManager.GetTrackStore(resourcesStore);
+
+        var musicFile = chart.MusicFileBindable.Value;
+        var demoFile = chart.DemoFileBindable.Value;
+
+        if (musicFile != null)
+        {
+            var loadedTrack = await trackStore.GetAsync(musicFile.Name);
+            if (loadedTrack != null)
+                CurrentTrack.Value = loadedTrack;
+
+            CurrentTrackStreamGetter.Value = () => trackStore.GetStream(musicFile.Name);
+        }
+
+        CurrentChart.Value = chart;
+    }
 }

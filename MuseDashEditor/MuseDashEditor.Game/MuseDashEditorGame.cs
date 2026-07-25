@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using MuseDashEditor.Game.Data.Holder;
+using MuseDashEditor.Game.Project;
 using MuseDashEditor.Game.Screens;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -20,15 +21,16 @@ namespace MuseDashEditor.Game;
 
 public partial class MuseDashEditorGame : MuseDashEditorGameBase
 {
-    // Editor data
     [Cached] protected readonly EditorDataHolder DataHolder = new();
-
-    // UI data
+    [Cached] protected readonly ProjectManager ProjectManager = new();
     [Cached] protected readonly ScreenStack ScreenStack = new() { RelativeSizeAxes = Axes.Both };
 
     [BackgroundDependencyLoader]
     private void load()
     {
+        Dependencies.Inject(DataHolder);
+        Dependencies.Inject(ProjectManager);
+
         Child = ScreenStack;
     }
 

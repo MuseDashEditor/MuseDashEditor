@@ -28,7 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\"/>
-    <Folder Include="Tests\Screens\"/>
   </ItemGroup>
   <ItemGroup>
     <None Remove="Resources\WACCA_ULTRA_DREAM_MEGAMIX.mdm"/>

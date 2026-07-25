@@ -12,14 +12,11 @@
 
 using System;
 using MuseDashEditor.Game.Data.Holder;
-using MuseDashEditor.Game.Data.Parser;
+using MuseDashEditor.Game.Project;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osuTK;
 
@@ -28,9 +25,9 @@ namespace MuseDashEditor.Game.Screens.Open;
 public partial class FolderSelectorScreen : Screen
 {
     [BackgroundDependencyLoader]
-    private void load(GameHost host, ScreenStack screenStack, AudioManager audioManager, EditorDataHolder dataHolder)
+    private void load(ScreenStack screenStack, EditorDataHolder dataHolder, ProjectManager projectManager)
     {
-        var fileSelector = new BasicFileSelector(null, [".bms", ".json", ".ogg", ".mp3", ".mdm"])
+        var fileSelector = new BasicFileSelector(null, [".mdm"])
         {
             RelativeSizeAxes = Axes.X,
             Size = new Vector2(1, 1030),
@@ -53,44 +50,25 @@ public partial class FolderSelectorScreen : Screen
                     try
                     {
                         var selectedFile = fileSelector.CurrentFile.Value;
-                        if (selectedFile != null)
+                        if (selectedFile == null)
                         {
-                            // TODO
+                            return;
                         }
 
-                        var pathValue = fileSelector.CurrentPath.Value;
-                        Logger.Log($"Opening chart from {pathValue.FullName}...");
+                        var pathValue = fileSelector.CurrentFile.Value;
+                        if (pathValue == null) return;
 
-                        var chart = await ChartParser.Parse(pathValue);
-                        if (chart == null) return;
+                        Logger.Log($"Importing chart from {pathValue.FullName}...");
 
-                        // Create backing storage
-                        var storage = new NativeStorage(pathValue.FullName, host);
-                        var resourcesStore = new StorageBackedResourceStore(storage);
-
-                        var trackStore = audioManager.GetTrackStore(resourcesStore);
-
-                        var musicFile = chart.MusicFileBindable.Value;
-                        var demoFile = chart.DemoFileBindable.Value;
-
-                        // Load audio files
-                        if (musicFile != null)
-                        {
-                            var loadedTrack = await trackStore.GetAsync(musicFile.Name);
-                            if (loadedTrack != null)
-                                dataHolder.CurrentTrack.Value = loadedTrack;
-
-                            dataHolder.CurrentTrackStreamGetter.Value = () => trackStore.GetStream(musicFile.Name);
-                        }
-
-                        dataHolder.CurrentChart.Value = chart;
+                        var storage = await projectManager.ImportChart(pathValue.FullName);
+                        await dataHolder.Initialize(storage);
 
                         this.Exit();
                         screenStack.Push(new DifficultySelectorScreen());
                     }
                     catch (Exception e)
                     {
-                        Logger.Error(e, "Failed to open chart");
+                        Logger.Error(e, "Failed to import chart");
                     }
                 })
             }

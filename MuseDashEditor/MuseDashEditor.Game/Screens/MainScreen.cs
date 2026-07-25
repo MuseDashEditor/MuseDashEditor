@@ -53,7 +53,7 @@ public partial class MainScreen : Screen
                         Colour = Colour4.AliceBlue,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Action = () => {}
+                        Action = () => MainScreenStack.Push(new ProjectListScreen())
                     },
                     new BasicButton
                     {

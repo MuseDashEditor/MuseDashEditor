@@ -60,7 +60,7 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
             if (gameObjectData == null)
                 continue;
 
-            var tickPosition = ScrollContainer.PositionAtTime(gameObject.Offset);
+            var tickPosition = ScrollContainer.PositionAtTime(gameObject.Offset.Value);
 
             if (tickPosition < CurrentMinRange)
             {
@@ -124,7 +124,7 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
 
             isPlacing = true;
 
-            var tickPosition = ScrollContainer.PositionAtTime(gameObject.Offset);
+            var tickPosition = ScrollContainer.PositionAtTime(gameObject.Offset.Value);
             var nextObject = getNextObjectOfType(gameObjects, allowedObjectType, index);
 
             if (nextObject == null)
@@ -134,7 +134,7 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
                 continue;
             }
 
-            var endPosition = ScrollContainer.PositionAtTime(nextObject.Offset);
+            var endPosition = ScrollContainer.PositionAtTime(nextObject.Offset.Value);
 
             if (tickPosition < CurrentMinRange)
             {
@@ -203,7 +203,7 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
             var gameObjectData = gameObject.GameObjectData;
             if (gameObjectData == null) continue;
 
-            var tickPosition = ScrollContainer.PositionAtTime(gameObject.Offset);
+            var tickPosition = ScrollContainer.PositionAtTime(gameObject.Offset.Value);
 
             // TODO
         }

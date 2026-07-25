@@ -94,6 +94,6 @@ public partial class TimingTrack : Container
 
         ZoomableScrollContainer.Add(WaveformGraph);
         ZoomableScrollContainer.Add(TimingTrackTickDisplay);
-        ZoomableScrollContainer.SetupZoom(100, 1, 500); // TODO
+        ZoomableScrollContainer.SetupZoom(200, 50, 50 * 258); // Zoom enough to see 1/256th of a beat, and a bit more
     }
 }

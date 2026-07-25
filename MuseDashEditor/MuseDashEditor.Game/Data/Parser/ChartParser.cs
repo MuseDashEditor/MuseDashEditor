@@ -49,6 +49,7 @@ public static class ChartParser
         var chartInfoFile = new FileInfo(Path.Combine(directory.FullName, "info.json"));
         var infoFileData = chartInfoFile.OpenText().BaseStream;
         var chartInfoRaw = await JsonSerializer.DeserializeAsync<ChartInfoRaw>(infoFileData);
+        if (chartInfoRaw == null) return null;
 
         var chartInfo = new ChartInfo(chartInfoRaw);
 

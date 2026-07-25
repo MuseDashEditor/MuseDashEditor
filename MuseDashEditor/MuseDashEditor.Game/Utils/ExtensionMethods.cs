@@ -41,14 +41,12 @@ public static class ExtensionMethods
 
         foreach (var timingPointObject in timingPoints)
         {
-            if (timingPointObject.Offset > time) continue;
-            if (ignoreExact && Math.Abs(timingPointObject.Offset - time) < 0.01f) continue;
-            if (nearestTimingPoint != null && timingPointObject.Offset <= nearestTimingPoint.Offset) continue;
+            if (timingPointObject.Offset.Value > time) continue;
+            if (ignoreExact && Math.Abs(timingPointObject.Offset.Value - time) < 1) continue;
+            if (nearestTimingPoint != null && timingPointObject.Offset.Value <= nearestTimingPoint.Offset.Value) continue;
 
             nearestTimingPoint = timingPointObject;
         }
-
-        Logger.Log($"Nearest timing point at time {time}: {nearestTimingPoint?.Offset}");
 
         return nearestTimingPoint;
     }
@@ -64,8 +62,8 @@ public static class ExtensionMethods
 
         foreach (var timingPointObject in timingPoints)
         {
-            if (timingPointObject.Offset <= time) continue;
-            if (nextTimingPoint != null && timingPointObject.Offset >= nextTimingPoint.Offset) continue;
+            if (timingPointObject.Offset.Value <= time + 0.5) continue;
+            if (nextTimingPoint != null && timingPointObject.Offset.Value >= nextTimingPoint.Offset.Value) continue;
 
             nextTimingPoint = timingPointObject;
         }

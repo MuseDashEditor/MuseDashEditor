@@ -10,9 +10,11 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using osu.Framework.Bindables;
+
 namespace MuseDashEditor.Game.Data.Object.MappingObject;
 
 public sealed class TimingPointObject(double offset, double newBpm) : MappingObject(offset)
 {
-    public double NewBpm { get; set; } = newBpm;
+    public BindableDouble NewBpm { get; } = new(newBpm);
 }

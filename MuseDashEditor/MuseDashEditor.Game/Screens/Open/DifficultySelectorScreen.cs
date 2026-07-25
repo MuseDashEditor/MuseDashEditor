@@ -31,7 +31,8 @@ public partial class DifficultySelectorScreen : Screen
     [BackgroundDependencyLoader]
     private void load()
     {
-        // if (dataHolder.CurrentChart.Value == null) return; // TODO
+        if (DataHolder.CurrentChart.Value == null)
+            return;
 
         InternalChildren =
         [
@@ -55,7 +56,7 @@ public partial class DifficultySelectorScreen : Screen
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = "CHART NAME", // TODO
+                        Text = DataHolder.CurrentChart.Value.ChartInfo.NameBindable.Value,
                         Font = FontUsage.Default.With(size: 50)
                     },
                     new FillFlowContainer<DifficultyDisplay>
@@ -69,26 +70,22 @@ public partial class DifficultySelectorScreen : Screen
                         [
                             new DifficultyDisplay
                             {
-                                StarColour = Color4.Green,
-                                Difficulty = DifficultyType.Easy,
+                                DifficultyName = "Easy",
                                 OnClickAction = () => OnDifficultySelected(DifficultyType.Easy)
                             },
                             new DifficultyDisplay
                             {
-                                StarColour = Color4.Aqua,
-                                Difficulty = DifficultyType.Hard,
+                                DifficultyName = "Hard",
                                 OnClickAction = () => OnDifficultySelected(DifficultyType.Hard)
                             },
                             new DifficultyDisplay
                             {
-                                StarColour = Color4.Magenta,
-                                Difficulty = DifficultyType.Master,
+                                DifficultyName = "Master",
                                 OnClickAction = () => OnDifficultySelected(DifficultyType.Master)
                             },
                             new DifficultyDisplay
                             {
-                                StarColour = Color4.Gray,
-                                Difficulty = DifficultyType.Hidden,
+                                DifficultyName = "Hidden",
                                 OnClickAction = () => OnDifficultySelected(DifficultyType.Hidden)
                             }
                         ]

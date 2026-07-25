@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using System;
-using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Editor.Clock;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
@@ -27,12 +26,14 @@ namespace MuseDashEditor.Game.Screens.Editor.Components;
 
 public partial class PlayBar : CompositeDrawable
 {
-    private SpriteText percentText;
-    private SpriteText timerText;
-    private BasicSliderBar<float> slider;
+    [Resolved] protected EditorClock EditorClock { get; private set; } = null!;
+
+    private SpriteText percentText = null!;
+    private SpriteText timerText = null!;
+    private BasicSliderBar<double> slider = null!;
 
     [BackgroundDependencyLoader]
-    private void load(EditorDataHolder dataHolder, EditorClock clock)
+    private void load()
     {
         RelativeSizeAxes = Axes.X;
         Height = 65;
@@ -50,56 +51,85 @@ public partial class PlayBar : CompositeDrawable
                 Colour = MdeColors.Background5
             },
 
-            // Text
-            timerText = new SpriteText
+            new GridContainer
             {
-                Text = "00:00.0000",
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.Centre,
-                Position = new Vector2(125, 17.5f),
-                Font = FontUsage.Default.With(size: 28f)
-            },
-            percentText = new SpriteText
-            {
-                Text = "0.00 %",
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.Centre,
-                Position = new Vector2(125, -12.5f),
-                Font = FontUsage.Default.With(size: 28f)
-            },
+                RelativeSizeAxes = Axes.Both,
+                Content = new[]
+                {
+                    new Drawable[]
+                    {
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Children =
+                            [
+                                timerText = new SpriteText
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Text = "00:00.0000",
+                                    Font = FontUsage.Default.With(size: 28f),
+                                },
+                                percentText = new SpriteText
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Text = "0.00 %",
+                                    Font = FontUsage.Default.With(size: 28f)
+                                }
+                            ]
+                        },
+                        slider = new BasicSliderBar<double>
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(1320, 20),
 
-            // Slider
-            slider = new BasicSliderBar<float>
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(1320, 20),
+                            BackgroundColour = MdeColors.Dark4,
+                            SelectionColour = MdeColors.Dark2,
+                            FocusColour = MdeColors.Dark1,
 
-                BackgroundColour = MdeColors.Dark4,
-                SelectionColour = MdeColors.Dark2,
-                FocusColour = MdeColors.Dark1,
-
-                Current = new BindableNumber<float> { MinValue = 0, MaxValue = 1, Precision = .01f }
+                            Current = new BindableDouble
+                            {
+                                MinValue = 0,
+                                MaxValue = 1,
+                                Value = 0,
+                                Precision = 1
+                            }
+                        },
+                        new Box()
+                    }
+                },
+                RowDimensions = [new Dimension(GridSizeMode.Relative, 1)],
+                ColumnDimensions =
+                [
+                    new Dimension(GridSizeMode.Absolute, 125),
+                    new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 125)
+                ]
             }
-
-            // Play button
-            // TODO
         ];
 
-        clock.OnTimeChanged += time =>
-        {
-            double minutes = Math.Floor(time / 60000);
-            double seconds = Math.Floor(time / 1000) % 60;
-            double miliseconds = Math.Floor(time % 1000);
+        slider.Current.BindTo(EditorClock.CurrentTimeBindable);
 
-            var timerString = $"{minutes:00}:{seconds:00}.{miliseconds:000}";
-            timerText.Text = timerString;
+        EditorClock.OnTimeChanged += onClockTimeChanged;
+        onClockTimeChanged(0);
+    }
 
-            percentText.Text = $"{(time / clock.TrackLength) * 100:0.00} %";
-            var sliderValue = (float)(time / clock.TrackLength);
-            if (sliderValue < 0) sliderValue = 0;
-            if (sliderValue > 1) sliderValue = 1;
-            slider.Current.Value = sliderValue;
-        };
+    private void onClockTimeChanged(double time)
+    {
+        double minutes = Math.Floor(time / 60000);
+        double seconds = Math.Floor(time / 1000) % 60;
+        double miliseconds = Math.Floor(time % 1000);
+
+        var timerString = $"{minutes:00}:{seconds:00}.{miliseconds:000}";
+        timerText.Text = timerString;
+
+        var editorClockTrackLength = EditorClock.TrackLength;
+        if (editorClockTrackLength == 0) editorClockTrackLength = 1; // Prevent division by zero
+        percentText.Text = $"{time / editorClockTrackLength * 100:0.00} %";
     }
 }

@@ -10,6 +10,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using MuseDashEditor.Game.Data.Object.GameObject;
@@ -29,6 +30,9 @@ public record Map(
     public readonly List<TimingPointObject> TimingPoints = [];
 
     public readonly SortedDictionary<int, Dictionary<(LaneModifierType, LaneType), int[]>> RawMapData = new();
+
+    public Action OnTimingPointsChanged = () => {};
+    public Action OnGameObjectsChanged = () => {};
 }
 
 public class MapMetadata

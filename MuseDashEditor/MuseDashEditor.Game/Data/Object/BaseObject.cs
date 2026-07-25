@@ -10,9 +10,11 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using osu.Framework.Bindables;
+
 namespace MuseDashEditor.Game.Data.Object;
 
 public abstract class BaseObject(double offset)
 {
-    public double Offset { get; set; } = offset;
+    public BindableDouble Offset { get; } = new(offset);
 }

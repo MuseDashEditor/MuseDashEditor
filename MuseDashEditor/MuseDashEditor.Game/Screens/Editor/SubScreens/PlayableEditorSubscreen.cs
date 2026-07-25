@@ -63,77 +63,91 @@ public partial class PlayableEditorSubscreen : EditorSubscreen
             }
             case Key.PageUp:
             {
-                var currentTime = EditorClock.CurrentTime;
+                var currentTime = ScrollContainer.GetCurrentOrTargetTime();
                 if (currentTime <= 0) break;
 
                 var nearestTimingPoint = EditorDataHolder.GetTimingPointAtTime(currentTime, true);
                 if (nearestTimingPoint == null) break;
 
-                ScrollContainer.ScrollToTime(nearestTimingPoint.Offset);
+                ScrollContainer.ScrollToTime(nearestTimingPoint.Offset.Value, true);
                 break;
             }
             case Key.PageDown:
             {
-                var currentTime = EditorClock.CurrentTime;
+                var currentTime = ScrollContainer.GetCurrentOrTargetTime();
                 if (currentTime >= EditorClock.TrackLength) break;
 
                 var nextTimingPoint = EditorDataHolder.GetNextTimingPointAtTime(currentTime);
                 if (nextTimingPoint == null) break;
 
-                ScrollContainer.ScrollToTime(nextTimingPoint.Offset);
+                ScrollContainer.ScrollToTime(nextTimingPoint.Offset.Value, true);
                 break;
             }
             case Key.Left:
             {
-                var currentTime = EditorClock.CurrentTime;
+                var currentTime = ScrollContainer.GetCurrentOrTargetTime();
                 if (currentTime <= 0) break;
 
                 var nearestTimingPoint = EditorDataHolder.GetTimingPointAtTime(currentTime, true);
                 if (nearestTimingPoint == null) break;
 
-                double beatLength = 60_000 / nearestTimingPoint.NewBpm;
-                double nearestTime = nearestTimingPoint.Offset +
-                                     Math.Floor((currentTime - nearestTimingPoint.Offset) / beatLength) * beatLength;
+                double beatLength = 60_000 / nearestTimingPoint.NewBpm.Value;
 
-                if (Math.Abs(nearestTime - currentTime) < 0.01f)
-                    nearestTime -= beatLength;
+                var subBeatCount = e.ControlPressed ? 1 : ScrollContainer.GetCurrentSubBeatDisplayedCount();
+                var subBeatLength = beatLength / subBeatCount;
 
-                if (nearestTime < nearestTimingPoint.Offset)
-                    nearestTime = nearestTimingPoint.Offset;
+                double nearestTime = nearestTimingPoint.Offset.Value +
+                                     Math.Floor((currentTime - nearestTimingPoint.Offset.Value) / subBeatLength) * subBeatLength;
 
-                ScrollContainer.ScrollToTime(nearestTime);
+                if (Math.Abs(nearestTime - currentTime) < 1)
+                    nearestTime -= subBeatLength;
+
+                if (nearestTime < nearestTimingPoint.Offset.Value)
+                    nearestTime = nearestTimingPoint.Offset.Value;
+
+                ScrollContainer.ScrollToTime(nearestTime, true);
                 break;
             }
             case Key.Right:
             {
-                var currentTime = EditorClock.CurrentTime;
+                var currentTime = ScrollContainer.GetCurrentOrTargetTime();
                 if (currentTime >= EditorClock.TrackLength) break;
 
                 var nearestTimingPoint = EditorDataHolder.GetTimingPointAtTime(currentTime);
                 if (nearestTimingPoint == null) break;
 
-                double beatLength = 60_000 / nearestTimingPoint.NewBpm;
-                double nearestTime = nearestTimingPoint.Offset +
-                                     (Math.Floor((currentTime - nearestTimingPoint.Offset) / beatLength) + 1) *
-                                     beatLength;
-
-                if (Math.Abs(nearestTime - currentTime) < 0.01f)
-                    nearestTime += beatLength;
-
                 var nextTimingPoint = EditorDataHolder.GetNextTimingPointAtTime(currentTime);
-                if (nextTimingPoint != null && nearestTime > nextTimingPoint.Offset)
-                    nearestTime = nextTimingPoint.Offset;
+                if (nextTimingPoint != null && Math.Abs(nextTimingPoint.Offset.Value - currentTime) < 1f)
+                {
+                    nearestTimingPoint = nextTimingPoint;
+                    nextTimingPoint = EditorDataHolder.GetNextTimingPointAtTime(nextTimingPoint.Offset.Value);
+                }
 
-                ScrollContainer.ScrollToTime(nearestTime);
+                double beatLength = 60_000 / nearestTimingPoint.NewBpm.Value;
+
+                var subBeatCount = e.ControlPressed ? 1 : ScrollContainer.GetCurrentSubBeatDisplayedCount();
+                var subBeatLength = beatLength / subBeatCount;
+
+                double nearestTime = nearestTimingPoint.Offset.Value +
+                                     (Math.Floor((currentTime - nearestTimingPoint.Offset.Value) / subBeatLength) + 1) *
+                                     subBeatLength;
+
+                if (Math.Abs(nearestTime - currentTime) < 1f)
+                    nearestTime += subBeatLength;
+
+                if (nextTimingPoint != null && nearestTime > nextTimingPoint.Offset.Value)
+                    nearestTime = nextTimingPoint.Offset.Value;
+
+                ScrollContainer.ScrollToTime(nearestTime, true);
                 break;
             }
             case Key.Home:
                 if (e.Repeat) return false;
-                ScrollContainer.ScrollToTime(0);
+                ScrollContainer.ScrollToTime(0, true);
                 break;
             case Key.End:
                 if (e.Repeat) return false;
-                ScrollContainer.ScrollToTime(EditorClock.TrackLength);
+                ScrollContainer.ScrollToTime(EditorClock.TrackLength, true);
                 break;
             default:
                 return base.OnKeyDown(e);

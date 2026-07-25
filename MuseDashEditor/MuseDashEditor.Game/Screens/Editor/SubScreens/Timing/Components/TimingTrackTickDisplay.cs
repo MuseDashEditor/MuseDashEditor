@@ -10,6 +10,8 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System;
+using System.Collections.Generic;
 using MuseDashEditor.Game.Component;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Object.MappingObject;
@@ -17,6 +19,7 @@ using MuseDashEditor.Game.Editor.Clock;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics.Colour;
 using osuTK.Graphics;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Timing.Components;
@@ -37,9 +40,13 @@ public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPoint
         tickSample = audio.Samples.Get("tick");
         tickSample.Volume.Value = 2f;
 
-        dataHolder.CurrentMap.ValueChanged += _ => ContentCache.Invalidate();
+        dataHolder.CurrentMap.ValueChanged += e => onTimingPointsChanged();
+        dataHolder.CurrentMap.Value.OnTimingPointsChanged += onTimingPointsChanged;
+    }
 
-        // TODO: OnTimingPointChanged
+    private void onTimingPointsChanged()
+    {
+        ContentCache.Invalidate();
     }
 
     protected override void Update()
@@ -92,8 +99,8 @@ public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPoint
         var isLastPoint = pointIndex == timingPoints.Count - 1;
         var nextPoint = isLastPoint ? null : timingPoints[pointIndex + 1];
 
-        var startOffset = currentTimingPoint.Offset;
-        var endOffset = nextPoint?.Offset ?? dataHolder.CurrentTrack.Value.Length;
+        var startOffset = currentTimingPoint.Offset.Value;
+        var endOffset = nextPoint?.Offset.Value ?? dataHolder.CurrentTrack.Value.Length;
 
         var startPosition = ScrollContainer.PositionAtTime(startOffset);
         var endPosition = ScrollContainer.PositionAtTime(endOffset);
@@ -101,17 +108,17 @@ public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPoint
         if (startPosition > CurrentMaxRange || endPosition < CurrentMinRange)
             return;
 
-        var beatLength = 60_000 / currentTimingPoint.NewBpm;
+        var beatLength = 60_000 / currentTimingPoint.NewBpm.Value;
 
-        var subBeatCount = 4; // TODO: type of subdivision (4/4, 3/4, 6/8, etc.)
+        var subBeatCount = ScrollContainer.GetCurrentSubBeatDisplayedCount();
         var subBeatLength = beatLength / subBeatCount;
 
         var beatIndex = -1;
 
         for (var tickOffset = startOffset; tickOffset < endOffset; tickOffset += subBeatLength)
         {
-            var isFirstBeat = (beatIndex + 1) % subBeatCount == 0;
             beatIndex++;
+            var isFirstBeat = beatIndex % subBeatCount == 0;
 
             var tickPosition = ScrollContainer.PositionAtTime(tickOffset);
 
@@ -158,9 +165,42 @@ public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPoint
             {
                 tick.Height = 0.5f;
                 tick.Width = TimingPointTick.SUB_BEAT_POINT_WIDTH;
-                tick.Colour = Color4.Blue;
+                tick.Colour = getBeatColor(beatIndex, subBeatCount);
             }
         }
+    }
+
+    private static ColourInfo getBeatColor(int beatIndex, uint subBeatCount)
+    {
+        var inBeatIndex = beatIndex % subBeatCount;
+
+        if (inBeatIndex == 0) return Color4.White;
+
+        var colors = new Dictionary<int, ColourInfo>
+        {
+            { 2, Color4.Red },
+            { 4, Color4.Blue },
+            { 8, Color4.Green },
+            { 16, Color4.Yellow },
+            { 32, Color4.Purple },
+            { 64, Color4.Orange },
+            { 128, Color4.Cyan },
+            { 256, Color4.Magenta }
+        };
+
+        var gcd = TimingTrackTickDisplay.gcd((uint)inBeatIndex, subBeatCount);
+        var denominator = (int)(subBeatCount / gcd);
+
+        return colors.TryGetValue(denominator, out var color) ? color : Color4.Blue;
+    }
+
+    private static uint gcd(uint a, uint b)
+    {
+        while (b != 0)
+        {
+            (a, b) = (b, a % b);
+        }
+        return a;
     }
 
     private TimingPointTick getOrCreateTick()

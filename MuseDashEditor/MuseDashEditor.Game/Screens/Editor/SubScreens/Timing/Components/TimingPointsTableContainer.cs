@@ -62,7 +62,7 @@ public partial class TimingPointsTableContainer : TableContainer
                     ? dataHolder.CurrentMap.Value.TimingPoints[index + 1]
                     : null;
 
-                if (time >= timingPoint.Offset && time < (nextPoint?.Offset ?? editorClock.TrackLength))
+                if (time >= timingPoint.Offset.Value && time < (nextPoint?.Offset.Value ?? editorClock.TrackLength))
                     icon.FadeTo(1, 100);
                 else
                     icon.FadeTo(0, 100);
@@ -75,13 +75,31 @@ public partial class TimingPointsTableContainer : TableContainer
                 {
                     Text = $"Timing point #{index + 1}"
                 },
-                new SpriteText
+                new AdjustableInput
                 {
-                    Text = timingPoint.Offset.ToString("0.0000")
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+
+                    Value = timingPoint.Offset,
+                    MinValue = double.MinValue, // Allow negative values for offset
+                    MaxValue = editorClock.TrackLength,
+
+                    SmallStep = 1,
+                    LargeStep = 100
                 },
-                new SpriteText
+                new AdjustableInput
                 {
-                    Text = timingPoint.NewBpm.ToString("0.0000")
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+
+                    Value = timingPoint.NewBpm,
+                    MinValue = 1,
+                    MaxValue = double.MaxValue,
+
+                    SmallStep = 0.1,
+                    LargeStep = 10
                 },
                 new Box() // TODO
             ];

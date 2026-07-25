@@ -157,7 +157,7 @@ public static class BmsParser
             }
         }
 
-        map.GameObjects.Sort((g1, g2) => g1.Offset.CompareTo(g2.Offset));
+        map.GameObjects.Sort((g1, g2) => g1.Offset.Value.CompareTo(g2.Offset.Value));
         Logger.Log($"Parsed {map.GameObjects.Count} objects");
     }
 

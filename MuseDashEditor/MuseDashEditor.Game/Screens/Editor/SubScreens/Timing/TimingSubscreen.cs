@@ -61,16 +61,7 @@ public partial class TimingSubscreen : PlayableEditorSubscreen
 
         var currentTrackValue = dataHolder.CurrentTrack.Value;
         if (currentTrackValue == null) return;
-        currentTrackValue.Volume.Value = 0.5f;
-    }
-
-    public override void Hide()
-    {
-        base.Hide();
-
-        var currentTrackValue = dataHolder.CurrentTrack.Value;
-        if (currentTrackValue == null) return;
-        currentTrackValue.Volume.Value = 1;
+        currentTrackValue.Volume.Value = 0.5f; // TODO: config
     }
 
     protected override bool OnKeyDown(KeyDownEvent e)

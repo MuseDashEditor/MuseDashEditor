@@ -30,17 +30,17 @@ public partial class LaneCircleContainer : Container<LaneCircle>
             new LaneCircle
             {
                 InnerColor = MdeColors.TopLaneColor,
-                Position = new Vector2(EditorConstants.HIT_CIRCLE_X, EditorConstants.TOP_LANE_Y),
+                Position = new Vector2(EditorConstants.PREVIEW_HIT_CIRCLE_X, EditorConstants.PREVIEW_TOP_LANE_Y),
             },
             new LaneCircle
             {
                 InnerColor = MdeColors.BottomLaneColor,
-                Position = new Vector2(EditorConstants.HIT_CIRCLE_X, EditorConstants.BOTTOM_LANE_Y),
+                Position = new Vector2(EditorConstants.PREVIEW_HIT_CIRCLE_X, EditorConstants.PREVIEW_BOTTOM_LANE_Y),
             },
             new LaneCircle
             {
                 InnerColor = MdeColors.BossLaneColor,
-                Position = new Vector2(EditorConstants.HIT_CIRCLE_X, EditorConstants.BOSS_LANE_Y),
+                Position = new Vector2(EditorConstants.PREVIEW_HIT_CIRCLE_X, EditorConstants.PREVIEW_BOSS_LANE_Y),
             },
         ];
     }

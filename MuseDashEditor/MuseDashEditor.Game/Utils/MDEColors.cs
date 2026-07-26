@@ -10,7 +10,10 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System;
+using MuseDashEditor.Game.Data.Type;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 
 namespace MuseDashEditor.Game.Utils;
 
@@ -52,5 +55,16 @@ public static class MdeColors
     private static Colour4 getColour(float saturation, float lightness)
     {
         return Colour4.FromHSL(base_hue / 360f, saturation, lightness);
+    }
+
+    public static ColourInfo GetLaneColor(LaneType laneType)
+    {
+        return laneType switch
+        {
+            LaneType.Air or LaneType.Air2 => TopLaneColor,
+            LaneType.Ground or LaneType.Ground2 => BottomLaneColor,
+            LaneType.Special or LaneType.Special2 => BossLaneColor,
+            _ => throw new ArgumentOutOfRangeException(nameof(laneType), laneType, null)
+        };
     }
 }

@@ -12,6 +12,7 @@
 
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Type;
+using MuseDashEditor.Game.Editor.Clock;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;

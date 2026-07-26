@@ -42,9 +42,9 @@ public partial class TimingTrack : Container
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            RelativeSizeAxes = Axes.Both,
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
             Width = 0.9f,
-            Height = 1f,
             Depth = 20
         };
         WaveformGraph = new WaveformGraph
@@ -77,8 +77,9 @@ public partial class TimingTrack : Container
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Size = new Vector2(1, 250),
-                Colour = Color4.White,
+                RelativeSizeAxes = Axes.Y,
+                Size = new Vector2(3, 1),
+                Colour = Color4.LimeGreen,
                 Depth = 10,
                 X = xCenter
             },

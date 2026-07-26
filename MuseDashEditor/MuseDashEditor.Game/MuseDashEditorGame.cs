@@ -13,6 +13,7 @@
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Project;
 using MuseDashEditor.Game.Screens;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -23,13 +24,19 @@ public partial class MuseDashEditorGame : MuseDashEditorGameBase
 {
     [Cached] protected readonly EditorDataHolder DataHolder = new();
     [Cached] protected readonly ProjectManager ProjectManager = new();
+    [Cached] protected readonly MdeSounds MdeSounds = new();
     [Cached] protected readonly ScreenStack ScreenStack = new() { RelativeSizeAxes = Axes.Both };
+
+    private readonly HighPerformanceSessionManager highPerformanceSessionManager = new();
 
     [BackgroundDependencyLoader]
     private void load()
     {
         Dependencies.Inject(DataHolder);
         Dependencies.Inject(ProjectManager);
+        Dependencies.Inject(MdeSounds);
+
+        MdeSounds.Preload();
 
         Child = ScreenStack;
     }
@@ -38,6 +45,16 @@ public partial class MuseDashEditorGame : MuseDashEditorGameBase
     {
         base.LoadComplete();
 
+        highPerformanceSessionManager.Start();
+
         ScreenStack.Push(new MainScreen());
+    }
+
+    protected override void Dispose(bool isDisposing)
+    {
+        highPerformanceSessionManager.Stop();
+        MdeSounds.Dispose();
+
+        base.Dispose(isDisposing);
     }
 }

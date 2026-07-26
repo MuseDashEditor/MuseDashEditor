@@ -24,7 +24,7 @@ using osuTK.Graphics;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Timing.Components;
 
-public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPointTick>(TimingPointTick.MAX_WIDTH * 2)
+public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPointTick>(TimingPointTick.MAX_WIDTH * 5)
 {
     [Resolved] private EditorDataHolder dataHolder { get; set; } = null!;
     [Resolved] private EditorClock editorClock { get; set; } = null!;
@@ -149,21 +149,18 @@ public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPoint
 
             if (beatIndex == 0)
             {
-                tick.Height = 1;
                 tick.Width = TimingPointTick.TIMING_CHANGE_WIDTH;
                 tick.Colour = Color4.Red;
                 tick.ShouldPlaySound = true;
             }
             else if (isFirstBeat)
             {
-                tick.Height = 0.8f;
                 tick.Width = TimingPointTick.FIRST_BEAT_POINT_WIDTH;
                 tick.Colour = Color4.White;
                 tick.ShouldPlaySound = true;
             }
-            else // TODO: Color per subdivision type
+            else
             {
-                tick.Height = 0.5f;
                 tick.Width = TimingPointTick.SUB_BEAT_POINT_WIDTH;
                 tick.Colour = getBeatColor(beatIndex, subBeatCount);
             }

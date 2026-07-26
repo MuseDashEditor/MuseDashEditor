@@ -60,9 +60,12 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
 
         base.Content.Add(zoomedContent = new Container
         {
-            RelativeSizeAxes = Axes.Y,
+            AutoSizeAxes = Axes.Y,
             Alpha = 0
         });
+
+        base.Content.RelativeSizeAxes = Axes.None;
+        base.Content.AutoSizeAxes = Axes.Both;
 
         AddLayout(zoomedContentWidthCache);
     }
@@ -81,7 +84,7 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
     protected override bool OnScroll(ScrollEvent e)
     {
         if (!e.ControlPressed)
-            return base.OnScroll(e);
+            return false;
 
         if (editorClock.IsRunning)
             editorClock.Stop();
@@ -129,6 +132,11 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
         editorClock.Seek(target);
     }
 
+    public float GetMaxScrollPosition()
+    {
+        return PositionAtTime(editorClock.TrackLength);
+    }
+
     protected override void UpdateAfterChildren()
     {
         base.UpdateAfterChildren();
@@ -161,6 +169,11 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
         OnDrawWidthChanged();
 
         Schedule(() => GC.Collect(0)); // Force GC due to waveform resampling creating a LOT of objects
+    }
+
+    protected override void OnUserScroll(double value, bool animated = true, double? distanceDecay = null)
+    {
+        // Cancel user scroll
     }
 
     protected override bool OnMouseDown(MouseDownEvent e)

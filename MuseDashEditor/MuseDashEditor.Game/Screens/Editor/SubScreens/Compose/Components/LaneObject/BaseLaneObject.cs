@@ -12,10 +12,12 @@
 
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Textures;
+using osu.Framework.Utils;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneObject;
 
@@ -23,7 +25,9 @@ public partial class BaseLaneObject : Container
 {
     public const float BASE_SIZE = 75;
 
-    [Resolved] private TextureStore textureStore { get; set; } = null!;
+    [Resolved] private MdeSounds mdeSounds { get; set; } = null!;
+
+    public double Offset { get; set; }
 
     public GameObject GameObject
     {
@@ -66,6 +70,7 @@ public partial class BaseLaneObject : Container
     private SceneType sceneType;
     private LaneType laneType;
     private LaneModifierType laneModifier;
+    private HitSoundType hitSoundType;
 
     private bool isHold;
     private float? holdLength;
@@ -94,14 +99,19 @@ public partial class BaseLaneObject : Container
             return;
 
         if (isHold)
-            longObject.UpdateObjectTextures(gameObject.ObjectType, sceneType, laneType, laneModifier, /* TODO */ LaneModifierType.Normal);
+            longObject.UpdateObjectTextures(gameObject.ObjectType, sceneType, laneType, laneModifier, /* TODO */
+                LaneModifierType.Normal);
         else
             simpleObject.UpdateObjectTextures(gameObject.ObjectType, sceneType, laneType, laneModifier, movementType);
     }
 
     private void setGameObject(GameObject value)
     {
-        // TODO: Load sound etc.
+        var gameObjectData = GameObjectUtils.GetGameObjectData(value.ObjectType);
+        if (gameObjectData is null)
+            return;
+
+        hitSoundType = gameObjectData.HitSoundType;
 
         gameObject = value;
         updateObjectTextures();
@@ -151,5 +161,11 @@ public partial class BaseLaneObject : Container
 
         longObject.SetHoldLength(value.Value);
         updateObjectTextures();
+    }
+
+    public void PlaySound()
+    {
+        if (!IsPresent) return;
+        mdeSounds.PlayHitSound(hitSoundType);
     }
 }

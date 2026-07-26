@@ -16,6 +16,7 @@ using System.Linq;
 using MuseDashEditor.Game.Config;
 using MuseDashEditor.Resources;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -68,6 +69,12 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
                 new NamespacedResourceStore<byte[]>(Resources, "Textures"),
                 new NamespacedResourceStore<byte[]>(Resources, "MuseDashResources/Textures")
             ]))));
+        dependencies.CacheAs(Audio.GetSampleStore(
+            new ResourceStore<byte[]>([
+                new NamespacedResourceStore<byte[]>(Resources, "Samples"),
+                new NamespacedResourceStore<byte[]>(Resources, "MuseDashResources/Samples"),
+            ])
+        ));
 
         dependencies.CacheAs(localConfig);
 

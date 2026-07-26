@@ -11,21 +11,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using System.Collections.Generic;
-using System.Linq;
 using MuseDashEditor.Game.Component;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
+using MuseDashEditor.Game.Editor.Clock;
 using MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneObject;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components;
 
-public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshContainer<BaseLaneObject>(50)
+public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObject>(BaseLaneObject.BASE_SIZE * 5)
 {
     [Resolved] private EditorDataHolder dataHolder { get; set; } = null!;
+    [Resolved] private EditorClock editorClock { get; set; } = null!;
+
+    private double lastPlayedTickOffset;
 
     [BackgroundDependencyLoader]
     private void load()
@@ -39,15 +43,18 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
         generateBasicObjects();
         generateHoldObjects();
         generateGeminiObjects();
+
+        if (CurrentTickIndex != 0)
+            return;
+
+        NextMinTick = CurrentMinRange;
+        NextMaxTick = CurrentMaxRange;
     }
 
     private void generateBasicObjects()
     {
         foreach (var gameObject in dataHolder.CurrentMap.Value.GameObjects)
         {
-            if (!laneTypes.Contains(gameObject.LaneType))
-                continue;
-
             var objectType = gameObject.ObjectType;
             if (objectType is ObjectType.Hold or ObjectType.Gemini or ObjectType.Masher or ObjectType.BossMasher1
                 or ObjectType.BossMasher2)
@@ -60,7 +67,8 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
             if (gameObjectData == null)
                 continue;
 
-            var tickPosition = ScrollContainer.PositionAtTime(gameObject.Offset.Value);
+            var tickOffset = gameObject.Offset.Value;
+            var tickPosition = ScrollContainer.PositionAtTime(tickOffset);
 
             if (tickPosition < CurrentMinRange)
             {
@@ -79,7 +87,9 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
             }
 
             var laneObject = getOrCreateObject();
+            laneObject.Offset = tickOffset;
             laneObject.X = tickPosition;
+            laneObject.Y = EditorConstants.GetLaneY(gameObject.LaneType);
 
             laneObject.GameObject = gameObject;
             laneObject.SceneType = SceneType.SpaceStation; // TODO: scene at time
@@ -105,8 +115,6 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
         for (var index = 0; index < gameObjects.Count; index++)
         {
             var gameObject = gameObjects[index];
-            if (!laneTypes.Contains(gameObject.LaneType))
-                continue;
 
             var objectType = gameObject.ObjectType;
             if (objectType != allowedObjectType || gameObject.LaneModifier == LaneModifierType.Landmine)
@@ -124,7 +132,8 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
 
             isPlacing = true;
 
-            var tickPosition = ScrollContainer.PositionAtTime(gameObject.Offset.Value);
+            var tickOffset = gameObject.Offset.Value;
+            var tickPosition = ScrollContainer.PositionAtTime(tickOffset);
             var nextObject = getNextObjectOfType(gameObjects, allowedObjectType, index);
 
             if (nextObject == null)
@@ -159,7 +168,9 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
             }
 
             var laneObject = getOrCreateObject();
+            laneObject.Offset = tickOffset;
             laneObject.X = tickPosition;
+            laneObject.Y = EditorConstants.GetLaneY(gameObject.LaneType);
 
             laneObject.GameObject = gameObject;
             laneObject.SceneType = SceneType.SpaceStation; // TODO: scene at time
@@ -175,8 +186,6 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
         for (var index = startIndex + 1; index < gameObjects.Count; index++)
         {
             var gameObject = gameObjects[index];
-            if (!laneTypes.Contains(gameObject.LaneType))
-                continue;
 
             if (gameObject.ObjectType != allowedObjectType || gameObject.LaneModifier == LaneModifierType.Landmine)
                 continue;
@@ -194,7 +203,6 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
         for (var index = 0; index < gameObjects.Count; index++)
         {
             var gameObject = gameObjects[index];
-            if (!laneTypes.Contains(gameObject.LaneType)) continue;
 
             var objectType = gameObject.ObjectType;
             if (objectType is not ObjectType.Gemini)
@@ -228,5 +236,40 @@ public partial class LaneContentContainer(LaneType[] laneTypes) : AutoRefreshCon
 
         CurrentTickIndex++;
         return baseLaneObject;
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+
+        if (editorClock.IsRunning)
+            playSound();
+        else
+        {
+            lastPlayedTickOffset = editorClock.CurrentTime;
+        }
+    }
+
+    private void playSound()
+    {
+        var currentTime = editorClock.CurrentTime;
+        if (currentTime < 0)
+            return;
+
+        var localLastPlayedTickOffset = lastPlayedTickOffset;
+
+        foreach (var obj in Children)
+        {
+            var tickOffset = obj.Offset;
+
+            if (tickOffset > currentTime) continue;
+            if (!(lastPlayedTickOffset < tickOffset) || !(tickOffset < currentTime)) continue;
+
+            obj.PlaySound();
+
+            localLastPlayedTickOffset = tickOffset;
+        }
+
+        lastPlayedTickOffset = localLastPlayedTickOffset;
     }
 }

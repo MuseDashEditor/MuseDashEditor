@@ -76,6 +76,7 @@ public partial class BaseLaneObject : Container
     private float? holdLength;
 
     private SimpleLaneObject simpleObject = null!;
+    private SimpleLaneObject geminiObject = null!;
     private LongLaneObject longObject = null!;
 
     [BackgroundDependencyLoader]
@@ -88,8 +89,18 @@ public partial class BaseLaneObject : Container
 
         Children =
         [
-            simpleObject = new SimpleLaneObject(),
-            longObject = new LongLaneObject()
+            simpleObject = new SimpleLaneObject
+            {
+                Anchor = Anchor.TopLeft,
+                Origin = Anchor.TopLeft
+            },
+            longObject = new LongLaneObject(),
+            geminiObject = new SimpleLaneObject
+            {
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Alpha = 0
+            }
         ];
     }
 
@@ -98,20 +109,18 @@ public partial class BaseLaneObject : Container
         if (laneType == 0)
             return;
 
-        if (isHold)
+        if (isHold && LaneModifier != LaneModifierType.Landmine)
             longObject.UpdateObjectTextures(gameObject.ObjectType, sceneType, laneType, laneModifier, /* TODO */
                 LaneModifierType.Normal);
         else
-            simpleObject.UpdateObjectTextures(gameObject.ObjectType, sceneType, laneType, laneModifier, movementType);
+             simpleObject.UpdateObjectTextures(gameObject.ObjectType, sceneType, laneType, laneModifier, movementType);
     }
 
     private void setGameObject(GameObject value)
     {
         var gameObjectData = GameObjectUtils.GetGameObjectData(value.ObjectType);
-        if (gameObjectData is null)
-            return;
-
-        hitSoundType = gameObjectData.HitSoundType;
+        if (gameObjectData is not null)
+            hitSoundType = gameObjectData.HitSoundType;
 
         gameObject = value;
         updateObjectTextures();
@@ -167,5 +176,27 @@ public partial class BaseLaneObject : Container
     {
         if (!IsPresent) return;
         mdeSounds.PlayHitSound(hitSoundType);
+
+        if (laneModifier == LaneModifierType.Heart)
+            mdeSounds.PlayHitSound(HitSoundType.Heart);
+    }
+
+    public void SetGeminiPairLane(LaneType value, LaneModifierType laneModifierType)
+    {
+        geminiObject.UpdateObjectTextures(gameObject.ObjectType, sceneType, value, laneModifierType, movementType);
+        geminiObject.Alpha = 1;
+    }
+
+    public void Reset()
+    {
+        simpleObject.Alpha = 1;
+        geminiObject.Alpha = 0;
+        longObject.Alpha = 0;
+        Y = 0;
+        X = 0;
+        holdLength = null;
+        isHold = false;
+        Height = BASE_SIZE;
+        hitSoundType = HitSoundType.None;
     }
 }

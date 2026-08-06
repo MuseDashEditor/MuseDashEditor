@@ -58,7 +58,7 @@ public partial class AdjustableInput : FillFlowContainer
         Value.BindValueChanged(newValue =>
         {
             textBox.Text = newValue.NewValue.ToString(CultureInfo.CurrentCulture);
-            dataHolder.CurrentMap.Value.OnTimingPointsChanged();
+            dataHolder.OnTimingPointsChanged();
         }, true);
 
         Children =

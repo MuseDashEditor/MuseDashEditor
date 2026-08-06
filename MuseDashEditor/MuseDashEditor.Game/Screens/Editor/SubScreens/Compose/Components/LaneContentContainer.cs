@@ -10,6 +10,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System;
 using System.Collections.Generic;
 using MuseDashEditor.Game.Component;
 using MuseDashEditor.Game.Data.Holder;
@@ -21,6 +22,7 @@ using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Framework.Utils;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components;
 
@@ -40,15 +42,56 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
 
     protected override void RegenerateContent()
     {
+        // TODO: merge all, to iterate only once over all the objects
         generateBasicObjects();
         generateHoldObjects();
         generateGeminiObjects();
+        generateDesignObjects();
 
         if (CurrentTickIndex != 0)
             return;
 
         NextMinTick = CurrentMinRange;
         NextMaxTick = CurrentMaxRange;
+    }
+
+    private void generateDesignObjects()
+    {
+        foreach (var gameObject in dataHolder.CurrentMap.Value.GameObjects)
+        {
+            var designObjectData = gameObject.DesignObjectData;
+            if (designObjectData == null)
+                continue;
+
+            var tickOffset = gameObject.Offset.Value;
+            var tickPosition = ScrollContainer.PositionAtTime(tickOffset);
+
+            if (tickPosition < CurrentMinRange)
+            {
+                if (NextMinTick == null || tickPosition > NextMinTick)
+                    NextMinTick = tickPosition;
+
+                continue;
+            }
+
+            if (tickPosition > CurrentMaxRange)
+            {
+                if (NextMaxTick == null || tickPosition < NextMaxTick)
+                    NextMaxTick = tickPosition;
+
+                continue;
+            }
+
+            var laneObject = getOrCreateObject();
+            laneObject.Offset = tickOffset;
+            laneObject.X = tickPosition;
+            laneObject.Y = EditorConstants.GetLaneY(gameObject.LaneType);
+
+            laneObject.GameObject = gameObject;
+            laneObject.SceneType = SceneType.SpaceStation; // TODO: scene at time
+            laneObject.LaneType = gameObject.LaneType;
+            laneObject.LaneModifier = gameObject.LaneModifier;
+        }
     }
 
     private void generateBasicObjects()
@@ -110,7 +153,7 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
     private void generateHoldObjectsOfType(ObjectType allowedObjectType)
     {
         var gameObjects = dataHolder.CurrentMap.Value.GameObjects;
-        var isPlacing = false;
+        HashSet<(LaneType, LaneModifierType)> placing = [];
 
         for (var index = 0; index < gameObjects.Count; index++)
         {
@@ -124,17 +167,16 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
             if (gameObjectData == null)
                 continue;
 
-            if (isPlacing)
+            if (placing.Remove((gameObject.LaneType, gameObject.LaneModifier)))
             {
-                isPlacing = false;
                 continue;
             }
 
-            isPlacing = true;
+            placing.Add((gameObject.LaneType, gameObject.LaneModifier));
 
             var tickOffset = gameObject.Offset.Value;
             var tickPosition = ScrollContainer.PositionAtTime(tickOffset);
-            var nextObject = getNextObjectOfType(gameObjects, allowedObjectType, index);
+            var nextObject = getNextObjectOfType(gameObjects, allowedObjectType, index, gameObject.LaneType, gameObject.LaneModifier);
 
             if (nextObject == null)
             {
@@ -181,13 +223,16 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
         }
     }
 
-    private GameObject? getNextObjectOfType(List<GameObject> gameObjects, ObjectType allowedObjectType, int startIndex)
+    private GameObject? getNextObjectOfType(List<GameObject> gameObjects, ObjectType objectType, int startIndex,
+        LaneType laneType, LaneModifierType laneModifier)
     {
         for (var index = startIndex + 1; index < gameObjects.Count; index++)
         {
             var gameObject = gameObjects[index];
 
-            if (gameObject.ObjectType != allowedObjectType || gameObject.LaneModifier == LaneModifierType.Landmine)
+            if (gameObject.ObjectType != objectType
+                || gameObject.LaneType != laneType
+                || gameObject.LaneModifier != laneModifier)
                 continue;
 
             return gameObject;
@@ -200,21 +245,84 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
     {
         var gameObjects = dataHolder.CurrentMap.Value.GameObjects;
 
-        for (var index = 0; index < gameObjects.Count; index++)
+        foreach (var gameObject in gameObjects)
         {
-            var gameObject = gameObjects[index];
-
             var objectType = gameObject.ObjectType;
             if (objectType is not ObjectType.Gemini)
+                continue;
+
+            if (gameObject.LaneType is not LaneType.Air and not LaneType.Air2)
                 continue;
 
             var gameObjectData = gameObject.GameObjectData;
             if (gameObjectData == null) continue;
 
-            var tickPosition = ScrollContainer.PositionAtTime(gameObject.Offset.Value);
+            var tickOffset = gameObject.Offset.Value;
+            var tickPosition = ScrollContainer.PositionAtTime(tickOffset);
 
-            // TODO
+            var otherGemini = findOtherGemini(gameObjects, gameObject);
+            if (otherGemini == null)
+            {
+                // TODO: popup for the user : the imported map has issues
+                Logger.Log("Cannot find pairing gemini", level: LogLevel.Error);
+                continue;
+            }
+
+            if (tickPosition < CurrentMinRange)
+            {
+                if (NextMinTick == null || tickPosition > NextMinTick)
+                    NextMinTick = tickPosition;
+
+                continue;
+            }
+
+            if (tickPosition > CurrentMaxRange)
+            {
+                if (NextMaxTick == null || tickPosition < NextMaxTick)
+                    NextMaxTick = tickPosition;
+
+                continue;
+            }
+
+            var laneObjectY = EditorConstants.GetLaneY(gameObject.LaneType);
+            var otherLaneObjectY = EditorConstants.GetLaneY(otherGemini.LaneType);
+
+            var laneObject = getOrCreateObject();
+            laneObject.Offset = tickOffset;
+            laneObject.X = tickPosition;
+            laneObject.Y = (laneObjectY + otherLaneObjectY) / 2;
+            laneObject.Height = MathF.Abs(otherLaneObjectY - laneObjectY) + BaseLaneObject.BASE_SIZE;
+
+            laneObject.GameObject = gameObject;
+            laneObject.SceneType = SceneType.SpaceStation; // TODO: scene at time
+            laneObject.MovementType = gameObjectData.MovementType;
+            laneObject.LaneType = gameObject.LaneType;
+            laneObject.LaneModifier = gameObject.LaneModifier;
+            laneObject.SetGeminiPairLane(otherGemini.LaneType, otherGemini.LaneModifier);
         }
+    }
+
+    private static GameObject? findOtherGemini(List<GameObject> gameObjects, GameObject gameObject)
+    {
+        var offsetValue = gameObject.Offset.Value;
+        var isAir = gameObject.LaneType is LaneType.Air or  LaneType.Air2;
+
+        foreach (var other in gameObjects)
+        {
+            if (other.ObjectType != ObjectType.Gemini)
+                continue;
+
+            if (!Precision.AlmostEquals(offsetValue, other.Offset.Value))
+                continue;
+
+            var isOtherAir = other.LaneType is LaneType.Air or  LaneType.Air2;
+            if (isAir && isOtherAir || !isAir && !isOtherAir)
+                continue;
+
+            return other;
+        }
+
+        return null;
     }
 
     private BaseLaneObject getOrCreateObject()
@@ -232,7 +340,7 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
         }
 
         baseLaneObject.Alpha = 1;
-        baseLaneObject.HoldLength = null;
+        baseLaneObject.Reset();
 
         CurrentTickIndex++;
         return baseLaneObject;

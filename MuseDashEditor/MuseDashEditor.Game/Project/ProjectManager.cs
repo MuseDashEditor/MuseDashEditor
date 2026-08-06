@@ -16,6 +16,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using MuseDashEditor.Game.Conversion.MdeFormat;
 using MuseDashEditor.Game.Data.Project;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
@@ -32,7 +33,7 @@ public partial class ProjectManager : IDependencyInjectionCandidate
         var projectsStorage = Host.Storage.GetStorageForDirectory("projects");
         return projectsStorage.GetDirectories(".")
             .Select(projectsStorage.GetStorageForDirectory)
-            .Where(storage => storage.Exists("project.mde"));
+            .Where(storage => storage.Exists("project.mdep"));
     }
 
     public Storage CreateProject(string importedChartHash = "")
@@ -43,7 +44,7 @@ public partial class ProjectManager : IDependencyInjectionCandidate
         var projectStorage = projectsStorage.GetStorageForDirectory(projectUid.ToString());
 
         var projectData = new ProjectData(importedChartHash);
-        using var stream = projectStorage.CreateFileSafely("project.mde");
+        using var stream = projectStorage.CreateFileSafely("project.mdep");
         stream.Write(JsonSerializer.SerializeToUtf8Bytes(projectData, typeof(ProjectData)));
 
         return projectStorage;
@@ -70,6 +71,8 @@ public partial class ProjectManager : IDependencyInjectionCandidate
 
         await using var sourceStream = inputFileInfo.OpenRead();
         ZipFile.ExtractToDirectory(sourceStream, storagePath);
+
+        await MdeChartLoader.ConvertFromBms(storage);
 
         return storage;
     }

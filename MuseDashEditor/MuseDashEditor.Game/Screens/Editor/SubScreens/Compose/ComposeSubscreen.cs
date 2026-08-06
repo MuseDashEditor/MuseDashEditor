@@ -35,18 +35,20 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
 
         InternalChildren =
         [
-            timingTrack = new TimingTrack(-900)
-            {
-                AutoSizeAxes = Axes.Y,
-                Origin = Anchor.CentreLeft,
-                Anchor = Anchor.CentreLeft
-            },
             laneBackgrounds = new Container
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Origin = Anchor.CentreLeft,
-                Anchor = Anchor.CentreLeft
+                Anchor = Anchor.CentreLeft,
+                Depth = 1
+            },
+            timingTrack = new TimingTrack(-900)
+            {
+                AutoSizeAxes = Axes.Y,
+                Origin = Anchor.CentreLeft,
+                Anchor = Anchor.CentreLeft,
+                Depth = 0
             }
         ];
 
@@ -59,7 +61,6 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
                 Origin = Anchor.CentreLeft,
                 Anchor = Anchor.CentreLeft,
                 Y = EditorConstants.GetLaneY(laneType),
-                Depth = 0,
                 Alpha = 0.1f,
                 Colour = MdeColors.GetLaneColor(laneType)
             });

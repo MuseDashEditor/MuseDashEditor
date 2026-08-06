@@ -41,7 +41,7 @@ public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPoint
         tickSample.Volume.Value = 2f;
 
         dataHolder.CurrentMap.ValueChanged += e => onTimingPointsChanged();
-        dataHolder.CurrentMap.Value.OnTimingPointsChanged += onTimingPointsChanged;
+        dataHolder.OnTimingPointsChanged += onTimingPointsChanged;
     }
 
     private void onTimingPointsChanged()

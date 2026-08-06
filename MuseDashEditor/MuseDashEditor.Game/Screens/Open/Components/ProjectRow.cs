@@ -12,7 +12,6 @@
 
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Threading.Tasks;
 using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Utils;
@@ -38,13 +37,13 @@ public partial class ProjectRow(Storage projectStorage) : Container
     [Resolved] protected ScreenStack ScreenStack { get; private set; } = null!;
 
     private Box hoverBox = null!;
-    private bool isLoading = false;
+    private bool isLoading;
 
     [BackgroundDependencyLoader]
     private void load(IRenderer renderer, GameHost gameHost, TextureStore textures)
     {
         RelativeSizeAxes = Axes.X;
-        Size = new Vector2(1920, 150);
+        Size = new Vector2(1, 150);
 
         var textureStore = new LargeTextureStore(renderer,
             gameHost.CreateTextureLoaderStore(new StorageBackedResourceStore(projectStorage)));
@@ -57,63 +56,94 @@ public partial class ProjectRow(Storage projectStorage) : Container
             new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = MdeColors.Background6
+                Colour = MdeColors.Background6,
+                Depth = 2
             },
-            new Sprite
+            new GridContainer
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Size = new Vector2(140, 140),
-                X = 5,
-                Texture = textureStore.Get("cover") ?? textures.Get("UI/default_cover"),
-            },
-            new FillFlowContainer
-            {
-                Direction = FillDirection.Vertical,
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                X = 150,
-                MaximumSize = new Vector2(992, 150),
-                Margin = new MarginPadding(5),
-                Children =
+                RelativeSizeAxes = Axes.Both,
+                ColumnDimensions =
                 [
-                    new SpriteText
+                    new Dimension(GridSizeMode.Absolute, 140f),
+                    new Dimension(),
+                    new Dimension(GridSizeMode.Relative, 0.3f),
+                    new Dimension(GridSizeMode.Absolute, 50f)
+                ],
+                RowDimensions =
+                [
+                    new Dimension(GridSizeMode.Relative, 1f)
+                ],
+                Content = new[]
+                {
+                    new Drawable[]
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Text = chartInfoRaw.name,
-                        Font = FontUsage.Default.With(size: 40, weight: "600"),
-                    },
-                    new SpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Text = chartInfoRaw.author,
-                        Font = FontUsage.Default.With(size: 20),
-                    },
-                    new SpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Text = chartInfoRaw.bpm + " BPM",
-                        Font = FontUsage.Default.With(size: 20),
+                        new Container
+                        {
+                            Padding = new MarginPadding(5),
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new Sprite
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Texture = textureStore.Get("cover") ?? textures.Get("UI/default_cover"),
+                            }
+                        },
+                        new FillFlowContainer
+                        {
+                            Direction = FillDirection.Vertical,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding(5),
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Children =
+                            [
+                                new SpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Text = chartInfoRaw.name,
+                                    Font = FontUsage.Default.With(size: 40, weight: "600"),
+                                },
+                                new SpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Text = chartInfoRaw.author,
+                                    Font = FontUsage.Default.With(size: 20),
+                                },
+                                new SpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Text = chartInfoRaw.bpm + " BPM",
+                                    Font = FontUsage.Default.With(size: 20),
+                                }
+                            ]
+                        },
+                        new FillFlowContainer
+                        {
+                            Direction = FillDirection.Vertical,
+                            RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding(5),
+                            Children = tryBuilDifficultyRows(textures, chartInfoRaw)
+                        },
+                        new ProjectRowButtons(projectStorage)
+                        {
+                            Depth = 0
+                        }
                     }
-                ]
-            },
-            new FillFlowContainer
-            {
-                Direction = FillDirection.Vertical,
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                AutoSizeAxes = Axes.Both,
-                Spacing = new Vector2(3f),
-                X = 1152,
-                Children = tryBuilDifficultyRows(textures, chartInfoRaw)
+                }
             },
             hoverBox = new Box
             {
                 RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
                 Colour = Colour4.White,
+                Depth = 1,
                 Alpha = 0
             }
         ];
@@ -194,7 +224,7 @@ public partial class ProjectRow(Storage projectStorage) : Container
             return true;
 
         isLoading = true;
-        hoverBox.TransformTo("Colour", (ColourInfo) Colour4.Gray, 200);
+        hoverBox.TransformTo("Colour", (ColourInfo)Colour4.Gray, 200);
         hoverBox.TransformTo("Alpha", 0.2f, 200);
 
         DataHolder.Initialize(projectStorage)

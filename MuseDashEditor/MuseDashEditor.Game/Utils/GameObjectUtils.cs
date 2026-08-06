@@ -13,6 +13,7 @@
 using System;
 using System.Reflection;
 using MuseDashEditor.Game.Data.Attribute;
+using MuseDashEditor.Game.Data.Object.DesignObject;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
 using osu.Framework.Graphics.Textures;
@@ -24,6 +25,11 @@ public static class GameObjectUtils
     public static GameObjectData? GetGameObjectData(ObjectType objectType)
     {
         return typeof(ObjectType).GetField(objectType.ToString())?.GetCustomAttribute<GameObjectData>();
+    }
+
+    public static DesignObjectData? GetDesignObjectData(ObjectType objectType)
+    {
+        return typeof(ObjectType).GetField(objectType.ToString())?.GetCustomAttribute<DesignObjectData>();
     }
 
     public static Texture? GetObjectTexture(this ITextureStore textureStore, ObjectType objectType,

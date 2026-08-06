@@ -10,6 +10,8 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using MuseDashEditor.Game.Component.Common;
+using MuseDashEditor.Game.Component.Notification;
 using MuseDashEditor.Game.Project;
 using MuseDashEditor.Game.Screens.Open.Components;
 using osu.Framework.Allocation;
@@ -24,6 +26,8 @@ namespace MuseDashEditor.Game.Screens.Open;
 
 public partial class ProjectListScreen : Screen
 {
+    [Cached] private NotificationContainer notificationContainer = new();
+
     [BackgroundDependencyLoader]
     private void load(ProjectManager projectManager)
     {
@@ -59,7 +63,7 @@ public partial class ProjectListScreen : Screen
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                    new BasicButton
+                    new RoundedButton
                     {
                         Text = "New chart",
                         Size = new Vector2(200, 50),
@@ -74,7 +78,8 @@ public partial class ProjectListScreen : Screen
 
         InternalChildren =
         [
-            listContainer
+            listContainer,
+            notificationContainer
         ];
     }
 }

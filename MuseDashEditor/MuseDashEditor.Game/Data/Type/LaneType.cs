@@ -21,5 +21,6 @@ public enum LaneType
     Ground2 = 4,
 
     Special = 5,
-    Special2 = 8
+    Special2 = 8,
+    Special3 = 6 // ???
 }

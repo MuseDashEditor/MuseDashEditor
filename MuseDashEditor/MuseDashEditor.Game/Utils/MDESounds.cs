@@ -36,6 +36,9 @@ public partial class MdeSounds : IDependencyInjectionCandidate
     {
         foreach (HitSoundType hitSoundType in Enum.GetValuesAsUnderlyingType<HitSoundType>())
         {
+            if (hitSoundType == HitSoundType.None)
+                continue;
+
             var sampleName = Enum.GetName(typeof(HitSoundType), hitSoundType)?.ToLowerInvariant();
             var sample = SampleStore.Get($"Hit/{sampleName}");
             sample.PlaybackConcurrency.Value = concurrent_samples;
@@ -74,6 +77,9 @@ public partial class MdeSounds : IDependencyInjectionCandidate
 
     public void PlayHitSound(HitSoundType hitSoundType)
     {
+        if (hitSoundType == HitSoundType.None)
+            return;
+
         preloadedChannels[hitSoundType].Dequeue().Play();
 
         var sample = samples[hitSoundType];

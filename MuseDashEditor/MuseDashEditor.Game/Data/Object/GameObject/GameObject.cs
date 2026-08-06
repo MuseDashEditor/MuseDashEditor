@@ -10,6 +10,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using MuseDashEditor.Game.Data.Object.DesignObject;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Utils;
 
@@ -27,4 +28,5 @@ public class GameObject(
     public LaneModifierType LaneModifier { get; set; } = laneModifier;
 
     public GameObjectData? GameObjectData => GameObjectUtils.GetGameObjectData(ObjectType);
+    public DesignObjectData? DesignObjectData => GameObjectUtils.GetDesignObjectData(ObjectType);
 }

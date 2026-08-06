@@ -47,7 +47,7 @@ public partial class SubscreenSwitcher : TabControl<EditorSubscreenType>
 
     protected override Dropdown<EditorSubscreenType> CreateDropdown()
     {
-        return null; // No dropdown
+        return null;
     }
 
     protected override TabItem<EditorSubscreenType> CreateTabItem(EditorSubscreenType value)

@@ -37,7 +37,7 @@ public partial class LongLaneObject : Container
     private Sprite rightLaneModifierSprite = null!;
 
     private int currentNotesTickIndex;
-    private Texture notesTexture;
+    private Texture notesTexture = null!;
 
     [BackgroundDependencyLoader]
     private void load()

@@ -15,6 +15,7 @@ using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osuTK;
@@ -25,6 +26,7 @@ public partial class SimpleLaneObject : Container
 {
     [Resolved] private TextureStore textureStore { get; set; } = null!;
 
+    private FastCircle landmineCircle = null!;
     private Sprite circleSprite = null!;
     private Sprite objectSprite = null!;
     private Sprite movementSprite = null!;
@@ -34,13 +36,21 @@ public partial class SimpleLaneObject : Container
     private void load()
     {
         Name = "SimpleLaneObject";
-        Anchor = Anchor.Centre;
-        Origin = Anchor.Centre;
-        RelativeSizeAxes = Axes.Y;
-        Width = 75;
+        Height = BaseLaneObject.BASE_SIZE;
+        Width = BaseLaneObject.BASE_SIZE;
 
         Children =
         [
+            landmineCircle = new FastCircle
+            {
+                Name = "Landmine background",
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                Size = new Vector2(1.1f, 1.1f),
+                Colour = Colour4.Red,
+                Alpha = 0
+            },
             circleSprite = new Sprite
             {
                 Name = "Lane background",
@@ -69,6 +79,8 @@ public partial class SimpleLaneObject : Container
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
+                Size = new Vector2(0.5f, 0.5f),
+                Y = -25,
                 Texture = textureStore.Get("Icons/Object/Common/heart"), // Default heart icon
                 Alpha = 0
             }
@@ -92,5 +104,6 @@ public partial class SimpleLaneObject : Container
         }
 
         laneModifierSprite.Alpha = laneModifier == LaneModifierType.Heart ? 1 : 0;
+        landmineCircle.Alpha = laneModifier == LaneModifierType.Landmine ? 1 : 0;
     }
 }

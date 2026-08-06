@@ -14,12 +14,12 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using MuseDashEditor.Game.Config;
+using MuseDashEditor.Game.Input;
 using MuseDashEditor.Resources;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Handlers.Joystick;
@@ -35,18 +35,20 @@ namespace MuseDashEditor.Game;
 
 public partial class MuseDashEditorGameBase : osu.Framework.Game
 {
-    protected override Container<Drawable> Content { get; }
+#if DEBUG
+    private const string game_name = "MuseDashEditor (development)";
+#else
+    private const string game_name = "MuseDashEditor";
+#endif
+
+    public const string MDE_PROTOCOL = "mde://";
 
     private MdeConfigManager localConfig = null!;
     private DependencyContainer dependencies = null!;
 
     protected MuseDashEditorGameBase()
     {
-        base.Content.Add(Content = new DrawSizePreservingFillContainer
-        {
-            TargetDrawSize = new Vector2(1920, 1080),
-            Strategy = DrawSizePreservationStrategy.Minimum
-        });
+        Name = game_name;
     }
 
     public override void SetHost(GameHost host)
@@ -58,6 +60,14 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
     [BackgroundDependencyLoader]
     private void load(IRenderer renderer, GameHost gameHost)
     {
+        base.Content.Add(new DrawSizePreservingFillContainer
+            {
+                TargetDrawSize = new Vector2(1920, 1080),
+                Strategy = DrawSizePreservationStrategy.Minimum
+            }
+            .WithChild(new MdeKeyBindingContainer())
+            .WithChild(new TooltipContainer()));
+
         Resources.AddStore(new DllResourceStore(typeof(MuseDashEditorResources).Assembly));
         dependencies.CacheAs(new LargeTextureStore(renderer,
             gameHost.CreateTextureLoaderStore(new ResourceStore<byte[]>([

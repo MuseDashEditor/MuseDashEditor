@@ -30,9 +30,6 @@ public record Map(
     public readonly List<TimingPointObject> TimingPoints = [];
 
     public readonly SortedDictionary<int, Dictionary<(LaneModifierType, LaneType), int[]>> RawMapData = new();
-
-    public Action OnTimingPointsChanged = () => {};
-    public Action OnGameObjectsChanged = () => {};
 }
 
 public class MapMetadata

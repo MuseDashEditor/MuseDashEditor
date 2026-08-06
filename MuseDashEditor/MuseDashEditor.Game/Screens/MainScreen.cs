@@ -10,6 +10,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using MuseDashEditor.Game.Component.Common;
 using MuseDashEditor.Game.Screens.Open;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -37,7 +38,7 @@ public partial class MainScreen : Screen
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Children = [
-                    new BasicButton
+                    new RoundedButton
                     {
                         Text = "New chart",
                         Size = new Vector2(200, 50),
@@ -46,7 +47,7 @@ public partial class MainScreen : Screen
                         Origin = Anchor.Centre,
                         Action = () => {}
                     },
-                    new BasicButton
+                    new RoundedButton
                     {
                         Text = "Open project",
                         Size = new Vector2(200, 50),
@@ -55,7 +56,7 @@ public partial class MainScreen : Screen
                         Origin = Anchor.Centre,
                         Action = () => MainScreenStack.Push(new ProjectListScreen())
                     },
-                    new BasicButton
+                    new RoundedButton
                     {
                         Text = "Import chart",
                         Size = new Vector2(200, 50),
@@ -64,7 +65,7 @@ public partial class MainScreen : Screen
                         Origin = Anchor.Centre,
                         Action = () => MainScreenStack.Push(new FolderSelectorScreen())
                     },
-                    new BasicButton
+                    new RoundedButton
                     {
                         Text = "Settings",
                         Size = new Vector2(200, 50),

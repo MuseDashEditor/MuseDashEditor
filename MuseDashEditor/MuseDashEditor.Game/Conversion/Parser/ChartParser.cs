@@ -15,15 +15,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using MuseDashEditor.Game.Conversion.MdeFormat;
 using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Type;
 using osu.Framework.Logging;
 
-namespace MuseDashEditor.Game.Data.Parser;
+namespace MuseDashEditor.Game.Conversion.Parser;
 
 public static class ChartParser
 {
-    public static async Task<Chart.Chart?> Parse(DirectoryInfo directory)
+    public static async Task<Chart?> Parse(DirectoryInfo directory)
     {
         if (!directory.Exists) return null;
 
@@ -46,6 +47,23 @@ public static class ChartParser
             maps[(DifficultyType)mapNumber] = map;
         }
 
+        var mdeMapFiles = directory.GetFiles("*.mdem");
+        foreach (var file in mdeMapFiles)
+        {
+            if (!int.TryParse(file.Name.AsSpan(3, 1), out var mapNumber))
+            {
+                Logger.Log($"Invalid map number in file name: {file.Name}", level: LogLevel.Important);
+                continue;
+            }
+
+            if (!Enum.IsDefined(typeof(DifficultyType), mapNumber)) continue;
+
+            var map = await MdeChartLoader.Parse(file);
+            if (map == null) continue;
+
+            maps[(DifficultyType)mapNumber] = map;
+        }
+
         var chartInfoFile = new FileInfo(Path.Combine(directory.FullName, "info.json"));
         var infoFileData = chartInfoFile.OpenText().BaseStream;
         var chartInfoRaw = await JsonSerializer.DeserializeAsync<ChartInfoRaw>(infoFileData);
@@ -56,7 +74,7 @@ public static class ChartParser
         var mp3AudioFiles = directory.GetFiles("*.mp3");
         var oggAudioFiles = directory.GetFiles("*.ogg");
 
-        FileInfo musicFile = null;
+        FileInfo musicFile = null; // TODO
         FileInfo demoFile = null;
 
         foreach (var mp3AudioFile in mp3AudioFiles)
@@ -71,7 +89,7 @@ public static class ChartParser
             else if (oggAudioFile.Name.Equals("music.ogg", StringComparison.OrdinalIgnoreCase))
                 musicFile = oggAudioFile;
 
-        return new Chart.Chart(
+        return new Chart(
             directory,
             musicFile,
             demoFile,

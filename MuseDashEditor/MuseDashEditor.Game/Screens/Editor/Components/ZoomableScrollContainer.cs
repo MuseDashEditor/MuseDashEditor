@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using System;
-using System.Linq;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Editor.Clock;
 using MuseDashEditor.Game.Utils;
@@ -45,8 +44,6 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
     private float currentZoom = 1;
     private float minZoom;
     private float maxZoom;
-    private bool handlingDragInput;
-    private bool trackWasPlaying;
     private double lastScrollPosition;
     private double lastTrackTime;
     private bool isSliding;
@@ -144,9 +141,7 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
         if (!zoomedContentWidthCache.IsValid)
             updateZoomedContentWidth();
 
-        if (handlingDragInput)
-            seekTrackToCurrent();
-        else if (!editorClock.IsRunning)
+        if (!editorClock.IsRunning)
         {
             if (!Precision.AlmostEquals(Current, lastScrollPosition)
                 && Precision.AlmostEquals(editorClock.CurrentTime, lastTrackTime)

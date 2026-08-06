@@ -13,7 +13,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using MuseDashEditor.Game.Data.Parser;
+using MuseDashEditor.Game.Conversion.Parser;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Screens.Editor.SubScreens;
 using osu.Framework.Allocation;
@@ -36,6 +36,9 @@ public partial class EditorDataHolder : IDependencyInjectionCandidate
     public readonly Bindable<DifficultyType> SelectedDifficulty = new();
     public readonly Bindable<EditorSubscreenType> SelectedSubscreen = new();
     public readonly Bindable<SceneType> CurrentScene = new();
+
+    public Action OnTimingPointsChanged = () => {};
+    public Action OnGameObjectsChanged = () => {};
 
     public async Task Initialize(Storage? storage)
     {

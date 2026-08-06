@@ -22,16 +22,10 @@ using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Logging;
 
-namespace MuseDashEditor.Game.Data.Parser;
+namespace MuseDashEditor.Game.Conversion.Parser;
 
 public static class BmsParser
 {
-    private static readonly List<char> base36_chars =
-    [
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-    ];
-
     public static async Task<Map?> Parse(FileInfo file)
     {
         Logger.Log($"Parsing map from file: {file.FullName}...");
@@ -206,8 +200,8 @@ public static class BmsParser
         if (!int.TryParse(laneDeclaration.AsSpan(0, 3), out var trackNumber))
             return;
 
-        var laneModifierValue = parseBase36(laneDeclaration.AsSpan(3, 1));
-        var laneTypeValue = parseBase36(laneDeclaration.AsSpan(4, 1));
+        var laneModifierValue = Base36Converter.FromBase36(laneDeclaration.AsSpan(3, 1));
+        var laneTypeValue = Base36Converter.FromBase36(laneDeclaration.AsSpan(4, 1));
 
         if (!Enum.IsDefined(typeof(LaneModifierType), laneModifierValue))
         {
@@ -227,21 +221,10 @@ public static class BmsParser
         var dataCount = data.Length / 2;
         var dataArray = new int[dataCount];
 
-        for (var i = 0; i < dataCount; i++) dataArray[i] = parseBase36(data.AsSpan(i * 2, 2));
+        for (var i = 0; i < dataCount; i++) dataArray[i] = Base36Converter.FromBase36(data.AsSpan(i * 2, 2));
 
         map.RawMapData.ComputeIfAbsent(trackNumber, _ => new Dictionary<(LaneModifierType, LaneType), int[]>())
             .Add((laneModifier, laneType), dataArray);
-    }
-
-    private static int parseBase36(ReadOnlySpan<char> span)
-    {
-        if (span.Length < 2)
-            span = $"0{span[0]}";
-
-        var char1 = span[0];
-        var char2 = span[1];
-
-        return base36_chars.IndexOf(char1) * 36 + base36_chars.IndexOf(char2);
     }
 
     private static void parseMetadataHeader(string[] metadataParts, Map map)
@@ -293,7 +276,7 @@ public static class BmsParser
 
         if (key.StartsWith("BPM") && int.TryParse(value, out var bpmValue))
         {
-            var bpmKey = parseBase36(key.AsSpan(3, 2));
+            var bpmKey = Base36Converter.FromBase36(key.AsSpan(3, 2));
             map.Metadata.BpmChangeKeys[bpmKey] = bpmValue;
         }
     }

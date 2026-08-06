@@ -13,12 +13,18 @@
 using MuseDashEditor.Game.Screens.Open.Components;
 using MuseDashEditor.Game.Tests.Resources;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
+using osuTK;
 
 namespace MuseDashEditor.Game.Tests.Tests.Screens;
 
 public partial class ProjectListScreenTest : MuseDashEditorTestScene
 {
+    [Cached] private ScreenStack screenStack = new();
+
     [Test]
     public void TestProjectRowComponent()
     {
@@ -27,7 +33,12 @@ public partial class ProjectListScreenTest : MuseDashEditorTestScene
         AddStep("Add component", () =>
         {
             var storage = new NativeStorage(loadChartTask.Result.FullName, Host);
-            Add(new ProjectRow(storage));
+            Add(new DrawSizePreservingFillContainer
+            {
+                Strategy = DrawSizePreservationStrategy.Maximum,
+                TargetDrawSize = new Vector2(1920, 1080),
+                Child = new ProjectRow(storage)
+            });
         });
     }
 }

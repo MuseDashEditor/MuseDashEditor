@@ -26,10 +26,10 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Metadata.Components;
 
 public partial class MetadataField : CompositeComponent
 {
-    public string Label { private get; init; }
-    public Func<ChartInfo, Bindable<string>> FieldGetter { private get; init; }
+    public string Label { private get; init; } = null!;
+    public Func<ChartInfo, Bindable<string>> FieldGetter { private get; init; } = null!;
 
-    private BasicTextBox textBox;
+    private BasicTextBox textBox = null!;
 
     [BackgroundDependencyLoader]
     private void load(EditorDataHolder dataHolder)

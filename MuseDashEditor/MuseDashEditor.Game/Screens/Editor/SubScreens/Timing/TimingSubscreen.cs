@@ -53,6 +53,8 @@ public partial class TimingSubscreen : PlayableEditorSubscreen
         ];
 
         ScrollContainer = timingTrack.ZoomableScrollContainer;
+        timingTrack.WaveformGraph.RelativeSizeAxes = Axes.X;
+        timingTrack.WaveformGraph.Height = 250;
     }
 
     public override void Show()

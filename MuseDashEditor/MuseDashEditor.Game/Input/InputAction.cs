@@ -14,6 +14,28 @@ namespace MuseDashEditor.Game.Input;
 
 public enum InputAction
 {
-    PlaybackPlayPause,
+    PlaybackPlay,
+    PlaybackPause,
+    PlaybackPauseNoBack,
+    PlaybackGoToStart,
+    PlaybackGoToEnd,
+    NextBeat,
+    NextBeat2,
+    NextFirstBeat,
+    PreviousBeat,
+    PreviousBeat2,
+    PreviousFirstBeat,
+    NextTimingPoint,
+    PreviousTimingPoint,
+    SelectAll,
+    Copy,
+    Cut,
+    Paste,
+    Delete,
+    Flip,
+    ZoomIn,
+    ZoomOut,
+    VolumeUp,
+    VolumeDown
 
 }

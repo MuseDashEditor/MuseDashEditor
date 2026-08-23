@@ -13,15 +13,17 @@
 using System;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Editor.Clock;
+using MuseDashEditor.Game.Input;
 using MuseDashEditor.Game.Screens.Editor.Components;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osuTK.Input;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens;
 
-public partial class PlayableEditorSubscreen : EditorSubscreen
+public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandler<InputAction>
 {
     [Resolved] protected EditorClock EditorClock { get; private set; } = null!;
     [Resolved] protected EditorDataHolder EditorDataHolder { get; private set; } = null!;
@@ -202,5 +204,46 @@ public partial class PlayableEditorSubscreen : EditorSubscreen
             nearestTime = nearestTimingPoint.Offset.Value;
 
         ScrollContainer.ScrollToTime(nearestTime, true);
+    }
+
+    public bool OnPressed(KeyBindingPressEvent<InputAction> e)
+    {
+        switch (e.Action)
+        {
+            case InputAction.PlaybackPlay:
+                break;
+            case InputAction.PlaybackPause:
+                break;
+            case InputAction.PlaybackPauseNoBack:
+                break;
+            case InputAction.PlaybackGoToStart:
+                break;
+            case InputAction.PlaybackGoToEnd:
+                break;
+            case InputAction.NextBeat:
+                break;
+            case InputAction.NextBeat2:
+                break;
+            case InputAction.NextFirstBeat:
+                break;
+            case InputAction.PreviousBeat:
+                break;
+            case InputAction.PreviousBeat2:
+                break;
+            case InputAction.PreviousFirstBeat:
+                break;
+            case InputAction.NextTimingPoint:
+                break;
+            case InputAction.PreviousTimingPoint:
+                break;
+            default:
+                return false;
+        }
+
+        return true;
+    }
+
+    public void OnReleased(KeyBindingReleaseEvent<InputAction> e)
+    {
     }
 }

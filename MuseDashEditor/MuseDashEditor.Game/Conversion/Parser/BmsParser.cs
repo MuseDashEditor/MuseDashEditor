@@ -223,8 +223,13 @@ public static class BmsParser
 
         for (var i = 0; i < dataCount; i++) dataArray[i] = Base36Converter.FromBase36(data.AsSpan(i * 2, 2));
 
-        map.RawMapData.ComputeIfAbsent(trackNumber, _ => new Dictionary<(LaneModifierType, LaneType), int[]>())
-            .Add((laneModifier, laneType), dataArray);
+        var trackData =
+            map.RawMapData.ComputeIfAbsent(trackNumber, () => new Dictionary<(LaneModifierType, LaneType), int[]>());
+
+        var dataKey = (laneModifier, laneType);
+
+        // We don't attempt to merge etc. to follow what BMS does
+        trackData[dataKey] = dataArray;
     }
 
     private static void parseMetadataHeader(string[] metadataParts, Map map)

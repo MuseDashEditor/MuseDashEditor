@@ -14,16 +14,15 @@ using System;
 using System.Collections.Generic;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Object.MappingObject;
-using osu.Framework.Logging;
 
 namespace MuseDashEditor.Game.Utils;
 
 public static class ExtensionMethods
 {
     public static TValue ComputeIfAbsent<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key,
-        Func<TKey, TValue> valueFactory)
+        Func<TValue> valueFactory)
     {
-        var value = dictionary.TryGetValue(key, out var existingValue) ? existingValue : valueFactory(key);
+        var value = dictionary.TryGetValue(key, out var existingValue) ? existingValue : valueFactory();
         dictionary[key] = value;
         return value;
     }

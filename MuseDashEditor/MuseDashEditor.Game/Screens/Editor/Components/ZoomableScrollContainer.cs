@@ -129,14 +129,12 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
         editorClock.Seek(target);
     }
 
-    public float GetMaxScrollPosition()
-    {
-        return PositionAtTime(editorClock.TrackLength);
-    }
-
     protected override void UpdateAfterChildren()
     {
         base.UpdateAfterChildren();
+
+        if (Precision.AlmostEquals(Current, Target, 0.1))
+            ScrollTo(Target, false);
 
         if (!zoomedContentWidthCache.IsValid)
             updateZoomedContentWidth();
@@ -225,9 +223,17 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
         return (float)(time / editorClock.TrackLength * Content.DrawWidth);
     }
 
+    public float? PositionAtTime(double? time)
+    {
+        if (time == null)
+            return null;
+
+        return PositionAtTime(time.Value);
+    }
+
     public uint GetCurrentSubBeatDisplayedCount()
     {
-        var subBeatCount = (uint)Math.Floor(currentZoom / 50);
+        var subBeatCount = (uint)Math.Floor(currentZoom / 20);
 
         // Bit hack (https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2)
         subBeatCount--;

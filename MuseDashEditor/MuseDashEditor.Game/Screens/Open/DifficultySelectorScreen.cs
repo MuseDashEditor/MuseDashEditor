@@ -14,12 +14,12 @@ using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Screens.Editor;
 using MuseDashEditor.Game.Screens.Open.Components;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
-using osuTK.Graphics;
 
 namespace MuseDashEditor.Game.Screens.Open;
 
@@ -100,6 +100,7 @@ public partial class DifficultySelectorScreen : Screen
         DataHolder.SelectedDifficulty.Value = difficulty;
         DataHolder.CurrentChart.Value.ChartInfo.LoadDataFromMap((int)difficulty);
         DataHolder.CurrentMap.Value = DataHolder.CurrentChart.Value.Maps[difficulty];
+        MapUtils.PreProcessMap(DataHolder.CurrentMap.Value);
 
         this.Exit();
         MainScreenStack.Push(new EditorScreen());

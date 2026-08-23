@@ -16,17 +16,29 @@ using MuseDashEditor.Game.Utils;
 
 namespace MuseDashEditor.Game.Data.Object.GameObject;
 
-public class GameObject(
-    double offset,
-    ObjectType objectType,
-    LaneType laneType,
-    LaneModifierType laneModifier
-) : BaseObject(offset)
+public class GameObject : BaseObject
 {
-    public ObjectType ObjectType { get; } = objectType;
-    public LaneType LaneType { get; set; } = laneType;
-    public LaneModifierType LaneModifier { get; set; } = laneModifier;
+    public GameObject(double offset,
+        ObjectType objectType,
+        LaneType laneType,
+        LaneModifierType laneModifier) : base(offset)
+    {
+        ObjectType = objectType;
+        LaneType = laneType;
+        LaneModifier = laneModifier;
 
-    public GameObjectData? GameObjectData => GameObjectUtils.GetGameObjectData(ObjectType);
-    public DesignObjectData? DesignObjectData => GameObjectUtils.GetDesignObjectData(ObjectType);
+        GameObjectData = GameObjectUtils.GetGameObjectData(ObjectType);
+        DesignObjectData = GameObjectUtils.GetDesignObjectData(ObjectType);
+    }
+
+    public ObjectType ObjectType { get; }
+    public LaneType LaneType { get; set; }
+    public LaneModifierType LaneModifier { get; set; }
+
+    public readonly GameObjectData? GameObjectData;
+    public readonly DesignObjectData? DesignObjectData;
+
+    public GameObject? HoldEndObject;
+    public GameObject? GeminiPairObject;
+    public bool IsHoldEnd = false;
 }

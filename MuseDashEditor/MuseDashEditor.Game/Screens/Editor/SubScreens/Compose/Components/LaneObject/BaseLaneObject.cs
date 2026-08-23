@@ -14,10 +14,9 @@ using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Utils;
+using osu.Framework.Input.Events;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneObject;
 
@@ -26,6 +25,7 @@ public partial class BaseLaneObject : Container
     public const float BASE_SIZE = 75;
 
     [Resolved] private MdeSounds mdeSounds { get; set; } = null!;
+    [Resolved] private SelectionHandler selectionHandler { get; set; } = null!;
 
     public double Offset { get; set; }
 
@@ -198,5 +198,31 @@ public partial class BaseLaneObject : Container
         isHold = false;
         Height = BASE_SIZE;
         hitSoundType = HitSoundType.None;
+    }
+
+    protected override bool OnClick(ClickEvent e)
+    {
+        if (base.OnClick(e))
+        {
+            return true;
+        }
+
+        selectionHandler.Select(gameObject, e.ControlPressed);
+        return true;
+    }
+
+    protected override bool OnDragStart(DragStartEvent e)
+    {
+        return true;
+    }
+
+    protected override void OnDragEnd(DragEndEvent e)
+    {
+
+    }
+
+    protected override void OnDrag(DragEvent e)
+    {
+        // TODO: Snap position
     }
 }

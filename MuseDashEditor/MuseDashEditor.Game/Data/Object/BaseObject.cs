@@ -17,4 +17,5 @@ namespace MuseDashEditor.Game.Data.Object;
 public abstract class BaseObject(double offset)
 {
     public BindableDouble Offset { get; } = new(offset);
+    public BindableBool Selected { get; } = new();
 }

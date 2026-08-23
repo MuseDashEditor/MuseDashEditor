@@ -10,23 +10,20 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using System;
-using System.Collections.Generic;
-using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components;
-using MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneObject;
 using MuseDashEditor.Game.Screens.Editor.SubScreens.Timing.Components;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osuTK;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose;
 
 public partial class ComposeSubscreen : PlayableEditorSubscreen
 {
+    [Cached] private readonly SelectionHandler selectionHandler = new();
+
     [BackgroundDependencyLoader]
     private void load()
     {
@@ -41,14 +38,14 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
                 AutoSizeAxes = Axes.Y,
                 Origin = Anchor.CentreLeft,
                 Anchor = Anchor.CentreLeft,
-                Depth = 1
+                Depth = 2
             },
             timingTrack = new TimingTrack(-900)
             {
                 AutoSizeAxes = Axes.Y,
                 Origin = Anchor.CentreLeft,
                 Anchor = Anchor.CentreLeft,
-                Depth = 0
+                Depth = 1
             }
         ];
 
@@ -75,6 +72,7 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
             ScrollContainer = timingTrack.ZoomableScrollContainer,
             Depth = -20,
         });
+        timingTrack.ZoomableScrollContainer.Add(selectionHandler);
 
         timingTrack.ZoomableScrollContainer.Width = 1f;
         timingTrack.WaveformGraph.Alpha = 0; // TODO: add setting

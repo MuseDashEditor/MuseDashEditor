@@ -27,6 +27,7 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
 {
     [Resolved] private EditorDataHolder dataHolder { get; set; } = null!;
     [Resolved] private EditorClock editorClock { get; set; } = null!;
+    [Resolved] private SelectionHandler selectionHandler { get; set; } = null!;
 
     private double lastPlayedTickOffset;
 
@@ -35,6 +36,8 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
     {
         Anchor = Anchor.CentreLeft;
         Origin = Anchor.CentreLeft;
+
+        selectionHandler.LaneContentContainer = this;
     }
 
     protected override void RegenerateContent()

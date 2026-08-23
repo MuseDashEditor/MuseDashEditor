@@ -24,7 +24,8 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneO
 
 public partial class SimpleLaneObject : Container
 {
-    [Resolved] private TextureStore textureStore { get; set; } = null!;
+    [Resolved]
+    private TextureStore textureStore { get; set; } = null!;
 
     private FastCircle landmineCircle = null!;
     private Sprite circleSprite = null!;
@@ -88,7 +89,7 @@ public partial class SimpleLaneObject : Container
     }
 
     public void UpdateObjectTextures(ObjectType objectType, SceneType sceneType, LaneType laneType,
-        LaneModifierType laneModifier, MovementType movementType)
+                                     LaneModifierType laneModifier, MovementType movementType)
     {
         circleSprite.Texture = textureStore.GetLaneBackgroundTexture(laneType);
         objectSprite.Texture = textureStore.GetObjectTexture(objectType, sceneType, laneType);

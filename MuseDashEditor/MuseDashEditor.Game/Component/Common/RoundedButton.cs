@@ -113,8 +113,8 @@ public partial class RoundedButton : Button
         if (Enabled.Value)
         {
             hover.FadeTo(0.2f, 40, Easing.OutQuint)
-                .Then()
-                .FadeTo(HoverLayerFinalAlpha, 800, Easing.OutQuint);
+                 .Then()
+                 .FadeTo(HoverLayerFinalAlpha, 800, Easing.OutQuint);
         }
 
         return base.OnHover(e);

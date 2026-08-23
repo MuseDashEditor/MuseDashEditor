@@ -12,12 +12,9 @@
 
 using System;
 using MuseDashEditor.Game.Data.Holder;
-using MuseDashEditor.Game.Data.Type;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
@@ -59,7 +56,8 @@ public partial class DifficultyDisplay : BasicButton
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Size = new Vector2(100, 100),
-                    Children = [
+                    Children =
+                    [
                         new Sprite
                         {
                             Anchor = Anchor.Centre,

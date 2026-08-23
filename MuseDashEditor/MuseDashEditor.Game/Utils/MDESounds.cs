@@ -24,8 +24,11 @@ namespace MuseDashEditor.Game.Utils;
 
 public partial class MdeSounds : IDependencyInjectionCandidate
 {
-    [Resolved] protected ISampleStore SampleStore { get; private set; } = null!;
-    [Resolved] protected AudioManager AudioManager { get; private set; } = null!;
+    [Resolved]
+    protected ISampleStore SampleStore { get; private set; } = null!;
+
+    [Resolved]
+    protected AudioManager AudioManager { get; private set; } = null!;
 
     private const int concurrent_samples = 10;
     private readonly Dictionary<HitSoundType, Sample> samples = new();

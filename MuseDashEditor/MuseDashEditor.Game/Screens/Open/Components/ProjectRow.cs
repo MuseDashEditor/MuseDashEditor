@@ -33,8 +33,11 @@ namespace MuseDashEditor.Game.Screens.Open.Components;
 
 public partial class ProjectRow(Storage projectStorage) : Container
 {
-    [Resolved] protected EditorDataHolder DataHolder { get; private set; } = null!;
-    [Resolved] protected ScreenStack ScreenStack { get; private set; } = null!;
+    [Resolved]
+    protected EditorDataHolder DataHolder { get; private set; } = null!;
+
+    [Resolved]
+    protected ScreenStack ScreenStack { get; private set; } = null!;
 
     private Box hoverBox = null!;
     private bool isLoading;
@@ -177,7 +180,7 @@ public partial class ProjectRow(Storage projectStorage) : Container
     }
 
     private static FillFlowContainer buildDifficultyRow(TextureStore textures, string difficulty, string levelDesigner,
-        string difficultyName)
+                                                        string difficultyName)
     {
         return new FillFlowContainer
         {
@@ -228,12 +231,12 @@ public partial class ProjectRow(Storage projectStorage) : Container
         hoverBox.TransformTo("Alpha", 0.2f, 200);
 
         DataHolder.Initialize(projectStorage)
-            .GetAwaiter()
-            .OnCompleted(() =>
-            {
-                ScreenStack.CurrentScreen.Exit();
-                ScreenStack.Push(new DifficultySelectorScreen());
-            });
+                  .GetAwaiter()
+                  .OnCompleted(() =>
+                  {
+                      ScreenStack.CurrentScreen.Exit();
+                      ScreenStack.Push(new DifficultySelectorScreen());
+                  });
 
         return true;
     }

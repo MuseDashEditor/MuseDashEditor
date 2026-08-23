@@ -25,8 +25,11 @@ namespace MuseDashEditor.Game.Screens.Open;
 
 public partial class DifficultySelectorScreen : Screen
 {
-    [Resolved] protected ScreenStack MainScreenStack { get; private set; } = null!;
-    [Resolved] protected EditorDataHolder DataHolder { get; private set; } = null!;
+    [Resolved]
+    protected ScreenStack MainScreenStack { get; private set; } = null!;
+
+    [Resolved]
+    protected EditorDataHolder DataHolder { get; private set; } = null!;
 
     [BackgroundDependencyLoader]
     private void load()

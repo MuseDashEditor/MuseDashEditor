@@ -36,8 +36,8 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
         Precision = 1
     };
 
-    public Action<double> OnTimeChanged = _ => {};
-    public Action OnSeek = () => {};
+    public Action<double> OnTimeChanged = _ => { };
+    public Action OnSeek = () => { };
 
     private readonly DecouplingFramedClock decouplingClock;
     private readonly InterpolatingFramedClock interpolatingClock;

@@ -25,8 +25,11 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens;
 
 public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandler<InputAction>
 {
-    [Resolved] protected EditorClock EditorClock { get; private set; } = null!;
-    [Resolved] protected EditorDataHolder EditorDataHolder { get; private set; } = null!;
+    [Resolved]
+    protected EditorClock EditorClock { get; private set; } = null!;
+
+    [Resolved]
+    protected EditorDataHolder EditorDataHolder { get; private set; } = null!;
 
     protected ZoomableScrollContainer? ScrollContainer;
 
@@ -64,6 +67,7 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
             case > 0:
                 scrollToPreviousBeat(e);
                 break;
+
             case < 0:
                 scrollToNextBeat(e);
                 break;
@@ -94,6 +98,7 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
                     EditorClock.Start();
                 return true;
             }
+
             case Key.PageUp:
             {
                 var currentTime = ScrollContainer.GetCurrentOrTargetTime();
@@ -105,6 +110,7 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
                 ScrollContainer.ScrollToTime(nearestTimingPoint.Offset.Value, true);
                 break;
             }
+
             case Key.PageDown:
             {
                 var currentTime = ScrollContainer.GetCurrentOrTargetTime();
@@ -116,24 +122,29 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
                 ScrollContainer.ScrollToTime(nextTimingPoint.Offset.Value, true);
                 break;
             }
+
             case Key.Left:
             {
                 scrollToPreviousBeat(e);
                 break;
             }
+
             case Key.Right:
             {
                 scrollToNextBeat(e);
                 break;
             }
+
             case Key.Home:
                 if (e.Repeat) return false;
                 ScrollContainer.ScrollToTime(0, true);
                 break;
+
             case Key.End:
                 if (e.Repeat) return false;
                 ScrollContainer.ScrollToTime(EditorClock.TrackLength, true);
                 break;
+
             default:
                 return base.OnKeyDown(e);
         }
@@ -155,6 +166,7 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
         if (nearestTimingPoint == null) return;
 
         var nextTimingPoint = EditorDataHolder.GetNextTimingPointAtTime(currentTime);
+
         if (nextTimingPoint != null && Math.Abs(nextTimingPoint.Offset.Value - currentTime) < 1f)
         {
             nearestTimingPoint = nextTimingPoint;
@@ -212,30 +224,43 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
         {
             case InputAction.PlaybackPlay:
                 break;
+
             case InputAction.PlaybackPause:
                 break;
+
             case InputAction.PlaybackPauseNoBack:
                 break;
+
             case InputAction.PlaybackGoToStart:
                 break;
+
             case InputAction.PlaybackGoToEnd:
                 break;
+
             case InputAction.NextBeat:
                 break;
+
             case InputAction.NextBeat2:
                 break;
+
             case InputAction.NextFirstBeat:
                 break;
+
             case InputAction.PreviousBeat:
                 break;
+
             case InputAction.PreviousBeat2:
                 break;
+
             case InputAction.PreviousFirstBeat:
                 break;
+
             case InputAction.NextTimingPoint:
                 break;
+
             case InputAction.PreviousTimingPoint:
                 break;
+
             default:
                 return false;
         }

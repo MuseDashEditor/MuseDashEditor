@@ -15,7 +15,6 @@ using MuseDashEditor.Game.Screens.Open;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osuTK;
 
@@ -23,7 +22,8 @@ namespace MuseDashEditor.Game.Screens;
 
 public partial class MainScreen : Screen
 {
-    [Resolved] protected ScreenStack MainScreenStack { get; private set; } = null!;
+    [Resolved]
+    protected ScreenStack MainScreenStack { get; private set; } = null!;
 
     [BackgroundDependencyLoader]
     private void load()
@@ -37,7 +37,8 @@ public partial class MainScreen : Screen
                 AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Children = [
+                Children =
+                [
                     new RoundedButton
                     {
                         Text = "New chart",
@@ -45,7 +46,7 @@ public partial class MainScreen : Screen
                         Colour = Colour4.AliceBlue,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Action = () => {}
+                        Action = () => { }
                     },
                     new RoundedButton
                     {
@@ -72,7 +73,7 @@ public partial class MainScreen : Screen
                         Colour = Colour4.AliceBlue,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Action = () => {}
+                        Action = () => { }
                     }
                 ]
             }

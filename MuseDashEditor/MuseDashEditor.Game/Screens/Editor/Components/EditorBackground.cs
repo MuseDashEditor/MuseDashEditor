@@ -12,12 +12,10 @@
 
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Type;
-using MuseDashEditor.Game.Editor.Clock;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osuTK;
@@ -26,7 +24,8 @@ namespace MuseDashEditor.Game.Screens.Editor.Components;
 
 public partial class EditorBackground : Sprite
 {
-    [Resolved] protected LargeTextureStore Textures { get; private set; } = null!;
+    [Resolved]
+    protected LargeTextureStore Textures { get; private set; } = null!;
 
     [BackgroundDependencyLoader]
     private void load(EditorDataHolder dataHolder)

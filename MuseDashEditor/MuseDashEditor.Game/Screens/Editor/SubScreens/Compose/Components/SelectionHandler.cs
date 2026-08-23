@@ -27,7 +27,8 @@ public partial class SelectionHandler : Container<Container>
 {
     private const float border = 10;
 
-    [Resolved] private EditorDataHolder dataHolder { get; set; } = null!;
+    [Resolved]
+    private EditorDataHolder dataHolder { get; set; } = null!;
 
     public LaneContentContainer LaneContentContainer { get; set; } = null!;
 

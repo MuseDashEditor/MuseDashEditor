@@ -16,7 +16,6 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osuTK;
 
 namespace MuseDashEditor.Game.Tests.Tests.UI;

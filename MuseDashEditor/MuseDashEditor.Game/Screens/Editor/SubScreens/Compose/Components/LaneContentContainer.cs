@@ -25,9 +25,14 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components;
 
 public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObject>(BaseLaneObject.BASE_SIZE * 5)
 {
-    [Resolved] private EditorDataHolder dataHolder { get; set; } = null!;
-    [Resolved] private EditorClock editorClock { get; set; } = null!;
-    [Resolved] private SelectionHandler selectionHandler { get; set; } = null!;
+    [Resolved]
+    private EditorDataHolder dataHolder { get; set; } = null!;
+
+    [Resolved]
+    private EditorClock editorClock { get; set; } = null!;
+
+    [Resolved]
+    private SelectionHandler selectionHandler { get; set; } = null!;
 
     private double lastPlayedTickOffset;
 
@@ -91,12 +96,14 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
             laneObject.LaneModifier = gameObject.LaneModifier;
 
             var gameObjectData = gameObject.GameObjectData;
+
             if (gameObjectData != null)
             {
                 laneObject.MovementType = gameObjectData.MovementType;
             }
 
             var designObjectData = gameObject.DesignObjectData;
+
             if (designObjectData != null)
             {
                 // TODO

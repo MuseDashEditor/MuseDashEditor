@@ -49,30 +49,32 @@ public static class BmsParser
 
         // 1. Parse bpm changes
         foreach (var (trackId, trackDataDictionary) in map.RawMapData)
-        foreach (var ((laneModifier, laneType), data) in trackDataDictionary)
         {
-            if (laneModifier != LaneModifierType.Music) continue;
-            if ((int)laneType != 8) continue;
-
-            var dataCount = data.Length;
-
-            for (var i = 0; i < dataCount; i++)
+            foreach (var ((laneModifier, laneType), data) in trackDataDictionary)
             {
-                var objectData = data[i];
-                if (objectData == 0) continue;
+                if (laneModifier != LaneModifierType.Music) continue;
+                if ((int)laneType != 8) continue;
 
-                var globalIndex = trackId * maxDataLength + i / dataCount * maxDataLength;
+                var dataCount = data.Length;
 
-                if (globalIndex == 0)
+                for (var i = 0; i < dataCount; i++)
                 {
-                    Logger.Log("Found bpm change at index 0!", level: LogLevel.Error);
-                    continue;
+                    var objectData = data[i];
+                    if (objectData == 0) continue;
+
+                    var globalIndex = trackId * maxDataLength + i / dataCount * maxDataLength;
+
+                    if (globalIndex == 0)
+                    {
+                        Logger.Log("Found bpm change at index 0!", level: LogLevel.Error);
+                        continue;
+                    }
+
+                    if (!map.Metadata.BpmChangeKeys.TryGetValue(objectData, out var bpmChangeValue)) continue;
+
+                    if (!bpmChangesInTrack.TryAdd(globalIndex, bpmChangeValue))
+                        Logger.Log($"Duplicate bpm change at index {globalIndex}", level: LogLevel.Important);
                 }
-
-                if (!map.Metadata.BpmChangeKeys.TryGetValue(objectData, out var bpmChangeValue)) continue;
-
-                if (!bpmChangesInTrack.TryAdd(globalIndex, bpmChangeValue))
-                    Logger.Log($"Duplicate bpm change at index {globalIndex}", level: LogLevel.Important);
             }
         }
 
@@ -110,44 +112,49 @@ public static class BmsParser
 
         // 3. Parse everything else now that we can get the timing of any object
         foreach (var (trackId, trackDataDictionary) in map.RawMapData)
-        foreach (var ((laneModifier, laneType), data) in trackDataDictionary)
         {
-            if (laneModifier == LaneModifierType.Music) continue;
-
-            var dataCount = data.Length;
-
-            for (var i = 0; i < dataCount; i++)
+            foreach (var ((laneModifier, laneType), data) in trackDataDictionary)
             {
-                var objectData = data[i];
-                if (objectData == 0) continue;
+                if (laneModifier == LaneModifierType.Music) continue;
 
-                var globalIndex = Math.Round(trackId * maxDataLength + i / (double)dataCount * maxDataLength);
+                var dataCount = data.Length;
 
-                // Find last known offset before current index
-                var lastKnownOffsetIndex = 0;
-                foreach (var index in knownOffsets.Keys)
-                    if (index <= globalIndex)
-                        lastKnownOffsetIndex = index;
-                    else
-                        break;
+                for (var i = 0; i < dataCount; i++)
+                {
+                    var objectData = data[i];
+                    if (objectData == 0) continue;
 
-                var offsetAtIndex = knownOffsets[lastKnownOffsetIndex];
-                var bpmAtIndex = bpmChangesInTrack[lastKnownOffsetIndex];
-                var elapsedDuration = 240_000 / bpmAtIndex / maxDataLength * (globalIndex - lastKnownOffsetIndex);
-                var objectOffset = Math.Round(offsetAtIndex + elapsedDuration);
+                    var globalIndex = Math.Round(trackId * maxDataLength + i / (double)dataCount * maxDataLength);
 
-                var objectType = (ObjectType)objectData;
+                    // Find last known offset before current index
+                    var lastKnownOffsetIndex = 0;
 
-                var gameObject = new GameObject(
-                    objectOffset,
-                    objectType,
-                    laneType,
-                    laneModifier
-                );
-                map.GameObjects.Add(gameObject);
+                    foreach (var index in knownOffsets.Keys)
+                    {
+                        if (index <= globalIndex)
+                            lastKnownOffsetIndex = index;
+                        else
+                            break;
+                    }
 
-                Logger.Log(
-                    $"Adding object at offset {objectOffset} ({globalIndex} / {trackId}#{i}) with type {objectType} in lane {laneType} ({laneModifier})");
+                    var offsetAtIndex = knownOffsets[lastKnownOffsetIndex];
+                    var bpmAtIndex = bpmChangesInTrack[lastKnownOffsetIndex];
+                    var elapsedDuration = 240_000 / bpmAtIndex / maxDataLength * (globalIndex - lastKnownOffsetIndex);
+                    var objectOffset = Math.Round(offsetAtIndex + elapsedDuration);
+
+                    var objectType = (ObjectType)objectData;
+
+                    var gameObject = new GameObject(
+                        objectOffset,
+                        objectType,
+                        laneType,
+                        laneModifier
+                    );
+                    map.GameObjects.Add(gameObject);
+
+                    Logger.Log(
+                        $"Adding object at offset {objectOffset} ({globalIndex} / {trackId}#{i}) with type {objectType} in lane {laneType} ({laneModifier})");
+                }
             }
         }
 
@@ -252,9 +259,11 @@ public static class BmsParser
                 map.Metadata.InitialLaneSpeed.Value = (LaneSpeed)playerNumber;
                 return;
             }
+
             case "GENRE":
             {
                 var initialScene = SceneUtils.GetSceneType(value);
+
                 if (initialScene == SceneType.Unknown)
                 {
                     Logger.Log($"Invalid scene name: {value}", level: LogLevel.Important);
@@ -264,6 +273,7 @@ public static class BmsParser
                 map.Metadata.InitialScene.Value = initialScene;
                 return;
             }
+
             case "BPM":
             {
                 if (!double.TryParse(value, out var initialBpmValue))

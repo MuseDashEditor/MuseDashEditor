@@ -23,7 +23,8 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneO
 
 public partial class LongLaneObject : Container
 {
-    [Resolved] private TextureStore textureStore { get; set; } = null!;
+    [Resolved]
+    private TextureStore textureStore { get; set; } = null!;
 
     private Container<Sprite> holdNotesContainer = null!;
     private Sprite holdBodySprite = null!;
@@ -125,7 +126,7 @@ public partial class LongLaneObject : Container
     }
 
     public void UpdateObjectTextures(ObjectType objectType, SceneType sceneType, LaneType laneType,
-        LaneModifierType leftLaneModifier, LaneModifierType rightLaneModifier)
+                                     LaneModifierType leftLaneModifier, LaneModifierType rightLaneModifier)
     {
         leftCircleSprite.Texture = rightCircleSprite.Texture = textureStore.GetLaneBackgroundTexture(laneType);
         leftObjectSprite.Texture =

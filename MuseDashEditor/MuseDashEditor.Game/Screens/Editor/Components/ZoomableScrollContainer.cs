@@ -29,8 +29,11 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
     private const float zoom_speed = 10f;
     private const float snap_distance = 50f;
 
-    [Resolved] private EditorDataHolder editorDataHolder { get; set; } = null!;
-    [Resolved] private EditorClock editorClock { get; set; } = null!;
+    [Resolved]
+    private EditorDataHolder editorDataHolder { get; set; } = null!;
+
+    [Resolved]
+    private EditorClock editorClock { get; set; } = null!;
 
     protected override Container<Drawable> Content => zoomedContent;
 
@@ -51,7 +54,8 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
     public ZoomableScrollContainer(
         Direction direction = Direction.Horizontal,
         float? xCenter = null
-    ) : base(direction)
+    )
+        : base(direction)
     {
         this.xCenter = xCenter;
 
@@ -316,7 +320,8 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
 public partial class ZoomableScrollContainer<T> : ScrollContainer<T>
     where T : Drawable
 {
-    protected ZoomableScrollContainer(Direction direction) : base(direction)
+    protected ZoomableScrollContainer(Direction direction)
+        : base(direction)
     {
     }
 

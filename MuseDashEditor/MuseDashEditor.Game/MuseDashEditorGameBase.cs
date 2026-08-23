@@ -61,12 +61,12 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
     private void load(IRenderer renderer, GameHost gameHost)
     {
         base.Content.Add(new DrawSizePreservingFillContainer
-            {
-                TargetDrawSize = new Vector2(1920, 1080),
-                Strategy = DrawSizePreservationStrategy.Minimum
-            }
-            .WithChild(new MdeKeyBindingContainer())
-            .WithChild(new TooltipContainer()));
+                         {
+                             TargetDrawSize = new Vector2(1920, 1080),
+                             Strategy = DrawSizePreservationStrategy.Minimum
+                         }
+                         .WithChild(new MdeKeyBindingContainer())
+                         .WithChild(new TooltipContainer()));
 
         Resources.AddStore(new DllResourceStore(typeof(MuseDashEditorResources).Assembly));
         dependencies.CacheAs(new LargeTextureStore(renderer,

@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using System;
-using MuseDashEditor.Game.Data.Type;
 
 namespace MuseDashEditor.Game.Data.Scene;
 

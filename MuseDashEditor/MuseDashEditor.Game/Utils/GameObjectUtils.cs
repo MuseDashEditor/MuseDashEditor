@@ -33,7 +33,7 @@ public static class GameObjectUtils
     }
 
     public static Texture? GetObjectTexture(this ITextureStore textureStore, ObjectType objectType,
-        SceneType currentScene, LaneType laneType)
+                                            SceneType currentScene, LaneType laneType)
     {
         var objectData = GetGameObjectData(objectType);
         if (objectData is null) return null;
@@ -45,6 +45,7 @@ public static class GameObjectUtils
         var ignoreLane = false;
 
         var specialTextureData = typeof(TextureType).GetField(objectData.TextureType.ToString())?.GetCustomAttribute<SpecialTexture>();
+
         if (specialTextureData != null)
         {
             ignoreScene = specialTextureData.SceneIndependent;
@@ -53,13 +54,15 @@ public static class GameObjectUtils
 
         string scenePath = ignoreScene ? "Common" : $"scene_{sceneData.ResourcePath}";
 
-        string suffix = ignoreLane ? "" : laneType switch
-        {
-            LaneType.Air or LaneType.Air2 => "_air",
-            LaneType.Ground or LaneType.Ground2 => "_ground",
-            LaneType.Special or LaneType.Special2 => "",
-            _ => throw new ArgumentOutOfRangeException(nameof(laneType), laneType, null)
-        };
+        string suffix = ignoreLane
+            ? ""
+            : laneType switch
+            {
+                LaneType.Air or LaneType.Air2 => "_air",
+                LaneType.Ground or LaneType.Ground2 => "_ground",
+                LaneType.Special or LaneType.Special2 => "",
+                _ => throw new ArgumentOutOfRangeException(nameof(laneType), laneType, null)
+            };
 
         var path = $"Icons/Object/{scenePath}/{objectData.TextureType.ToString().ToLowerInvariant()}{suffix}";
         return textureStore.Get(path);

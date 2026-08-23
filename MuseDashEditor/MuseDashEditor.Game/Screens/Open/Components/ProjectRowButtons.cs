@@ -22,7 +22,8 @@ namespace MuseDashEditor.Game.Screens.Open.Components;
 
 public partial class ProjectRowButtons(Storage projectStorage) : FillFlowContainer<ProjectRowButton>
 {
-    [Resolved] protected NotificationContainer NotificationContainer { get; private set; } = null!;
+    [Resolved]
+    protected NotificationContainer NotificationContainer { get; private set; } = null!;
 
     [BackgroundDependencyLoader]
     private void load(GameHost gameHost)

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using MuseDashEditor.Game.Conversion.MdeFormat;
 using MuseDashEditor.Game.Data.Project;
@@ -26,14 +27,15 @@ namespace MuseDashEditor.Game.Project;
 
 public partial class ProjectManager : IDependencyInjectionCandidate
 {
-    [Resolved] protected GameHost Host { get; private set; } = null!;
+    [Resolved]
+    protected GameHost Host { get; private set; } = null!;
 
     public IEnumerable<Storage> GetAllProjects()
     {
         var projectsStorage = Host.Storage.GetStorageForDirectory("projects");
         return projectsStorage.GetDirectories(".")
-            .Select(projectsStorage.GetStorageForDirectory)
-            .Where(storage => storage.Exists("project.mdep"));
+                              .Select(projectsStorage.GetStorageForDirectory)
+                              .Where(storage => storage.Exists("project.mdep"));
     }
 
     public Storage CreateProject(string importedChartHash = "")
@@ -57,12 +59,13 @@ public partial class ProjectManager : IDependencyInjectionCandidate
             return null;
 
         string fileHash;
-        using (var hasher = System.Security.Cryptography.SHA1.Create())
+
+        using (var hasher = SHA1.Create())
         {
             await using (var stream = File.OpenRead(pathValueFullName))
             {
                 var hash = await hasher.ComputeHashAsync(stream);
-               fileHash = BitConverter.ToString(hash).Replace("-", "");
+                fileHash = BitConverter.ToString(hash).Replace("-", "");
             }
         }
 

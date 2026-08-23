@@ -26,7 +26,8 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Timing.Components;
 
 public partial class TimingTrack : Container
 {
-    [Resolved] protected EditorDataHolder DataHolder { get; private set; } = null!;
+    [Resolved]
+    protected EditorDataHolder DataHolder { get; private set; } = null!;
 
     public readonly ZoomableScrollContainer ZoomableScrollContainer;
     public readonly WaveformGraph WaveformGraph;

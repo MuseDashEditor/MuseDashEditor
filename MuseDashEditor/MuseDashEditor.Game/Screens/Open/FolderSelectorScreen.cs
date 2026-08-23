@@ -50,6 +50,7 @@ public partial class FolderSelectorScreen : Screen
                     try
                     {
                         var selectedFile = fileSelector.CurrentFile.Value;
+
                         if (selectedFile == null)
                         {
                             return;

@@ -26,7 +26,8 @@ namespace MuseDashEditor.Game.Screens.Editor.Components;
 
 public partial class PlayBar : CompositeDrawable
 {
-    [Resolved] protected EditorClock EditorClock { get; private set; } = null!;
+    [Resolved]
+    protected EditorClock EditorClock { get; private set; } = null!;
 
     private SpriteText percentText = null!;
     private SpriteText timerText = null!;

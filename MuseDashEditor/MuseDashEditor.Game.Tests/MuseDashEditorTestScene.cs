@@ -27,9 +27,14 @@ namespace MuseDashEditor.Game.Tests;
 
 public abstract partial class MuseDashEditorTestScene : TestScene
 {
-    [Cached] protected readonly EditorDataHolder EditorDataHolder = new();
-    [Resolved] protected GameHost Host { get; private set; }
-    [Resolved] protected AudioManager AudioManager { get; private set; }
+    [Cached]
+    protected readonly EditorDataHolder EditorDataHolder = new();
+
+    [Resolved]
+    protected GameHost Host { get; private set; }
+
+    [Resolved]
+    protected AudioManager AudioManager { get; private set; }
 
     private readonly EditorClock editorClock = new();
     protected override Container<Drawable> Content => content;

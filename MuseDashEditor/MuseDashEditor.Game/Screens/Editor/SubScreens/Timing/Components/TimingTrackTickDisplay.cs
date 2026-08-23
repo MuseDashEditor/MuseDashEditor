@@ -10,7 +10,6 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using System;
 using System.Collections.Generic;
 using MuseDashEditor.Game.Component;
 using MuseDashEditor.Game.Data.Holder;
@@ -26,8 +25,11 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Timing.Components;
 
 public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPointTick>(TimingPointTick.MAX_WIDTH * 5)
 {
-    [Resolved] private EditorDataHolder dataHolder { get; set; } = null!;
-    [Resolved] private EditorClock editorClock { get; set; } = null!;
+    [Resolved]
+    private EditorDataHolder dataHolder { get; set; } = null!;
+
+    [Resolved]
+    private EditorClock editorClock { get; set; } = null!;
 
     public bool ShouldPlayTickSound { get; set; } = true;
 
@@ -197,6 +199,7 @@ public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPoint
         {
             (a, b) = (b, a % b);
         }
+
         return a;
     }
 

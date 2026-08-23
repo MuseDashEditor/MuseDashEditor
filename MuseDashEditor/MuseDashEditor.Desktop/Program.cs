@@ -10,9 +10,9 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using osu.Framework.Platform;
-using osu.Framework;
 using MuseDashEditor.Game;
+using osu.Framework;
+using osu.Framework.Platform;
 
 namespace MuseDashEditor.Desktop;
 

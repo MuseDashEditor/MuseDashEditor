@@ -22,7 +22,8 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose;
 
 public partial class ComposeSubscreen : PlayableEditorSubscreen
 {
-    [Cached] private readonly SelectionHandler selectionHandler = new();
+    [Cached]
+    private readonly SelectionHandler selectionHandler = new();
 
     [BackgroundDependencyLoader]
     private void load()

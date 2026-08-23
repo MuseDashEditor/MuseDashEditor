@@ -121,12 +121,13 @@ public static class MdeChartLoader
             var newFile = new FileInfo(storage.GetFullPath(newFileName));
 
             await BmsParser.Parse(fileInfo)
-                .ContinueWith(task =>
-                {
-                    if (!task.IsCompletedSuccessfully || task.Result is null)
-                        return Task.CompletedTask;
-                    return Save(newFile, task.Result);
-                });
+                           .ContinueWith(task =>
+                           {
+                               if (!task.IsCompletedSuccessfully || task.Result is null)
+                                   return Task.CompletedTask;
+
+                               return Save(newFile, task.Result);
+                           });
 
             storage.Delete(filePath);
 

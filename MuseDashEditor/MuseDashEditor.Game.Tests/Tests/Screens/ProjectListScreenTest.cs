@@ -23,7 +23,8 @@ namespace MuseDashEditor.Game.Tests.Tests.Screens;
 
 public partial class ProjectListScreenTest : MuseDashEditorTestScene
 {
-    [Cached] private ScreenStack screenStack = new();
+    [Cached]
+    private ScreenStack screenStack = new();
 
     [Test]
     public void TestProjectRowComponent()

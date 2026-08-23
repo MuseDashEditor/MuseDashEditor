@@ -19,9 +19,10 @@ namespace MuseDashEditor.Game.Data.Object.GameObject;
 public class GameObject : BaseObject
 {
     public GameObject(double offset,
-        ObjectType objectType,
-        LaneType laneType,
-        LaneModifierType laneModifier) : base(offset)
+                      ObjectType objectType,
+                      LaneType laneType,
+                      LaneModifierType laneModifier)
+        : base(offset)
     {
         ObjectType = objectType;
         LaneType = laneType;

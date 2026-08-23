@@ -24,7 +24,8 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Timing;
 
 public partial class TimingSubscreen : PlayableEditorSubscreen
 {
-    [Resolved] private EditorDataHolder dataHolder { get; set; } = null!;
+    [Resolved]
+    private EditorDataHolder dataHolder { get; set; } = null!;
 
     [BackgroundDependencyLoader]
     private void load()
@@ -79,9 +80,11 @@ public partial class TimingSubscreen : PlayableEditorSubscreen
             case Key.Left:
                 ScrollContainer?.ScrollToTime(currentTime - amount);
                 break;
+
             case Key.Right:
                 ScrollContainer?.ScrollToTime(currentTime + amount);
                 break;
+
             default: return base.OnKeyDown(e);
         }
 

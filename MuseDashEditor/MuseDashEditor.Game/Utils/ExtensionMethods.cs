@@ -20,7 +20,7 @@ namespace MuseDashEditor.Game.Utils;
 public static class ExtensionMethods
 {
     public static TValue ComputeIfAbsent<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key,
-        Func<TValue> valueFactory)
+                                                       Func<TValue> valueFactory)
     {
         var value = dictionary.TryGetValue(key, out var existingValue) ? existingValue : valueFactory();
         dictionary[key] = value;
@@ -28,7 +28,7 @@ public static class ExtensionMethods
     }
 
     public static TimingPointObject? GetTimingPointAtTime(this EditorDataHolder dataHolder, double time,
-        bool ignoreExact = false)
+                                                          bool ignoreExact = false)
     {
         var currentMap = dataHolder.CurrentMap.Value;
         if (currentMap == null) return null;

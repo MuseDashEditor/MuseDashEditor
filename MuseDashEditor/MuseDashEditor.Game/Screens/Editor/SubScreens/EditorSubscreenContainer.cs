@@ -67,18 +67,23 @@ public partial class EditorSubscreenContainer : Container<EditorSubscreen>
             case EditorSubscreenType.Metadata:
                 metadataSubscreen.Hide();
                 break;
+
             case EditorSubscreenType.Timing:
                 timingSubscreen.Hide();
                 break;
+
             case EditorSubscreenType.Compose:
                 composeSubscreen.Hide();
                 break;
+
             case EditorSubscreenType.Design:
                 designSubscreen.Hide();
                 break;
+
             case EditorSubscreenType.Validation:
                 validationSubscreen.Hide();
                 break;
+
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -88,18 +93,23 @@ public partial class EditorSubscreenContainer : Container<EditorSubscreen>
             case EditorSubscreenType.Metadata:
                 metadataSubscreen.Show();
                 break;
+
             case EditorSubscreenType.Timing:
                 timingSubscreen.Show();
                 break;
+
             case EditorSubscreenType.Compose:
                 composeSubscreen.Show();
                 break;
+
             case EditorSubscreenType.Design:
                 designSubscreen.Show();
                 break;
+
             case EditorSubscreenType.Validation:
                 validationSubscreen.Show();
                 break;
+
             default:
                 throw new ArgumentOutOfRangeException();
         }

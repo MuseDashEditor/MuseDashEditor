@@ -18,7 +18,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osuTK;
 
@@ -26,7 +25,8 @@ namespace MuseDashEditor.Game.Screens.Open;
 
 public partial class ProjectListScreen : Screen
 {
-    [Cached] private NotificationContainer notificationContainer = new();
+    [Cached]
+    private NotificationContainer notificationContainer = new();
 
     [BackgroundDependencyLoader]
     private void load(ProjectManager projectManager)
@@ -70,7 +70,7 @@ public partial class ProjectListScreen : Screen
                         Colour = Colour4.AliceBlue,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Action = () => {} // TODO
+                        Action = () => { } // TODO
                     }
                 ]
             });

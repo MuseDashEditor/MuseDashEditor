@@ -16,5 +16,4 @@ namespace MuseDashEditor.Game.Data.Attribute;
 
 [AttributeUsage(AttributeTargets.Field)]
 public class LaneTypeData(
-
 ) : System.Attribute;

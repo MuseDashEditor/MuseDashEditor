@@ -20,7 +20,7 @@ namespace MuseDashEditor.Game.Data.Chart;
 public class Chart(
     DirectoryInfo directory,
     FileInfo musicFile,
-    FileInfo demoFile,
+    FileInfo? demoFile,
     ChartInfo info,
     Dictionary<DifficultyType, Map> maps
 )
@@ -37,6 +37,6 @@ public class Chart(
     private readonly Bindable<FileInfo> musicFileBindableInternal = new(musicFile);
     public IBindable<FileInfo> MusicFileBindable => musicFileBindableInternal;
 
-    private readonly Bindable<FileInfo> demoFileBindableInternal = new(demoFile);
-    public IBindable<FileInfo> DemoFileBindable => demoFileBindableInternal;
+    private readonly Bindable<FileInfo?> demoFileBindableInternal = new(demoFile);
+    public IBindable<FileInfo?> DemoFileBindable => demoFileBindableInternal;
 }

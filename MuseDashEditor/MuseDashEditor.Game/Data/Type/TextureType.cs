@@ -24,15 +24,22 @@ public enum TextureType
     Hammer,
     Gemini,
     Hold,
-    [SpecialTexture(false, true)] HoldBody,
+
+    [SpecialTexture(false, true)]
+    HoldBody,
     Masher,
     Gear,
     Raider,
     Boss,
 
-    [SpecialTexture(false, true)] Ghost,
-    [SpecialTexture(true, true)] Heart,
-    [SpecialTexture(true, true)] Note,
+    [SpecialTexture(false, true)]
+    Ghost,
+
+    [SpecialTexture(true, true)]
+    Heart,
+
+    [SpecialTexture(true, true)]
+    Note,
 
     // Boss
     BossProjectile1,
@@ -40,7 +47,8 @@ public enum TextureType
     BossProjectile3,
 
     // Touhou special
-    [SpecialTexture(true, true)] PItem,
+    [SpecialTexture(true, true)]
+    PItem,
     BossBullet1,
     BossBullet2,
     MediumBullet,

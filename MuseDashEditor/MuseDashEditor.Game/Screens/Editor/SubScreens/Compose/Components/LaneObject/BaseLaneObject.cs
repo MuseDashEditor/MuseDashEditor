@@ -24,8 +24,11 @@ public partial class BaseLaneObject : Container
 {
     public const float BASE_SIZE = 75;
 
-    [Resolved] private MdeSounds mdeSounds { get; set; } = null!;
-    [Resolved] private SelectionHandler selectionHandler { get; set; } = null!;
+    [Resolved]
+    private MdeSounds mdeSounds { get; set; } = null!;
+
+    [Resolved]
+    private SelectionHandler selectionHandler { get; set; } = null!;
 
     public double Offset { get; set; }
 
@@ -110,10 +113,12 @@ public partial class BaseLaneObject : Container
             return;
 
         if (isHold && LaneModifier != LaneModifierType.Landmine)
+        {
             longObject.UpdateObjectTextures(gameObject.ObjectType, sceneType, laneType, laneModifier, /* TODO */
                 LaneModifierType.Normal);
+        }
         else
-             simpleObject.UpdateObjectTextures(gameObject.ObjectType, sceneType, laneType, laneModifier, movementType);
+            simpleObject.UpdateObjectTextures(gameObject.ObjectType, sceneType, laneType, laneModifier, movementType);
     }
 
     private void setGameObject(GameObject value)
@@ -218,7 +223,6 @@ public partial class BaseLaneObject : Container
 
     protected override void OnDragEnd(DragEndEvent e)
     {
-
     }
 
     protected override void OnDrag(DragEvent e)

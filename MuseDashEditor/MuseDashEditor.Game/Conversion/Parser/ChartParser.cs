@@ -31,6 +31,7 @@ public static class ChartParser
         var maps = new Dictionary<DifficultyType, Map>();
 
         var bmsFiles = directory.GetFiles("*.bms");
+
         foreach (var file in bmsFiles)
         {
             if (!int.TryParse(file.Name.AsSpan(3, 1), out var mapNumber))
@@ -48,6 +49,7 @@ public static class ChartParser
         }
 
         var mdeMapFiles = directory.GetFiles("*.mdem");
+
         foreach (var file in mdeMapFiles)
         {
             if (!int.TryParse(file.Name.AsSpan(3, 1), out var mapNumber))
@@ -74,20 +76,30 @@ public static class ChartParser
         var mp3AudioFiles = directory.GetFiles("*.mp3");
         var oggAudioFiles = directory.GetFiles("*.ogg");
 
-        FileInfo musicFile = null; // TODO
-        FileInfo demoFile = null;
+        FileInfo musicFile = null!; // TODO
+        FileInfo? demoFile = null;
 
         foreach (var mp3AudioFile in mp3AudioFiles)
+        {
             if (mp3AudioFile.Name.Equals("demo.mp3", StringComparison.OrdinalIgnoreCase))
                 demoFile = mp3AudioFile;
             else if (mp3AudioFile.Name.Equals("music.mp3", StringComparison.OrdinalIgnoreCase))
                 musicFile = mp3AudioFile;
+        }
 
         foreach (var oggAudioFile in oggAudioFiles)
+        {
             if (oggAudioFile.Name.Equals("demo.ogg", StringComparison.OrdinalIgnoreCase))
                 demoFile = oggAudioFile;
             else if (oggAudioFile.Name.Equals("music.ogg", StringComparison.OrdinalIgnoreCase))
                 musicFile = oggAudioFile;
+        }
+
+        if (musicFile == null)
+        {
+            // TODO popup
+            throw new Exception("No music file found");
+        }
 
         return new Chart(
             directory,

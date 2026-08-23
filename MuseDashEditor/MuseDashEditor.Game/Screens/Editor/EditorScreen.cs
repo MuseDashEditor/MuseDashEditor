@@ -22,7 +22,8 @@ namespace MuseDashEditor.Game.Screens.Editor;
 
 public partial class EditorScreen : Screen
 {
-    [Cached] protected readonly EditorClock EditorClock = new();
+    [Cached]
+    protected readonly EditorClock EditorClock = new();
 
     [BackgroundDependencyLoader]
     private void load()

@@ -22,7 +22,8 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Timing.Components;
 
 public partial class TimingPointsTable : Container
 {
-    [Resolved] protected EditorDataHolder DataHolder { get; private set; } = null!;
+    [Resolved]
+    protected EditorDataHolder DataHolder { get; private set; } = null!;
 
     [BackgroundDependencyLoader]
     private void load()

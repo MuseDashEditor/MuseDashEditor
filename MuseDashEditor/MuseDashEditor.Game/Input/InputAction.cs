@@ -37,5 +37,4 @@ public enum InputAction
     ZoomOut,
     VolumeUp,
     VolumeDown
-
 }

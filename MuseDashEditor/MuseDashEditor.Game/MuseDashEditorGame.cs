@@ -22,10 +22,17 @@ namespace MuseDashEditor.Game;
 
 public partial class MuseDashEditorGame : MuseDashEditorGameBase
 {
-    [Cached] protected readonly EditorDataHolder DataHolder = new();
-    [Cached] protected readonly ProjectManager ProjectManager = new();
-    [Cached] protected readonly MdeSounds MdeSounds = new();
-    [Cached] protected readonly ScreenStack ScreenStack = new() { RelativeSizeAxes = Axes.Both };
+    [Cached]
+    protected readonly EditorDataHolder DataHolder = new();
+
+    [Cached]
+    protected readonly ProjectManager ProjectManager = new();
+
+    [Cached]
+    protected readonly MdeSounds MdeSounds = new();
+
+    [Cached]
+    protected readonly ScreenStack ScreenStack = new() { RelativeSizeAxes = Axes.Both };
 
     private readonly HighPerformanceSessionManager highPerformanceSessionManager = new();
 

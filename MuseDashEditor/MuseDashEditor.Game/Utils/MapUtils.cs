@@ -40,6 +40,7 @@ public static class MapUtils
             if (isHoldType && !isLandmine)
             {
                 var pairKey = (gameObject.LaneType, gameObject.LaneModifier);
+
                 if (placing.GetValueOrDefault(objectType, []).Remove(pairKey))
                 {
                     gameObject.IsHoldEnd = true;
@@ -50,6 +51,7 @@ public static class MapUtils
 
                 var nextObject = getNextObjectOfType(gameObjects, objectType, objectIndex, gameObject.LaneType,
                     gameObject.LaneModifier);
+
                 if (nextObject == null)
                 {
                     // TODO: popup for the user : the imported map has issues
@@ -63,6 +65,7 @@ public static class MapUtils
             if (objectType == ObjectType.Gemini)
             {
                 var otherGemini = findOtherGemini(gameObjects, gameObject);
+
                 if (otherGemini == null)
                 {
                     // TODO: popup for the user : the imported map has issues
@@ -76,7 +79,7 @@ public static class MapUtils
     }
 
     private static GameObject? getNextObjectOfType(List<GameObject> gameObjects, ObjectType objectType, int startIndex,
-        LaneType laneType, LaneModifierType laneModifier)
+                                                   LaneType laneType, LaneModifierType laneModifier)
     {
         for (var index = startIndex + 1; index < gameObjects.Count; index++)
         {

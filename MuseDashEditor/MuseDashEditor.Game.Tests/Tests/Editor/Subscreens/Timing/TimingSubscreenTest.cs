@@ -10,16 +10,9 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using MuseDashEditor.Game.Data.Holder;
-using MuseDashEditor.Game.Editor.Clock;
 using MuseDashEditor.Game.Screens.Editor.SubScreens.Timing;
 using MuseDashEditor.Game.Tests.Resources;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Platform;
 
 namespace MuseDashEditor.Game.Tests.Tests.Editor.Subscreens.Timing;
 

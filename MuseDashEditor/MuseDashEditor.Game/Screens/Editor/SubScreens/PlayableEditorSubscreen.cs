@@ -19,7 +19,6 @@ using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osuTK.Input;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens;
 
@@ -32,6 +31,7 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
     protected EditorDataHolder EditorDataHolder { get; private set; } = null!;
 
     protected ZoomableScrollContainer? ScrollContainer;
+    private double playInitialTime;
 
     [BackgroundDependencyLoader]
     private void load(EditorDataHolder editorDataHolder)
@@ -53,109 +53,11 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
 
         var currentTrackValue = EditorDataHolder.CurrentTrack.Value;
         if (currentTrackValue == null) return;
+
         currentTrackValue.Volume.Value = 0.7f; // TODO: config
     }
 
-    protected override bool OnScroll(ScrollEvent e)
-    {
-        if (ScrollContainer == null) return false;
-
-        bool isPlaying = EditorClock.IsRunning;
-
-        switch (e.ScrollDelta.Y) // TODO: Config to invert scroll direction
-        {
-            case > 0:
-                scrollToPreviousBeat(e);
-                break;
-
-            case < 0:
-                scrollToNextBeat(e);
-                break;
-        }
-
-        if (isPlaying)
-            EditorClock.Start();
-
-        return true;
-    }
-
-    protected override bool OnKeyDown(KeyDownEvent e)
-    {
-        if (ScrollContainer == null) return false;
-
-        bool isPlaying = EditorClock.IsRunning;
-
-        // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-        switch (e.Key)
-        {
-            case Key.Space:
-            {
-                if (e.Repeat) return false;
-
-                if (EditorClock.IsRunning)
-                    EditorClock.Stop();
-                else
-                    EditorClock.Start();
-                return true;
-            }
-
-            case Key.PageUp:
-            {
-                var currentTime = ScrollContainer.GetCurrentOrTargetTime();
-                if (currentTime <= 0) break;
-
-                var nearestTimingPoint = EditorDataHolder.GetTimingPointAtTime(currentTime, true);
-                if (nearestTimingPoint == null) break;
-
-                ScrollContainer.ScrollToTime(nearestTimingPoint.Offset.Value, true);
-                break;
-            }
-
-            case Key.PageDown:
-            {
-                var currentTime = ScrollContainer.GetCurrentOrTargetTime();
-                if (currentTime >= EditorClock.TrackLength) break;
-
-                var nextTimingPoint = EditorDataHolder.GetNextTimingPointAtTime(currentTime);
-                if (nextTimingPoint == null) break;
-
-                ScrollContainer.ScrollToTime(nextTimingPoint.Offset.Value, true);
-                break;
-            }
-
-            case Key.Left:
-            {
-                scrollToPreviousBeat(e);
-                break;
-            }
-
-            case Key.Right:
-            {
-                scrollToNextBeat(e);
-                break;
-            }
-
-            case Key.Home:
-                if (e.Repeat) return false;
-                ScrollContainer.ScrollToTime(0, true);
-                break;
-
-            case Key.End:
-                if (e.Repeat) return false;
-                ScrollContainer.ScrollToTime(EditorClock.TrackLength, true);
-                break;
-
-            default:
-                return base.OnKeyDown(e);
-        }
-
-        if (isPlaying)
-            EditorClock.Start();
-
-        return true;
-    }
-
-    private void scrollToNextBeat(UIEvent e)
+    private void scrollToNextBeat(bool isLargeJump)
     {
         if (ScrollContainer == null) return;
 
@@ -175,7 +77,7 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
 
         double beatLength = 60_000 / nearestTimingPoint.NewBpm.Value;
 
-        var subBeatCount = e.ControlPressed ? 1 : ScrollContainer.GetCurrentSubBeatDisplayedCount();
+        var subBeatCount = isLargeJump ? 1 : ScrollContainer.GetCurrentSubBeatDisplayedCount();
         var subBeatLength = beatLength / subBeatCount;
 
         double nearestTime = nearestTimingPoint.Offset.Value +
@@ -191,7 +93,7 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
         ScrollContainer.ScrollToTime(nearestTime, true);
     }
 
-    private void scrollToPreviousBeat(UIEvent e)
+    private void scrollToPreviousBeat(bool isLargeJump)
     {
         if (ScrollContainer == null) return;
 
@@ -203,7 +105,7 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
 
         double beatLength = 60_000 / nearestTimingPoint.NewBpm.Value;
 
-        var subBeatCount = e.ControlPressed ? 1 : ScrollContainer.GetCurrentSubBeatDisplayedCount();
+        var subBeatCount = isLargeJump ? 1 : ScrollContainer.GetCurrentSubBeatDisplayedCount();
         var subBeatLength = beatLength / subBeatCount;
 
         double nearestTime = nearestTimingPoint.Offset.Value +
@@ -220,45 +122,75 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
 
     public bool OnPressed(KeyBindingPressEvent<InputAction> e)
     {
+        if (ScrollContainer == null)
+            return false;
+
+        bool isPlaying = EditorClock.IsRunning;
+
         switch (e.Action)
         {
-            case InputAction.PlaybackPlay:
-                break;
+            case InputAction.PlaybackPlayPause:
+                if (!isPlaying)
+                {
+                    playInitialTime = EditorClock.CurrentTime;
+                    EditorClock.Start();
+                }
+                else
+                {
+                    EditorClock.Stop();
+                    ScrollContainer.ScrollToTime(playInitialTime);
+                }
 
-            case InputAction.PlaybackPause:
                 break;
 
             case InputAction.PlaybackPauseNoBack:
+                if (isPlaying)
+                    EditorClock.Stop();
                 break;
 
             case InputAction.PlaybackGoToStart:
+                ScrollContainer.ScrollToTime(0);
                 break;
 
             case InputAction.PlaybackGoToEnd:
+                ScrollContainer.ScrollToTime(EditorClock.TrackLength);
                 break;
 
             case InputAction.NextBeat:
-                break;
-
             case InputAction.NextBeat2:
+                scrollToNextBeat(false);
                 break;
 
             case InputAction.NextFirstBeat:
+                scrollToNextBeat(true);
                 break;
 
             case InputAction.PreviousBeat:
-                break;
-
             case InputAction.PreviousBeat2:
+                scrollToPreviousBeat(false);
                 break;
 
             case InputAction.PreviousFirstBeat:
+                scrollToPreviousBeat(true);
                 break;
 
             case InputAction.NextTimingPoint:
+                ScrollContainer.ScrollToTime(
+                    EditorDataHolder.GetNextTimingPointAtTime(
+                        ScrollContainer.GetCurrentOrTargetTime()
+                    )?.Offset.Value ?? EditorClock.TrackLength,
+                    true
+                );
                 break;
 
             case InputAction.PreviousTimingPoint:
+                ScrollContainer.ScrollToTime(
+                    EditorDataHolder.GetTimingPointAtTime(
+                        ScrollContainer.GetCurrentOrTargetTime(),
+                        true
+                    )?.Offset.Value ?? 0,
+                    true
+                );
                 break;
 
             default:

@@ -18,6 +18,7 @@ using MuseDashEditor.Game.Input;
 using MuseDashEditor.Resources;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Rendering;
@@ -46,6 +47,9 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
     private MdeConfigManager localConfig = null!;
     private DependencyContainer dependencies = null!;
 
+    protected override Container<Drawable> Content => content;
+    private Container content = null!;
+
     protected MuseDashEditorGameBase()
     {
         Name = game_name;
@@ -61,12 +65,24 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
     private void load(IRenderer renderer, GameHost gameHost)
     {
         base.Content.Add(new DrawSizePreservingFillContainer
-                         {
-                             TargetDrawSize = new Vector2(1920, 1080),
-                             Strategy = DrawSizePreservationStrategy.Minimum
-                         }
-                         .WithChild(new MdeKeyBindingContainer())
-                         .WithChild(new TooltipContainer()));
+        {
+            TargetDrawSize = new Vector2(1920, 1080),
+            Strategy = DrawSizePreservationStrategy.Minimum,
+            Children =
+            [
+                new MdeKeyBindingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children =
+                    [
+                        content = new TooltipContainer
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }
+                    ]
+                }
+            ]
+        });
 
         Resources.AddStore(new DllResourceStore(typeof(MuseDashEditorResources).Assembly));
         dependencies.CacheAs(new LargeTextureStore(renderer,

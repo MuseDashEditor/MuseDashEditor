@@ -45,7 +45,7 @@ public partial class MuseDashEditorGame : MuseDashEditorGameBase
 
         MdeSounds.Preload();
 
-        Child = ScreenStack;
+        Content.Add(ScreenStack);
     }
 
     protected override void LoadComplete()

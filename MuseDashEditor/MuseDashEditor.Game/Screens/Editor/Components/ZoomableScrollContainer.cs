@@ -20,7 +20,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Framework.Utils;
-using osuTK.Input;
 
 namespace MuseDashEditor.Game.Screens.Editor.Components;
 
@@ -145,8 +144,8 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
 
         if (!editorClock.IsRunning)
         {
-            if (!Precision.AlmostEquals(Current, lastScrollPosition)
-                && Precision.AlmostEquals(editorClock.CurrentTime, lastTrackTime)
+            if ((!Precision.AlmostEquals(Current, lastScrollPosition)
+                 && Precision.AlmostEquals(editorClock.CurrentTime, lastTrackTime))
                 || isSliding)
                 seekTrackToCurrent();
             else
@@ -175,7 +174,7 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
 
     protected override bool OnMouseDown(MouseDownEvent e)
     {
-        return e.Button == MouseButton.Left;
+        return false;
     }
 
     protected override bool OnKeyDown(KeyDownEvent e)

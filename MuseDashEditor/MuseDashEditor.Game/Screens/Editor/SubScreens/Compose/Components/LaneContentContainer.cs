@@ -32,7 +32,7 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
     private EditorClock editorClock { get; set; } = null!;
 
     [Resolved]
-    private SelectionHandler selectionHandler { get; set; } = null!;
+    private SelectionContainer selectionContainer { get; set; } = null!;
 
     private double lastPlayedTickOffset;
 
@@ -42,7 +42,7 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
         Anchor = Anchor.CentreLeft;
         Origin = Anchor.CentreLeft;
 
-        selectionHandler.LaneContentContainer = this;
+        selectionContainer.LaneContentContainer = this;
     }
 
     protected override void RegenerateContent()
@@ -54,6 +54,7 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
 
             var tickOffset = gameObject.Offset.Value;
             var tickPosition = ScrollContainer.PositionAtTime(tickOffset);
+            var isSelected = gameObject.Selected.Value;
 
             float? endPosition = ScrollContainer.PositionAtTime(gameObject.HoldEndObject?.Offset.Value);
             GameObject? otherGemini = gameObject.GeminiPairObject;
@@ -70,10 +71,11 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
                         if (endPosition > NextMinTick)
                             NextMinTick = endPosition;
 
-                        continue;
+                        if (!isSelected)
+                            continue;
                     }
                 }
-                else
+                else if (!isSelected)
                     continue;
             }
 
@@ -82,7 +84,8 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
                 if (NextMaxTick == null || tickPosition < NextMaxTick)
                     NextMaxTick = tickPosition;
 
-                continue;
+                if (!isSelected)
+                    continue;
             }
 
             var laneObject = getOrCreateObject();
@@ -114,7 +117,7 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
                 laneObject.HoldLength = endPosition - tickPosition;
             }
 
-            if (otherGemini != null)
+            if (otherGemini != null && gameObject.LaneType is LaneType.Air or LaneType.Air2)
             {
                 var laneObjectY = EditorConstants.GetLaneY(gameObject.LaneType);
                 var otherLaneObjectY = EditorConstants.GetLaneY(otherGemini.LaneType);
@@ -125,7 +128,7 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
             }
         }
 
-        selectionHandler.UpdateSelection();
+        selectionContainer.UpdateSelection();
 
         if (CurrentTickIndex != 0)
             return;
@@ -140,7 +143,7 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
 
         if (CurrentTickIndex >= Count)
         {
-            baseLaneObject = new BaseLaneObject();
+            baseLaneObject = new BaseLaneObject(ScrollContainer);
             Add(baseLaneObject);
         }
         else

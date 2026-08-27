@@ -10,11 +10,13 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using MuseDashEditor.Game.Data.Holder;
+using System;
+using System.Collections.Generic;
 using MuseDashEditor.Game.Data.Object;
 using MuseDashEditor.Game.Data.Object.GameObject;
+using MuseDashEditor.Game.Editor.Clock;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
+using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -23,24 +25,196 @@ using osuTK;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components;
 
-public partial class SelectionHandler : Container<Container>
+public partial class SelectionHandler(LaneContentContainer laneContentContainer) : Container
 {
-    private const float border = 10;
+    [Resolved]
+    private SelectionContainer selectionContainer { get; set; } = null!;
 
     [Resolved]
-    private EditorDataHolder dataHolder { get; set; } = null!;
+    private EditorClock editorClock { get; set; } = null!;
 
-    public LaneContentContainer LaneContentContainer { get; set; } = null!;
+    private readonly HashSet<BaseObject> selectedObjects = [];
+    private readonly HashSet<BaseObject> selectedBeforeDrag = [];
 
-    private readonly BindableList<BaseObject> selectedObjects = [];
-    private int currentIndex;
+    private Vector2 startPosition;
+    private Vector2 stopPosition;
+    private bool isSelectionActive;
+    private double selectionTimeStart;
+
+    private readonly Container selectionBox = new()
+    {
+        Anchor = Anchor.TopLeft,
+        Origin = Anchor.Centre,
+        Masking = true,
+        Alpha = 0,
+        BorderColour = Colour4.Yellow,
+        BorderThickness = 4,
+        Child = new Box
+        {
+            RelativeSizeAxes = Axes.Both,
+            Colour = Colour4.Yellow.Opacity(0.1f),
+        }
+    };
 
     [BackgroundDependencyLoader]
     private void load()
     {
-        Anchor = Anchor.CentreLeft;
-        Origin = Anchor.CentreLeft;
         RelativeSizeAxes = Axes.Both;
+
+        Child = selectionBox;
+    }
+
+    private void unselectAll()
+    {
+        foreach (var selectedObject in selectedObjects)
+        {
+            selectedObject.Selected.Value = false;
+        }
+
+        selectedObjects.Clear();
+    }
+
+    protected override bool OnClick(ClickEvent e)
+    {
+        if (e.ControlPressed)
+            return false;
+
+        if (base.OnClick(e))
+            return false;
+
+        unselectAll();
+        selectionContainer.UpdateSelection();
+        return false;
+    }
+
+    protected override void Update()
+    {
+        if (!isSelectionActive)
+            return;
+
+        var hoveredObjects = new HashSet<BaseObject>();
+        var selectionQuad = selectionBox.ScreenSpaceDrawQuad;
+
+        foreach (var drawable in laneContentContainer.Children)
+        {
+            if (drawable.ScreenSpaceDrawQuad.Intersects(selectionQuad))
+            {
+                hoveredObjects.Add(drawable.GameObject);
+            }
+        }
+
+        foreach (var baseObject in selectedBeforeDrag)
+        {
+            hoveredObjects.Add(baseObject);
+        }
+
+        unselectAll();
+
+        foreach (var selectedObject in hoveredObjects)
+        {
+            selectedObject.Selected.Value = true;
+            selectedObjects.Add(selectedObject);
+        }
+
+        selectionContainer.UpdateSelection();
+    }
+
+    protected override void UpdateAfterChildren()
+    {
+        if (!isSelectionActive)
+            return;
+
+        var screenSpacePos = laneContentContainer.ToScreenSpace(new Vector2(
+            laneContentContainer.ScrollContainer.PositionAtTime(selectionTimeStart),
+            0
+        ));
+        startPosition.X = ToLocalSpace(screenSpacePos).X;
+
+        var (minX, minY, maxX, maxY) = (
+            MathF.Min(startPosition.X, stopPosition.X),
+            MathF.Min(startPosition.Y, stopPosition.Y),
+            MathF.Max(startPosition.X, stopPosition.X),
+            MathF.Max(startPosition.Y, stopPosition.Y)
+        );
+        var centerPosition = new Vector2(
+            minX + (maxX - minX) / 2,
+            minY + (maxY - minY) / 2
+        );
+        var size = new Vector2(
+            maxX - minX,
+            maxY - minY
+        );
+
+        selectionBox.Position = centerPosition;
+        selectionBox.Size = size;
+    }
+
+    protected override bool OnDragStart(DragStartEvent e)
+    {
+        selectionBox.Alpha = 1;
+        selectionBox.Position = startPosition = e.MouseDownPosition;
+        selectionBox.Width = 0;
+        selectionBox.Height = 0;
+
+        selectedBeforeDrag.Clear();
+
+        if (!e.ControlPressed)
+        {
+            unselectAll();
+            selectionContainer.UpdateSelection();
+        }
+        else
+        {
+            foreach (var selectedObject in selectedObjects)
+            {
+                selectedBeforeDrag.Add(selectedObject);
+            }
+        }
+
+        selectionTimeStart = laneContentContainer.ScrollContainer.TimeAtPosition(
+            laneContentContainer.ToLocalSpace(
+                e.ScreenSpaceMouseDownPosition
+            ).X
+        );
+        isSelectionActive = true;
+
+        return true;
+    }
+
+    protected override void OnDrag(DragEvent e)
+    {
+        stopPosition = e.MousePosition;
+    }
+
+    protected override void OnDragEnd(DragEndEvent e)
+    {
+        isSelectionActive = false;
+
+        selectionBox.TransformTo("Alpha", 0f, 100);
+
+        var hoveredObjects = new List<GameObject>();
+        var selectionQuad = selectionBox.ScreenSpaceDrawQuad;
+
+        foreach (var drawable in laneContentContainer.Children)
+        {
+            if (drawable.ScreenSpaceDrawQuad.Intersects(selectionQuad))
+            {
+                hoveredObjects.Add(drawable.GameObject);
+            }
+        }
+
+        if (!e.ControlPressed)
+        {
+            unselectAll();
+        }
+
+        foreach (var selectedObject in hoveredObjects)
+        {
+            selectedObject.Selected.Value = true;
+            selectedObjects.Add(selectedObject);
+        }
+
+        selectionContainer.UpdateSelection();
     }
 
     public void Select(GameObject gameObject, bool addToSelection)
@@ -56,108 +230,13 @@ public partial class SelectionHandler : Container<Container>
         {
             selectedObjects.Remove(gameObject);
             gameObject.Selected.Value = false;
-            UpdateSelection();
-            return;
-        }
-
-        selectedObjects.Add(gameObject);
-        gameObject.Selected.Value = true;
-
-        UpdateSelection();
-    }
-
-    private void unselectAll()
-    {
-        foreach (var selectedObject in selectedObjects)
-        {
-            selectedObject.Selected.Value = false;
-        }
-
-        selectedObjects.Clear();
-
-        foreach (var container in Children)
-        {
-            container.Alpha = 0;
-        }
-    }
-
-    public void UpdateSelection()
-    {
-        currentIndex = 0;
-
-        if (selectedObjects.Count > 0)
-        {
-            foreach (var child in LaneContentContainer.Children)
-            {
-                if (child is null)
-                    continue;
-
-                if (!child.GameObject.Selected.Value)
-                    continue;
-
-                var container = getOrCreateObject();
-                container.Alpha = 1;
-                container.Position = child.Position;
-                container.Size = child.DrawSize + new Vector2(border, border);
-            }
-        }
-
-        while (currentIndex < Count)
-        {
-            Children[currentIndex++].Alpha = 0;
-        }
-    }
-
-    protected override bool OnClick(ClickEvent e)
-    {
-        if (e.ControlPressed)
-            return false;
-
-        unselectAll();
-        UpdateSelection();
-
-        return true;
-    }
-
-    private Container getOrCreateObject()
-    {
-        Container child;
-
-        if (currentIndex >= Count)
-        {
-            child = new Container
-            {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.Centre,
-                Masking = true,
-                BorderThickness = 4,
-                CornerRadius = 10,
-                BorderColour = Colour4.Yellow,
-                Alpha = 0,
-                Depth = -1,
-                Children =
-                [
-                    new Box
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        AlwaysPresent = true,
-                        Alpha = 0
-                    }
-                ]
-            };
-            Add(child);
         }
         else
         {
-            child = Children[currentIndex];
+            selectedObjects.Add(gameObject);
+            gameObject.Selected.Value = true;
         }
 
-        child.Alpha = 1;
-
-        currentIndex++;
-
-        return child;
+        selectionContainer.UpdateSelection();
     }
 }

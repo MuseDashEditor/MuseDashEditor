@@ -70,8 +70,6 @@ public partial class TimingTrack : Container
     {
         RelativeSizeAxes = Axes.X;
 
-        Masking = true;
-
         InternalChildren =
         [
             new Box
@@ -79,7 +77,7 @@ public partial class TimingTrack : Container
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 RelativeSizeAxes = Axes.Y,
-                Size = new Vector2(3, 1),
+                Size = new Vector2(3, 1.2f),
                 Colour = Color4.LimeGreen,
                 Depth = 10,
                 X = xCenter

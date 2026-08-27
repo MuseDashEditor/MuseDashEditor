@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Editor.Clock;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
@@ -29,6 +30,9 @@ public abstract partial class MuseDashEditorTestScene : TestScene
 {
     [Cached]
     protected readonly EditorDataHolder EditorDataHolder = new();
+
+    [Cached]
+    protected readonly MdeSounds MdeSounds = new();
 
     [Resolved]
     protected GameHost Host { get; private set; }

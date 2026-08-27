@@ -22,13 +22,39 @@ namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose;
 
 public partial class ComposeSubscreen : PlayableEditorSubscreen
 {
+    private readonly TimingTrack timingTrack;
+    private readonly LaneContentContainer laneContentContainer;
+
     [Cached]
-    private readonly SelectionHandler selectionHandler = new();
+    private readonly SelectionHandler selectionHandler;
+
+    [Cached]
+    private readonly SelectionContainer selectionContainer = new();
+
+    public ComposeSubscreen()
+    {
+        timingTrack = new TimingTrack(-900)
+        {
+            AutoSizeAxes = Axes.Y,
+            Origin = Anchor.CentreLeft,
+            Anchor = Anchor.CentreLeft,
+            Depth = 1
+        };
+        laneContentContainer = new LaneContentContainer
+        {
+            RelativeSizeAxes = Axes.X,
+            Height = EditorConstants.TOTAL_LANES_HEIGHT,
+            Origin = Anchor.CentreLeft,
+            Anchor = Anchor.CentreLeft,
+            ScrollContainer = timingTrack.ZoomableScrollContainer,
+            Depth = -20,
+        };
+        selectionHandler = new SelectionHandler(laneContentContainer);
+    }
 
     [BackgroundDependencyLoader]
     private void load()
     {
-        TimingTrack timingTrack;
         Container laneBackgrounds;
 
         InternalChildren =
@@ -41,13 +67,8 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
                 Anchor = Anchor.CentreLeft,
                 Depth = 2
             },
-            timingTrack = new TimingTrack(-900)
-            {
-                AutoSizeAxes = Axes.Y,
-                Origin = Anchor.CentreLeft,
-                Anchor = Anchor.CentreLeft,
-                Depth = 1
-            }
+            timingTrack,
+            selectionHandler
         ];
 
         foreach (var laneType in EditorConstants.ORDERED_LANE_TYPES)
@@ -64,16 +85,8 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
             });
         }
 
-        timingTrack.ZoomableScrollContainer.Add(new LaneContentContainer
-        {
-            RelativeSizeAxes = Axes.X,
-            Height = EditorConstants.TOTAL_LANES_HEIGHT,
-            Origin = Anchor.CentreLeft,
-            Anchor = Anchor.CentreLeft,
-            ScrollContainer = timingTrack.ZoomableScrollContainer,
-            Depth = -20,
-        });
-        timingTrack.ZoomableScrollContainer.Add(selectionHandler);
+        timingTrack.ZoomableScrollContainer.Add(laneContentContainer);
+        timingTrack.ZoomableScrollContainer.Add(selectionContainer);
 
         timingTrack.ZoomableScrollContainer.Width = 1f;
         timingTrack.WaveformGraph.Alpha = 0; // TODO: add setting

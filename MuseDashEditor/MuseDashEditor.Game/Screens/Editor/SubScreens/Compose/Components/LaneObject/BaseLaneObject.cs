@@ -12,6 +12,7 @@
 
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
+using MuseDashEditor.Game.Screens.Editor.Components;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -20,7 +21,7 @@ using osu.Framework.Input.Events;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneObject;
 
-public partial class BaseLaneObject : Container
+public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : Container
 {
     public const float BASE_SIZE = 75;
 
@@ -179,7 +180,9 @@ public partial class BaseLaneObject : Container
 
     public void PlaySound()
     {
-        if (!IsPresent) return;
+        if (!IsPresent)
+            return;
+
         mdeSounds.PlayHitSound(hitSoundType);
 
         if (laneModifier == LaneModifierType.Heart)
@@ -213,6 +216,12 @@ public partial class BaseLaneObject : Container
         }
 
         selectionHandler.Select(gameObject, e.ControlPressed);
+        return true;
+    }
+
+    protected override bool OnDoubleClick(DoubleClickEvent e)
+    {
+        scrollContainer.ScrollToTime(Offset, true);
         return true;
     }
 

@@ -29,7 +29,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osuTK;
 
-namespace MuseDashEditor.Game.Screens.Open.Components;
+namespace MuseDashEditor.Game.Screens.MainSubscreen.Open.Components;
 
 public partial class ProjectRow(Storage projectStorage) : Container
 {
@@ -38,6 +38,8 @@ public partial class ProjectRow(Storage projectStorage) : Container
 
     [Resolved]
     protected ScreenStack ScreenStack { get; private set; } = null!;
+
+    public bool ShowButtons { get; init; } = true;
 
     private Box hoverBox = null!;
     private bool isLoading;
@@ -56,11 +58,17 @@ public partial class ProjectRow(Storage projectStorage) : Container
 
         InternalChildren =
         [
-            new Box
+            new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = MdeColors.Background6,
-                Depth = 2
+                Masking = true,
+                CornerRadius = 10,
+                Depth = 2,
+                Child = hoverBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = MdeColors.Background5,
+                }
             },
             new GridContainer
             {
@@ -70,7 +78,7 @@ public partial class ProjectRow(Storage projectStorage) : Container
                     new Dimension(GridSizeMode.Absolute, 140f),
                     new Dimension(),
                     new Dimension(GridSizeMode.Relative, 0.3f),
-                    new Dimension(GridSizeMode.Absolute, 50f)
+                    new Dimension(GridSizeMode.Absolute, ShowButtons ? 50f : 0f)
                 ],
                 RowDimensions =
                 [
@@ -82,7 +90,7 @@ public partial class ProjectRow(Storage projectStorage) : Container
                     {
                         new Container
                         {
-                            Padding = new MarginPadding(5),
+                            Padding = new MarginPadding(20),
                             RelativeSizeAxes = Axes.Both,
                             Child = new Sprite
                             {
@@ -105,21 +113,21 @@ public partial class ProjectRow(Storage projectStorage) : Container
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Text = chartInfoRaw.name,
-                                    Font = FontUsage.Default.With(size: 40, weight: "600"),
+                                    Font = MDEFonts.ArialUnicodeMs.With(size: 40, weight: "600"),
                                 },
                                 new SpriteText
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Text = chartInfoRaw.author,
-                                    Font = FontUsage.Default.With(size: 20),
+                                    Font = MDEFonts.ArialUnicodeMs.With(size: 20),
                                 },
                                 new SpriteText
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Text = chartInfoRaw.bpm + " BPM",
-                                    Font = FontUsage.Default.With(size: 20),
+                                    Font = MDEFonts.ArialUnicodeMs.With(size: 20),
                                 }
                             ]
                         },
@@ -135,19 +143,11 @@ public partial class ProjectRow(Storage projectStorage) : Container
                         },
                         new ProjectRowButtons(projectStorage)
                         {
+                            Alpha = ShowButtons ? 1 : 0,
                             Depth = 0
                         }
                     }
                 }
-            },
-            hoverBox = new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Colour = Colour4.White,
-                Depth = 1,
-                Alpha = 0
             }
         ];
     }
@@ -203,7 +203,8 @@ public partial class ProjectRow(Storage projectStorage) : Container
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Text = $"{difficultyName} ({difficulty}) by {levelDesigner}"
+                    Text = $"{difficultyName} ({difficulty}) by {levelDesigner}",
+                    Font = MDEFonts.ArialUnicodeMs
                 }
             ]
         };
@@ -211,14 +212,16 @@ public partial class ProjectRow(Storage projectStorage) : Container
 
     protected override bool OnHover(HoverEvent e)
     {
-        hoverBox.TransformTo("Alpha", 0.1f, 200);
+        hoverBox.TransformTo(nameof(Colour), (ColourInfo)MdeColors.Background4, 200);
         return true;
     }
 
     protected override void OnHoverLost(HoverLostEvent e)
     {
-        if (isLoading) return;
-        hoverBox.TransformTo("Alpha", 0f, 200);
+        if (isLoading)
+            return;
+
+        hoverBox.TransformTo(nameof(Colour), (ColourInfo)MdeColors.Background5, 200);
     }
 
     protected override bool OnClick(ClickEvent e)

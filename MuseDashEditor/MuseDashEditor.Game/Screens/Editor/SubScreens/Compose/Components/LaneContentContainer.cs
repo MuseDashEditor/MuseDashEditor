@@ -59,6 +59,8 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
             float? endPosition = ScrollContainer.PositionAtTime(gameObject.HoldEndObject?.Offset.Value);
             GameObject? otherGemini = gameObject.GeminiPairObject;
 
+            var laneObject = gameObject.LaneObject;
+
             if (tickPosition < CurrentMinRange)
             {
                 if (NextMinTick == null || tickPosition > NextMinTick)
@@ -72,11 +74,27 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
                             NextMinTick = endPosition;
 
                         if (!isSelected)
+                        {
+                            if (laneObject != null)
+                            {
+                                laneObject.IsUsed = false;
+                                gameObject.LaneObject = null;
+                            }
+
                             continue;
+                        }
                     }
                 }
                 else if (!isSelected)
+                {
+                    if (laneObject != null)
+                    {
+                        laneObject.IsUsed = false;
+                        gameObject.LaneObject = null;
+                    }
+
                     continue;
+                }
             }
 
             if (tickPosition > CurrentMaxRange)
@@ -85,10 +103,22 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
                     NextMaxTick = tickPosition;
 
                 if (!isSelected)
+                {
+                    if (laneObject != null)
+                    {
+                        laneObject.IsUsed = false;
+                        gameObject.LaneObject = null;
+                    }
+
                     continue;
+                }
             }
 
-            var laneObject = getOrCreateObject();
+            if (laneObject != null)
+                continue;
+
+            laneObject = getOrCreateObject();
+            laneObject.IsUsed = true;
             laneObject.Offset = tickOffset;
             laneObject.X = tickPosition;
             laneObject.Y = EditorConstants.GetLaneY(gameObject.LaneType);
@@ -97,6 +127,8 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
             laneObject.SceneType = SceneType.SpaceStation; // TODO: scene at time
             laneObject.LaneType = gameObject.LaneType;
             laneObject.LaneModifier = gameObject.LaneModifier;
+
+            gameObject.LaneObject = laneObject;
 
             var gameObjectData = gameObject.GameObjectData;
 
@@ -139,23 +171,32 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
 
     private BaseLaneObject getOrCreateObject()
     {
-        BaseLaneObject baseLaneObject;
-
-        if (CurrentTickIndex >= Count)
+        while (true)
         {
-            baseLaneObject = new BaseLaneObject(ScrollContainer);
-            Add(baseLaneObject);
-        }
-        else
-        {
-            baseLaneObject = Children[CurrentTickIndex];
-        }
+            BaseLaneObject baseLaneObject;
 
-        baseLaneObject.Alpha = 1;
-        baseLaneObject.Reset();
+            if (CurrentTickIndex >= Count)
+            {
+                baseLaneObject = new BaseLaneObject(ScrollContainer);
+                Add(baseLaneObject);
+            }
+            else
+            {
+                baseLaneObject = Children[CurrentTickIndex];
+            }
 
-        CurrentTickIndex++;
-        return baseLaneObject;
+            CurrentTickIndex++;
+
+            if (baseLaneObject.IsUsed)
+            {
+                continue;
+            }
+
+            baseLaneObject.Alpha = 1;
+            baseLaneObject.Reset();
+
+            return baseLaneObject;
+        }
     }
 
     protected override void Update()

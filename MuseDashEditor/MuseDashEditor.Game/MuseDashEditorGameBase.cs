@@ -85,6 +85,10 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
         });
 
         Resources.AddStore(new DllResourceStore(typeof(MuseDashEditorResources).Assembly));
+
+        AddFont(Resources, @"Fonts/ArialUnicodeMS/ArialUnicodeMS");
+        AddFont(Resources, @"Fonts/Impact/Impact");
+
         dependencies.CacheAs(new LargeTextureStore(renderer,
             gameHost.CreateTextureLoaderStore(new ResourceStore<byte[]>([
                 new NamespacedResourceStore<byte[]>(Resources, "Textures"),

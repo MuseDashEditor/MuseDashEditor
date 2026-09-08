@@ -10,6 +10,10 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System.Collections.Generic;
+using MuseDashEditor.Game.Data.Holder;
+using MuseDashEditor.Game.Data.Object.GameObject;
+using MuseDashEditor.Game.Input;
 using MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components;
 using MuseDashEditor.Game.Screens.Editor.SubScreens.Timing.Components;
 using MuseDashEditor.Game.Utils;
@@ -17,6 +21,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose;
 
@@ -24,6 +29,9 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
 {
     private readonly TimingTrack timingTrack;
     private readonly LaneContentContainer laneContentContainer;
+
+    [Resolved]
+    private EditorDataHolder editorDataHolder { get; set; } = null!;
 
     [Cached]
     private readonly SelectionHandler selectionHandler;
@@ -94,5 +102,78 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
         timingTrack.TimingTrackTickDisplay.ShouldPlayTickSound = false; // TODO: add setting
 
         ScrollContainer = timingTrack.ZoomableScrollContainer;
+    }
+
+    public override bool OnPressed(KeyBindingPressEvent<InputAction> e)
+    {
+        List<GameObject> selectedObjects = [];
+
+        foreach (var gameObject in editorDataHolder.CurrentMap.Value.GameObjects)
+        {
+            if (gameObject.Selected.Value)
+                selectedObjects.Add(gameObject);
+        }
+
+        switch (e.Action)
+        {
+            case InputAction.Delete:
+                foreach (var selectedObject in selectedObjects)
+                {
+                    delete(selectedObject);
+                }
+
+                laneContentContainer.Invalidate();
+                selectionContainer.UpdateSelection();
+                break;
+
+            case InputAction.Flip:
+                foreach (var selectedObject in selectedObjects)
+                {
+                    flip(selectedObject);
+                }
+
+                laneContentContainer.Invalidate();
+                selectionContainer.UpdateSelection();
+                break;
+
+            case InputAction.SelectAllVisible:
+            case InputAction.SelectAll:
+            case InputAction.Copy:
+            case InputAction.Cut:
+            case InputAction.Paste:
+            case InputAction.ZoomIn:
+            case InputAction.ZoomOut:
+                return true;
+
+            default:
+                return base.OnPressed(e);
+        }
+
+        return true;
+    }
+
+    private void flip(GameObject selectedObject)
+    {
+        // TODO
+    }
+
+    private void delete(GameObject selectedObject, bool secondGemini = false)
+    {
+        editorDataHolder.CurrentMap.Value.GameObjects.Remove(selectedObject);
+
+        if (selectedObject.LaneObject != null)
+        {
+            selectedObject.LaneObject.IsUsed = false;
+            selectedObject.LaneObject = null;
+        }
+
+        if (selectedObject.Selected.Value)
+            selectionHandler.Unselect(selectedObject);
+
+        if (!secondGemini && selectedObject.GeminiPairObject != null)
+            delete(selectedObject.GeminiPairObject, true);
+
+        if (selectedObject.HoldEndObject != null)
+            delete(selectedObject.HoldEndObject);
     }
 }

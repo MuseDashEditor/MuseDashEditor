@@ -10,18 +10,26 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System;
+using System.Linq;
+using MuseDashEditor.Game.Component;
+using MuseDashEditor.Game.Data.Holder;
+using MuseDashEditor.Game.Data.Object;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
+using MuseDashEditor.Game.Editor.Clock;
 using MuseDashEditor.Game.Screens.Editor.Components;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
+using osuTK;
+using osuTK.Input;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneObject;
 
-public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : Container
+public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : RefreshableObject
 {
     public const float BASE_SIZE = 75;
 
@@ -30,6 +38,12 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : C
 
     [Resolved]
     private SelectionHandler selectionHandler { get; set; } = null!;
+
+    [Resolved]
+    private EditorDataHolder editorDataHolder { get; set; } = null!;
+
+    [Resolved]
+    private EditorClock editorClock { get; set; } = null!;
 
     public double Offset { get; set; }
 
@@ -83,9 +97,21 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : C
     private SimpleLaneObject geminiObject = null!;
     private LongLaneObject longObject = null!;
 
+    public bool IsDragging { get; private set; }
+    private Vector2 dragStartPosition;
+    private bool isDragCancelled;
+    private Vector2 lastDragPosition;
+
+    private TransformSequence<BaseLaneObject>? blinkTransform;
+    private Transform fadeOut = null!;
+    private Transform fadeIn = null!;
+
     [BackgroundDependencyLoader]
     private void load()
     {
+        fadeOut = this.MakeTransform(nameof(Alpha), 0.3f, 750);
+        fadeIn = this.MakeTransform(nameof(Alpha), 1f, 750);
+
         Anchor = Anchor.CentreLeft;
         Origin = Anchor.Centre;
         AutoSizeAxes = Axes.X;
@@ -106,6 +132,8 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : C
                 Alpha = 0
             }
         ];
+
+        editorClock.OnTimeChanged += _ => updateDragPosition();
     }
 
     private void updateObjectTextures()
@@ -206,10 +234,23 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : C
         isHold = false;
         Height = BASE_SIZE;
         hitSoundType = HitSoundType.None;
+        simpleObject.Reset();
     }
 
     protected override bool OnClick(ClickEvent e)
     {
+        if (e.Button == MouseButton.Right)
+        {
+            if (IsDragging)
+            {
+                cancelDrag();
+                return true;
+            }
+
+            // TODO context menu
+            return true;
+        }
+
         if (base.OnClick(e))
         {
             return true;
@@ -219,23 +260,119 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : C
         return true;
     }
 
+    private void cancelDrag()
+    {
+        isDragCancelled = true;
+        IsDragging = false;
+
+        cancelBlinkEffect();
+
+        // TODO reset position, lane etc.
+    }
+
+    private void cancelBlinkEffect()
+    {
+        // TODO: fix this
+        // RemoveTransform(fadeOut);
+        // RemoveTransform(fadeIn);
+        // Alpha = 1f;
+        blinkTransform?.TransformTo(nameof(Alpha), 1f);
+    }
+
     protected override bool OnDoubleClick(DoubleClickEvent e)
     {
         scrollContainer.ScrollToTime(Offset, true);
         return true;
     }
 
+    protected override bool OnMouseDown(MouseDownEvent e)
+    {
+        return true;
+    }
+
     protected override bool OnDragStart(DragStartEvent e)
     {
+        dragStartPosition = Position;
+        IsDragging = true;
+
+        blinkTransform = this.TransformTo(nameof(Alpha), 0.3f, 750)
+                             .Then()
+                             .TransformTo(nameof(Alpha), 1f, 750)
+                             .Loop();
+
         return true;
     }
 
     protected override void OnDragEnd(DragEndEvent e)
     {
+        if (isDragCancelled)
+            IsDragging = false;
+
+        if (!IsDragging)
+            return;
+
+        IsDragging = false;
+        cancelBlinkEffect();
     }
 
     protected override void OnDrag(DragEvent e)
     {
-        // TODO: Snap position
+        if (isDragCancelled)
+            return;
+
+        lastDragPosition = e.ScreenSpaceMousePosition;
+
+        updateGameObjectPosition();
+    }
+
+    private void updateGameObjectPosition()
+    {
+        var positionInScroll = scrollContainer.ToLocalSpace(lastDragPosition);
+        var x = MathF.Max(0, (float)(positionInScroll.X - BASE_SIZE / 2 + scrollContainer.Current));
+
+        x = scrollContainer.SnapXToNearestSubBeat(x);
+
+        var lane = EditorConstants.GetLaneAtY(positionInScroll.Y - scrollContainer.Height / 2);
+
+        if (lane is not null)
+        {
+            ObjectData? objectData = (ObjectData?)gameObject.GameObjectData ?? gameObject.DesignObjectData;
+
+            // Should never be null here
+            if (objectData is not null)
+            {
+                var validLaneTypes = objectData.ValidLaneTypes;
+                var isAllowed = validLaneTypes.Length == 0 || validLaneTypes.Contains(lane.Value);
+
+                if (!isAllowed)
+                    lane = laneType;
+            }
+            else
+                lane = laneType;
+        }
+        else
+            lane = laneType;
+
+        var y = EditorConstants.GetLaneY(lane.Value);
+        var offset = scrollContainer.TimeAtPosition(x);
+
+        var otherObject = MapUtils.GetObjectAt(editorDataHolder.CurrentMap.Value.GameObjects, offset, lane.Value);
+        if (otherObject is not null && otherObject.Id != gameObject.Id)
+            return;
+
+        X = x;
+        Y = y;
+        laneType = lane.Value;
+
+        gameObject.Offset.Value = offset;
+        updateObjectTextures();
+    }
+
+    private void updateDragPosition()
+    {
+        if (!IsDragging)
+            return;
+
+        updateGameObjectPosition();
     }
 }

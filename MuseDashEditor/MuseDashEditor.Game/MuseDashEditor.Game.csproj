@@ -22,6 +22,7 @@
     <ProjectReference Include="..\MuseDashEditor.Resources\MuseDashEditor.Resources.csproj"/>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Gameloop.Vdf" Version="0.6.2" />
     <PackageReference Include="ppy.osu.Framework" Version="2026.521.0" />
   </ItemGroup>
 </Project>

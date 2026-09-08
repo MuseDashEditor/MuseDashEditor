@@ -22,7 +22,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osuTK;
 
-namespace MuseDashEditor.Game.Screens.Open.Components;
+namespace MuseDashEditor.Game.Screens.MainSubscreen.Open.Components;
 
 public partial class ProjectRowButton : Container, IHasTooltip
 {
@@ -72,7 +72,7 @@ public partial class ProjectRowButton : Container, IHasTooltip
     {
         hoverBox.TransformTo("Alpha", 0.1f, 200);
         icon.TransformTo("Alpha", 1f, 200);
-        return true;
+        return false;
     }
 
     protected override void OnHoverLost(HoverLostEvent e)

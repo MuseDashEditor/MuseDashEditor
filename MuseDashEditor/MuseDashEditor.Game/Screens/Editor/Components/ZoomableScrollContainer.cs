@@ -257,17 +257,17 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
 
     public void SnapToNearestPreviousSubbeat()
     {
-        var (nearestPreviousTime, _) = getNearestSubbeatBounds();
+        var (nearestPreviousTime, _) = getNearestSubbeatBounds(Current);
         ScrollToTime(nearestPreviousTime);
     }
 
     public void SnapToNearestSubbeat()
     {
-        var currentPosition = TimeAtPosition(Current);
-        var (nearestPreviousTime, nearestNextTime) = getNearestSubbeatBounds();
+        var currentTime = TimeAtPosition(Current);
+        var (nearestPreviousTime, nearestNextTime) = getNearestSubbeatBounds(currentTime);
 
-        var deltaToPrevious = currentPosition - nearestPreviousTime;
-        var deltaToNext = nearestNextTime - currentPosition;
+        var deltaToPrevious = currentTime - nearestPreviousTime;
+        var deltaToNext = nearestNextTime - currentTime;
 
         if (deltaToPrevious < deltaToNext)
         {
@@ -278,9 +278,19 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
             ScrollToTime(nearestNextTime, true);
     }
 
-    private (double, double) getNearestSubbeatBounds()
+    public float SnapXToNearestSubBeat(float x)
     {
-        var currentTime = TimeAtPosition(Current);
+        var timeAtPosition = TimeAtPosition(x);
+        var (nearestPreviousTime, nearestNextTime) = getNearestSubbeatBounds(timeAtPosition);
+
+        var deltaToPrevious = timeAtPosition - nearestPreviousTime;
+        var deltaToNext = nearestNextTime - timeAtPosition;
+
+        return PositionAtTime(deltaToPrevious < deltaToNext ? nearestPreviousTime : nearestNextTime);
+    }
+
+    private (double, double) getNearestSubbeatBounds(double currentTime)
+    {
         if (currentTime < 0)
             currentTime = 0;
 

@@ -45,6 +45,11 @@ public abstract partial class AutoRefreshContainer<T>(float offset) : Container<
         };
     }
 
+    public void Invalidate()
+    {
+        ContentCache.Invalidate();
+    }
+
     protected override void Update()
     {
         base.Update();
@@ -81,10 +86,18 @@ public abstract partial class AutoRefreshContainer<T>(float offset) : Container<
         var usedTicks = CurrentTickIndex;
 
         while (CurrentTickIndex < Math.Min(usedTicks + 16, Count))
-            Children[CurrentTickIndex++].Alpha = 0;
+        {
+            var refreshableObject = Children[CurrentTickIndex++];
+            if (refreshableObject is RefreshableObject { IsUsed: false })
+                refreshableObject.Alpha = 0;
+        }
 
         while (CurrentTickIndex < Count)
-            Children[CurrentTickIndex++].Expire();
+        {
+            var refreshableObject = Children[CurrentTickIndex++];
+            if (refreshableObject is RefreshableObject { IsUsed: false })
+                refreshableObject.Expire();
+        }
 
         ContentCache.Validate();
     }

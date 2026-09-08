@@ -24,7 +24,9 @@ using osuTK.Graphics;
 
 namespace MuseDashEditor.Game.Component.Common;
 
-public partial class RoundedButton : Button
+public partial class RoundedButton() : MdeButton(10f);
+
+public partial class MdeButton(float cornerRadius) : Button
 {
     public LocalisableString Text
     {
@@ -36,6 +38,12 @@ public partial class RoundedButton : Button
     {
         get => background.Colour;
         set => background.Colour = value ?? MdeColors.Dark3;
+    }
+
+    public FontUsage FontUsage
+    {
+        get => spriteText.Font;
+        set => spriteText.Font = value;
     }
 
     private readonly SpriteText spriteText = new()
@@ -60,17 +68,14 @@ public partial class RoundedButton : Button
     [BackgroundDependencyLoader]
     private void load()
     {
-        Content.CornerRadius = 10;
-        Content.CornerExponent = 2.5f;
-
-        Height = 40;
+        Content.CornerRadius = cornerRadius;
 
         AddInternal(new Container
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
             Masking = true,
-            CornerRadius = 5,
+            CornerRadius = cornerRadius,
             RelativeSizeAxes = Axes.Both,
             Children =
             [

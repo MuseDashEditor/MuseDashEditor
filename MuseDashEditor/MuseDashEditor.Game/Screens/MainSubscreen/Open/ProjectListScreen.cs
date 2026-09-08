@@ -11,22 +11,35 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using MuseDashEditor.Game.Component.Common;
-using MuseDashEditor.Game.Component.Notification;
 using MuseDashEditor.Game.Project;
-using MuseDashEditor.Game.Screens.Open.Components;
+using MuseDashEditor.Game.Screens.MainSubscreen.Open.Components;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Screens;
 using osuTK;
 
-namespace MuseDashEditor.Game.Screens.Open;
+namespace MuseDashEditor.Game.Screens.MainSubscreen.Open;
 
-public partial class ProjectListScreen : Screen
+public partial class ProjectListScreen : MainSubscreen
 {
-    [Cached]
-    private NotificationContainer notificationContainer = new();
+    public static ProjectListScreen CreateInstance()
+    {
+        return new ProjectListScreen
+        {
+            Icon = FontAwesome.Solid.FolderOpen,
+            Text = "Open project",
+            Addition = new RoundedButton
+            {
+                Text = "Import from chart file",
+                FontUsage = MDEFonts.ArialUnicodeMs.With(size: 30),
+                Size = new Vector2(250, 60),
+                BackgroundColour = MdeColors.Background5,
+                Action = () => { }
+            }
+        };
+    }
 
     [BackgroundDependencyLoader]
     private void load(ProjectManager projectManager)
@@ -65,7 +78,7 @@ public partial class ProjectListScreen : Screen
                     },
                     new RoundedButton
                     {
-                        Text = "New chart",
+                        Text = "New project",
                         Size = new Vector2(200, 50),
                         Colour = Colour4.AliceBlue,
                         Anchor = Anchor.Centre,
@@ -76,10 +89,6 @@ public partial class ProjectListScreen : Screen
             });
         }
 
-        InternalChildren =
-        [
-            listContainer,
-            notificationContainer
-        ];
+        Content.Add(listContainer);
     }
 }

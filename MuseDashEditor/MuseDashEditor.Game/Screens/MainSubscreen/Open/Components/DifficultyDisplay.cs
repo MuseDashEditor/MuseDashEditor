@@ -12,6 +12,8 @@
 
 using System;
 using MuseDashEditor.Game.Data.Holder;
+using MuseDashEditor.Game.Data.Type;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,11 +23,12 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osuTK;
 
-namespace MuseDashEditor.Game.Screens.Open.Components;
+namespace MuseDashEditor.Game.Screens.MainSubscreen.Open.Components;
 
 public partial class DifficultyDisplay : BasicButton
 {
     public required string DifficultyName { get; init; }
+    public required DifficultyType DifficultyType { get; init; }
     public Action OnClickAction { get; init; } = () => { };
 
     [BackgroundDependencyLoader]
@@ -44,6 +47,7 @@ public partial class DifficultyDisplay : BasicButton
             "Hidden" => chartInfoRaw.difficulty4,
             _ => "?"
         };
+        var exists = dataHolder.CurrentChart.Value.Maps.TryGetValue(DifficultyType, out _);
 
         InternalChild = new Container
         {
@@ -63,14 +67,16 @@ public partial class DifficultyDisplay : BasicButton
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Texture = textureStore.Get($"Icons/difficulty/{DifficultyName.ToLowerInvariant()}"),
+                            Texture = textureStore.Get(exists
+                                ? $"Icons/difficulty/{DifficultyName.ToLowerInvariant()}"
+                                : "Icons/difficulty/unused"),
                         },
                         new SpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Text = difficultyValue,
-                            Font = FontUsage.Default.With(size: 20),
+                            Font = MDEFonts.Impact.With(size: 20),
                         }
                     ]
                 },
@@ -80,7 +86,7 @@ public partial class DifficultyDisplay : BasicButton
                     Origin = Anchor.TopCentre,
                     Y = 120,
                     Text = DifficultyName,
-                    Font = FontUsage.Default.With(size: 30)
+                    Font = MDEFonts.Impact.With(size: 30)
                 }
             ]
         };

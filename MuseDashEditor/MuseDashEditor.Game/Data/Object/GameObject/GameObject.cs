@@ -12,6 +12,7 @@
 
 using MuseDashEditor.Game.Data.Object.DesignObject;
 using MuseDashEditor.Game.Data.Type;
+using MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneObject;
 using MuseDashEditor.Game.Utils;
 
 namespace MuseDashEditor.Game.Data.Object.GameObject;
@@ -42,4 +43,6 @@ public class GameObject : BaseObject
     public GameObject? HoldEndObject;
     public GameObject? GeminiPairObject;
     public bool IsHoldEnd = false;
+
+    public BaseLaneObject? LaneObject;
 }

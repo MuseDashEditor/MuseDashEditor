@@ -18,4 +18,4 @@ public class TouhouSpecialGameObjectData(
     HitSoundType hitSoundType,
     TextureType textureType,
     MovementType movementType = MovementType.None
-) : GameObjectData(hitSoundType, textureType, movementType, null, [SceneType.Touhou]);
+) : BaseLaneGameObjectData(hitSoundType, textureType, movementType, [SceneType.Touhou]);

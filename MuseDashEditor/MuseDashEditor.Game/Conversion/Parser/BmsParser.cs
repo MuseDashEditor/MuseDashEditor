@@ -30,7 +30,7 @@ public static class BmsParser
     {
         Logger.Log($"Parsing map from file: {file.FullName}...");
 
-        Map map = new(file);
+        Map map = new(file, MapType.Bms);
 
         var content = await File.ReadAllTextAsync(file.FullName);
 

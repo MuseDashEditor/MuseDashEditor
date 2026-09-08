@@ -4,21 +4,18 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using System;
-using osu.Framework.Bindables;
+using MuseDashEditor.Game.Data.Type;
 
-namespace MuseDashEditor.Game.Data.Object;
+namespace MuseDashEditor.Game.Data.Object.GameObject;
 
-public abstract class BaseObject(double offset)
-{
-    public readonly Guid Id = Guid.NewGuid();
-
-    public BindableDouble Offset { get; } = new(offset);
-    public BindableBool Selected { get; } = new();
-}
+public class BossGameObjectData(
+    HitSoundType hitSoundType,
+    TextureType textureType,
+    SceneType[]? validScenes = null
+) : GameObjectData(hitSoundType, textureType, MovementType.None, [LaneType.Special, LaneType.Special2], validScenes);

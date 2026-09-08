@@ -95,11 +95,14 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
         var hoveredObjects = new HashSet<BaseObject>();
         var selectionQuad = selectionBox.ScreenSpaceDrawQuad;
 
-        foreach (var drawable in laneContentContainer.Children)
+        foreach (var baseLaneObject in laneContentContainer.Children)
         {
-            if (drawable.ScreenSpaceDrawQuad.Intersects(selectionQuad))
+            if (!baseLaneObject.IsUsed)
+                continue;
+
+            if (baseLaneObject.ScreenSpaceDrawQuad.Intersects(selectionQuad))
             {
-                hoveredObjects.Add(drawable.GameObject);
+                hoveredObjects.Add(baseLaneObject.GameObject);
             }
         }
 
@@ -151,6 +154,15 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
 
     protected override bool OnDragStart(DragStartEvent e)
     {
+        if (base.OnDragStart(e))
+            return false;
+
+        foreach (var baseLaneObject in laneContentContainer.Children)
+        {
+            if (baseLaneObject.ScreenSpaceDrawQuad.Contains(e.ScreenSpaceMouseDownPosition))
+                return false;
+        }
+
         selectionBox.Alpha = 1;
         selectionBox.Position = startPosition = e.MouseDownPosition;
         selectionBox.Width = 0;
@@ -238,5 +250,11 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
         }
 
         selectionContainer.UpdateSelection();
+    }
+
+    public void Unselect(GameObject selectedObject)
+    {
+        selectedObject.Selected.Value = false;
+        selectedObjects.Remove(selectedObject);
     }
 }

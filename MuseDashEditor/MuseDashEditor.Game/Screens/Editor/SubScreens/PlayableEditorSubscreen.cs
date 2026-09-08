@@ -120,7 +120,7 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
         ScrollContainer.ScrollToTime(nearestTime, true);
     }
 
-    public bool OnPressed(KeyBindingPressEvent<InputAction> e)
+    public virtual bool OnPressed(KeyBindingPressEvent<InputAction> e)
     {
         if (ScrollContainer == null)
             return false;

@@ -18,7 +18,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 
-namespace MuseDashEditor.Game.Screens.Open.Components;
+namespace MuseDashEditor.Game.Screens.MainSubscreen.Open.Components;
 
 public partial class ProjectRowButtons(Storage projectStorage) : FillFlowContainer<ProjectRowButton>
 {
@@ -70,6 +70,7 @@ public partial class ProjectRowButtons(Storage projectStorage) : FillFlowContain
                             NotificationContainer.Hide();
                         }
                     ));
+                    NotificationContainer.Show();
                 }
             }
         ];
@@ -77,6 +78,6 @@ public partial class ProjectRowButtons(Storage projectStorage) : FillFlowContain
 
     protected override bool OnHover(HoverEvent e)
     {
-        return true;
+        return false;
     }
 }

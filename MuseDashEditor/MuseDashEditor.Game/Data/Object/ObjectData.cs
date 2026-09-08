@@ -21,6 +21,6 @@ public class ObjectData(
     SceneType[]? validScenes
 ) : System.Attribute
 {
-    public LaneType[]? ValidLaneTypes => validLanes;
-    public SceneType[]? ValidSceneTypes => validScenes;
+    public LaneType[] ValidLaneTypes => validLanes ?? [];
+    public SceneType[] ValidSceneTypes => validScenes ?? [];
 }

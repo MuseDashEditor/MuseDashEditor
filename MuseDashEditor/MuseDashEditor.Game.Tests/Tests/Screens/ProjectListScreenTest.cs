@@ -10,10 +10,12 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-using MuseDashEditor.Game.Screens.Open.Components;
+using MuseDashEditor.Game.Component.Notification;
+using MuseDashEditor.Game.Screens.MainSubscreen.Open.Components;
 using MuseDashEditor.Game.Tests.Resources;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -25,6 +27,9 @@ public partial class ProjectListScreenTest : MuseDashEditorTestScene
 {
     [Cached]
     private ScreenStack screenStack = new();
+
+    [Cached]
+    private NotificationContainer notificationContainer = new();
 
     [Test]
     public void TestProjectRowComponent()
@@ -38,7 +43,22 @@ public partial class ProjectListScreenTest : MuseDashEditorTestScene
             {
                 Strategy = DrawSizePreservationStrategy.Maximum,
                 TargetDrawSize = new Vector2(1920, 1080),
-                Child = new ProjectRow(storage)
+                Children =
+                [
+                    notificationContainer,
+                    new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 10),
+                        Children =
+                        [
+                            new ProjectRow(storage)
+                        ]
+                    }
+                ]
             });
         });
     }

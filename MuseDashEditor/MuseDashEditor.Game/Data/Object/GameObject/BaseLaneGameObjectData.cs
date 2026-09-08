@@ -10,32 +10,13 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-namespace MuseDashEditor.Game.Input;
+using MuseDashEditor.Game.Data.Type;
 
-public enum InputAction
-{
-    Escape,
-    PlaybackPlayPause,
-    PlaybackPauseNoBack,
-    PlaybackGoToStart,
-    PlaybackGoToEnd,
-    NextBeat,
-    NextBeat2,
-    NextFirstBeat,
-    PreviousBeat,
-    PreviousBeat2,
-    PreviousFirstBeat,
-    NextTimingPoint,
-    PreviousTimingPoint,
-    SelectAll,
-    SelectAllVisible,
-    Copy,
-    Cut,
-    Paste,
-    Delete,
-    Flip,
-    ZoomIn,
-    ZoomOut,
-    VolumeUp,
-    VolumeDown
-}
+namespace MuseDashEditor.Game.Data.Object.GameObject;
+
+public class BaseLaneGameObjectData(
+    HitSoundType hitSoundType,
+    TextureType textureType,
+    MovementType movementType = MovementType.None,
+    SceneType[]? validScenes = null
+) : GameObjectData(hitSoundType, textureType, movementType, [LaneType.Air, LaneType.Air2, LaneType.Ground, LaneType.Ground2], validScenes);

@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using System.Collections.Generic;
+using System.Linq;
 using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
@@ -117,5 +118,11 @@ public static class MapUtils
         }
 
         return null;
+    }
+
+    public static GameObject? GetObjectAt(List<GameObject> gameObjects, double offset, LaneType lane)
+    {
+        return gameObjects.Where(gameObject => gameObject.LaneType == lane)
+                          .FirstOrDefault(gameObject => Precision.AlmostEquals(offset, gameObject.Offset.Value, 1E-2));
     }
 }

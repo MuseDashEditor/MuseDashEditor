@@ -30,6 +30,7 @@ public static class EditorConstants
     public const float TOTAL_LANES_HEIGHT = LANE_HEIGHT * 6 + LANE_SPACING * 5;
     private const float semi_lane_spacing = LANE_SPACING / 2;
     private const float semi_lane_height = LANE_HEIGHT / 2;
+    private const float lane_snap_offset = (LANE_HEIGHT + LANE_SPACING) / 2;
 
     public const float AIR2_LANE_Y = AIR_LANE_Y - LANE_SPACING - LANE_HEIGHT;
     public const float AIR_LANE_Y = GROUND2_LANE_Y - LANE_SPACING - LANE_HEIGHT;
@@ -37,6 +38,7 @@ public static class EditorConstants
     public const float GROUND_LANE_Y = semi_lane_height + semi_lane_spacing;
     public const float SPECIAL2_LANE_Y = GROUND_LANE_Y + LANE_SPACING + LANE_HEIGHT;
     public const float SPECIAL_LANE_Y = SPECIAL2_LANE_Y + LANE_SPACING + LANE_HEIGHT;
+    public const float SPECIAL3_LANE_Y = SPECIAL_LANE_Y + LANE_SPACING + LANE_HEIGHT;
 
     public static readonly List<LaneType> ORDERED_LANE_TYPES =
     [
@@ -57,5 +59,23 @@ public static class EditorConstants
             LaneType.Special => SPECIAL_LANE_Y,
             _ => throw new ArgumentOutOfRangeException(nameof(laneType), laneType, null)
         };
+    }
+
+    public static LaneType? GetLaneAtY(float y)
+    {
+        foreach (LaneType laneType in Enum.GetValuesAsUnderlyingType<LaneType>())
+        {
+            if (laneType == LaneType.Special3) // Ignore for now until we decide if we show it or not
+                continue;
+
+            float laneY = GetLaneY(laneType);
+
+            if (Math.Abs(laneY - y) < lane_snap_offset)
+            {
+                return laneType;
+            }
+        }
+
+        return null;
     }
 }

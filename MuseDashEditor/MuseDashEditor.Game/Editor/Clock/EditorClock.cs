@@ -86,9 +86,9 @@ public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjust
     public bool Seek(double position)
     {
         if (position < 0)
-            return false;
+            position = 0;
         if (position > TrackLength)
-            return false;
+            position = TrackLength;
 
         if (IsRunning) Stop(); // Maybe add an option to keep running?
 

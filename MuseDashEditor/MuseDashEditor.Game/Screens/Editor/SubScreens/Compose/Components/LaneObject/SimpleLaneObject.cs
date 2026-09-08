@@ -107,4 +107,11 @@ public partial class SimpleLaneObject : Container
         laneModifierSprite.Alpha = laneModifier == LaneModifierType.Heart ? 1 : 0;
         landmineCircle.Alpha = laneModifier == LaneModifierType.Landmine ? 1 : 0;
     }
+
+    public void Reset()
+    {
+        laneModifierSprite.Alpha = 0;
+        landmineCircle.Alpha = 0;
+        movementSprite.Alpha = 0;
+    }
 }

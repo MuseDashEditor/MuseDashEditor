@@ -22,7 +22,9 @@ public class HighPerformanceSessionManager
 
     public void Start()
     {
-        if (isActive) return;
+        if (isActive)
+            return;
+
         isActive = true;
         originalGcMode = GCSettings.LatencyMode;
         GCSettings.LatencyMode = GCLatencyMode.LowLatency;
@@ -31,7 +33,9 @@ public class HighPerformanceSessionManager
 
     public void Stop()
     {
-        if (!isActive) return;
+        if (!isActive)
+            return;
+
         isActive = false;
         GCSettings.LatencyMode = originalGcMode;
     }

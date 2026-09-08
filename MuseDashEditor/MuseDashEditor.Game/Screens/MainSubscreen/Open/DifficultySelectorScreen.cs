@@ -10,10 +10,13 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System.IO;
+using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Holder;
+using MuseDashEditor.Game.Data.Object.MappingObject;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Screens.Editor;
-using MuseDashEditor.Game.Screens.Open.Components;
+using MuseDashEditor.Game.Screens.MainSubscreen.Open.Components;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -21,7 +24,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 
-namespace MuseDashEditor.Game.Screens.Open;
+namespace MuseDashEditor.Game.Screens.MainSubscreen.Open;
 
 public partial class DifficultySelectorScreen : Screen
 {
@@ -74,21 +77,25 @@ public partial class DifficultySelectorScreen : Screen
                             new DifficultyDisplay
                             {
                                 DifficultyName = "Easy",
+                                DifficultyType = DifficultyType.Easy,
                                 OnClickAction = () => OnDifficultySelected(DifficultyType.Easy)
                             },
                             new DifficultyDisplay
                             {
                                 DifficultyName = "Hard",
+                                DifficultyType = DifficultyType.Hard,
                                 OnClickAction = () => OnDifficultySelected(DifficultyType.Hard)
                             },
                             new DifficultyDisplay
                             {
                                 DifficultyName = "Master",
+                                DifficultyType = DifficultyType.Master,
                                 OnClickAction = () => OnDifficultySelected(DifficultyType.Master)
                             },
                             new DifficultyDisplay
                             {
                                 DifficultyName = "Hidden",
+                                DifficultyType = DifficultyType.Hidden,
                                 OnClickAction = () => OnDifficultySelected(DifficultyType.Hidden)
                             }
                         ]
@@ -101,8 +108,24 @@ public partial class DifficultySelectorScreen : Screen
     private void OnDifficultySelected(DifficultyType difficulty)
     {
         DataHolder.SelectedDifficulty.Value = difficulty;
-        DataHolder.CurrentChart.Value.ChartInfo.LoadDataFromMap((int)difficulty);
-        DataHolder.CurrentMap.Value = DataHolder.CurrentChart.Value.Maps[difficulty];
+        var currentChart = DataHolder.CurrentChart.Value;
+        currentChart.ChartInfo.LoadDataFromMap((int)difficulty);
+
+        var isNewMap = !currentChart.Maps.TryGetValue(difficulty, out var map);
+
+        if (isNewMap || map is null)
+        {
+            map = new Map(
+                new FileInfo(Path.Combine(currentChart.Directory.FullName, $"map{(int)difficulty}.mdem")),
+                MapType.Mdem
+            );
+            map.Metadata.InitialBpm.Value = 120;
+            map.Metadata.InitialLaneSpeed.Value = LaneSpeed.Medium;
+            map.Metadata.InitialScene.Value = SceneType.SpaceStation;
+            map.TimingPoints.Add(new TimingPointObject(0, 120));
+        }
+
+        DataHolder.CurrentMap.Value = map;
         MapUtils.PreProcessMap(DataHolder.CurrentMap.Value);
 
         this.Exit();

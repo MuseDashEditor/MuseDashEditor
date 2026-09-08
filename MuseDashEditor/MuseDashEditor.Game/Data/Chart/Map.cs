@@ -20,7 +20,8 @@ using osu.Framework.Bindables;
 namespace MuseDashEditor.Game.Data.Chart;
 
 public record Map(
-    FileInfo MapFile
+    FileInfo MapFile,
+    MapType Type
 )
 {
     public readonly MapMetadata Metadata = new();

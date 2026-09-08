@@ -20,7 +20,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osuTK;
 
-namespace MuseDashEditor.Game.Screens.Open;
+namespace MuseDashEditor.Game.Screens.MainSubscreen.Open;
 
 public partial class FolderSelectorScreen : Screen
 {

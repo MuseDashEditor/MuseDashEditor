@@ -11,10 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using MuseDashEditor.Game.Component.Common;
-using MuseDashEditor.Game.Screens.Open;
+using MuseDashEditor.Game.Screens.MainSubscreen.New;
+using MuseDashEditor.Game.Screens.MainSubscreen.Open;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Screens;
 using osuTK;
 
@@ -26,10 +30,28 @@ public partial class MainScreen : Screen
     protected ScreenStack MainScreenStack { get; private set; } = null!;
 
     [BackgroundDependencyLoader]
-    private void load()
+    private void load(LargeTextureStore textures)
     {
         InternalChildren =
         [
+            new Sprite
+            {
+                RelativeSizeAxes = Axes.Both,
+                Size = new Vector2(1, 1),
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Alpha = 0.3f,
+                Texture = textures.Get("default_background")
+            },
+            new Sprite
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Y = 100,
+                Width = 640,
+                Height = 256,
+                Texture = textures.Get("title")
+            },
             new FillFlowContainer
             {
                 Direction = FillDirection.Vertical,
@@ -41,27 +63,30 @@ public partial class MainScreen : Screen
                 [
                     new RoundedButton
                     {
-                        Text = "New chart",
-                        Size = new Vector2(200, 50),
-                        Colour = Colour4.AliceBlue,
+                        Text = "New project",
+                        FontUsage = MDEFonts.ArialUnicodeMs.With(size: 40),
+                        Size = new Vector2(300, 80),
+                        BackgroundColour = MdeColors.Background3,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Action = () => { }
+                        Action = () => MainScreenStack.Push(NewChartScreen.CreateInstance())
                     },
                     new RoundedButton
                     {
                         Text = "Open project",
-                        Size = new Vector2(200, 50),
-                        Colour = Colour4.AliceBlue,
+                        FontUsage = MDEFonts.ArialUnicodeMs.With(size: 40),
+                        Size = new Vector2(300, 80),
+                        BackgroundColour = MdeColors.Background3,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Action = () => MainScreenStack.Push(new ProjectListScreen())
+                        Action = () => MainScreenStack.Push(ProjectListScreen.CreateInstance())
                     },
-                    new RoundedButton
+                    new RoundedButton // TODO merge into open
                     {
-                        Text = "Import chart",
-                        Size = new Vector2(200, 50),
-                        Colour = Colour4.AliceBlue,
+                        Text = "Import project",
+                        FontUsage = MDEFonts.ArialUnicodeMs.With(size: 40),
+                        Size = new Vector2(300, 80),
+                        BackgroundColour = MdeColors.Background3,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Action = () => MainScreenStack.Push(new FolderSelectorScreen())
@@ -69,13 +94,22 @@ public partial class MainScreen : Screen
                     new RoundedButton
                     {
                         Text = "Settings",
-                        Size = new Vector2(200, 50),
-                        Colour = Colour4.AliceBlue,
+                        FontUsage = MDEFonts.ArialUnicodeMs.With(size: 40),
+                        Size = new Vector2(300, 80),
+                        BackgroundColour = MdeColors.Background3,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Action = () => { }
                     }
                 ]
+            },
+            new SpriteText
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                Font = MDEFonts.ArialUnicodeMs.With(size: 20),
+                Alpha = 0.8f,
+                Text = "Not affiliated with, endorsed by, or sponsored by PeroPeroGames. MuseDash and all related assets belong to their respective owners."
             }
         ];
     }

@@ -19,6 +19,7 @@ public partial class MdeKeyBindingContainer : KeyBindingContainer<InputAction>
 {
     public override IEnumerable<IKeyBinding> DefaultKeyBindings =>
     [
+        new KeyBinding(new[] { InputKey.Escape }, InputAction.Escape),
         new KeyBinding(new[] { InputKey.Space }, InputAction.PlaybackPlayPause),
         new KeyBinding(new[] { InputKey.Control, InputKey.Space }, InputAction.PlaybackPauseNoBack),
         new KeyBinding(new[] { InputKey.Home }, InputAction.PlaybackGoToStart),
@@ -31,7 +32,8 @@ public partial class MdeKeyBindingContainer : KeyBindingContainer<InputAction>
         new KeyBinding(new[] { InputKey.Control, InputKey.Left }, InputAction.PreviousFirstBeat),
         new KeyBinding(new[] { InputKey.PageDown }, InputAction.NextTimingPoint),
         new KeyBinding(new[] { InputKey.PageUp }, InputAction.PreviousTimingPoint),
-        new KeyBinding(new[] { InputKey.Control, InputKey.A }, InputAction.SelectAll),
+        new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.A }, InputAction.SelectAll),
+        new KeyBinding(new[] { InputKey.Control, InputKey.A }, InputAction.SelectAllVisible),
         new KeyBinding(new[] { InputKey.Control, InputKey.C }, InputAction.Copy),
         new KeyBinding(new[] { InputKey.Control, InputKey.X }, InputAction.Cut),
         new KeyBinding(new[] { InputKey.Control, InputKey.V }, InputAction.Paste),

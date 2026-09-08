@@ -32,7 +32,7 @@ public static class MdeChartLoader
     {
         Logger.Log($"Parsing map from file: {file.FullName}...");
 
-        Map map = new(file);
+        Map map = new(file, MapType.Mdem);
 
         await parseMapContent(file, map);
 

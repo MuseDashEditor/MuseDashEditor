@@ -2,6 +2,8 @@
 
 An unofficial MuseDash chart editor for [MDMC](https://mdmc.moe/).
 
+This is an unofficial fan-made project and is not affiliated with, endorsed by, or sponsored by PeroPeroGames. MuseDash and all related assets, trademarks, and images are the property of their respective owners.
+
 ## Builds
 
 ### Last nightly build: ![TeamCity build status](https://teamcity.azn9.dev/app/rest/builds/buildType:id:public_MuseDashEditor_BuildNightly/statusIcon.svg)

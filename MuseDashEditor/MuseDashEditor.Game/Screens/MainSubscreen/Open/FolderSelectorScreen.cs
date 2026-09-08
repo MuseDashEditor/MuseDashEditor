@@ -11,8 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using System;
+using System.IO;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Project;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -27,7 +29,12 @@ public partial class FolderSelectorScreen : Screen
     [BackgroundDependencyLoader]
     private void load(ScreenStack screenStack, EditorDataHolder dataHolder, ProjectManager projectManager)
     {
-        var fileSelector = new BasicFileSelector(null, [".mdm"])
+        var museDashPath = SteamUtils.GetMuseDashFolder()?.FullName;
+        string? initialPath = null;
+        if (museDashPath is not null)
+            initialPath = Path.Combine(museDashPath, "Custom_Albums");
+
+        var fileSelector = new BasicFileSelector(initialPath, [".mdm"])
         {
             RelativeSizeAxes = Axes.X,
             Size = new Vector2(1, 1030),

@@ -28,7 +28,7 @@ public static class SteamUtils
 {
     public static List<Chart> GetChartsFromGame()
     {
-        var steamFolder = getMuseDashFolder();
+        var steamFolder = GetMuseDashFolder();
 
         if (steamFolder is null)
         {
@@ -74,7 +74,7 @@ public static class SteamUtils
         return [];
     }
 
-    private static DirectoryInfo? getMuseDashFolder()
+    public static DirectoryInfo? GetMuseDashFolder()
     {
         if (!OperatingSystem.IsWindows())
         {
@@ -105,10 +105,10 @@ public static class SteamUtils
                 continue;
 
             var libraryFolderToken = libraryFoldersProperty.Value;
-            if (libraryFolderToken is not VProperty libraryFolderValue)
+            if (libraryFolderToken is not VObject libraryFolderValue)
                 continue;
 
-            foreach (var libraryFolderValueToken in libraryFolderValue.Value)
+            foreach (var libraryFolderValueToken in libraryFolderValue.Children())
             {
                 if (libraryFolderValueToken is not VProperty libraryFolderValueTokenValue)
                     continue;

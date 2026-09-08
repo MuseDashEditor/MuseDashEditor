@@ -38,7 +38,8 @@ public partial class MainSubscreen : Screen, IKeyBindingHandler<InputAction>
     public Container Content { get; } = new()
     {
         RelativeSizeAxes = Axes.X,
-        Height = 1080 - 240,
+        Height = 1080 - 220,
+        Y = 10,
         Width = 0.9f,
         Anchor = Anchor.Centre,
         Origin = Anchor.Centre,
@@ -54,6 +55,7 @@ public partial class MainSubscreen : Screen, IKeyBindingHandler<InputAction>
                 RelativeSizeAxes = Axes.Both,
                 Colour = MdeColors.Background6
             },
+            Content,
             new TopBanner
             {
                 RelativeSizeAxes = Axes.X,
@@ -70,7 +72,6 @@ public partial class MainSubscreen : Screen, IKeyBindingHandler<InputAction>
                 RelativeSizeAxes = Axes.X,
                 Height = 100
             },
-            Content,
             notificationContainer
         ];
     }

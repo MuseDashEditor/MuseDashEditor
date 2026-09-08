@@ -73,12 +73,12 @@ public partial class NotificationContainer : Container
 
     protected override bool OnHover(HoverEvent e)
     {
-        return true;
+        return IsPresent;
     }
 
     protected override bool OnMouseDown(MouseDownEvent e)
     {
-        return true;
+        return IsPresent;
     }
 
     protected override void OnMouseUp(MouseUpEvent e)
@@ -87,7 +87,7 @@ public partial class NotificationContainer : Container
 
     protected override bool OnKeyDown(KeyDownEvent e)
     {
-        return true;
+        return IsPresent;
     }
 
     protected override void OnKeyUp(KeyUpEvent e)

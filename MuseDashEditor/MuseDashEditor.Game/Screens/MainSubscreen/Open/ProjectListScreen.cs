@@ -19,6 +19,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osuTK;
+using BasicScrollContainer = MuseDashEditor.Game.Component.Common.BasicScrollContainer;
 
 namespace MuseDashEditor.Game.Screens.MainSubscreen.Open;
 
@@ -46,11 +47,13 @@ public partial class ProjectListScreen : MainSubscreen
     {
         var listContainer = new FillFlowContainer
         {
-            RelativeSizeAxes = Axes.Both,
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
             Direction = FillDirection.Vertical,
             Spacing = new Vector2(0, 10),
+            Margin = new MarginPadding { Right = 30 }
         };
 
         foreach (var projectStorage in projectManager.GetAllProjects())
@@ -62,7 +65,8 @@ public partial class ProjectListScreen : MainSubscreen
         {
             listContainer.Add(new FillFlowContainer
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Direction = FillDirection.Vertical,
@@ -89,6 +93,15 @@ public partial class ProjectListScreen : MainSubscreen
             });
         }
 
-        Content.Add(listContainer);
+        var basicScrollContainer = new BasicScrollContainer
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Child = listContainer
+        };
+        basicScrollContainer.ScrollContent.AutoSizeAxes = Axes.Y;
+        basicScrollContainer.ScrollbarOverlapsContent = false;
+        Content.Add(basicScrollContainer);
     }
 }

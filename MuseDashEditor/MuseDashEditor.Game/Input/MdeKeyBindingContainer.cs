@@ -20,8 +20,8 @@ public partial class MdeKeyBindingContainer : KeyBindingContainer<InputAction>
     public override IEnumerable<IKeyBinding> DefaultKeyBindings =>
     [
         new KeyBinding(new[] { InputKey.Escape }, InputAction.Escape),
-        new KeyBinding(new[] { InputKey.Space }, InputAction.PlaybackPlayPause),
-        new KeyBinding(new[] { InputKey.Control, InputKey.Space }, InputAction.PlaybackPauseNoBack),
+        new KeyBinding(new[] { InputKey.Control, InputKey.Space }, InputAction.PlaybackPauseRollback),
+        new KeyBinding(new[] { InputKey.Space }, InputAction.PlaybackPause),
         new KeyBinding(new[] { InputKey.Home }, InputAction.PlaybackGoToStart),
         new KeyBinding(new[] { InputKey.End }, InputAction.PlaybackGoToEnd),
         new KeyBinding(new[] { InputKey.Right }, InputAction.NextBeat),

@@ -129,13 +129,8 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
 
         switch (e.Action)
         {
-            case InputAction.PlaybackPlayPause:
-                if (!isPlaying)
-                {
-                    playInitialTime = EditorClock.CurrentTime;
-                    EditorClock.Start();
-                }
-                else
+            case InputAction.PlaybackPauseRollback:
+                if (isPlaying)
                 {
                     EditorClock.Stop();
                     ScrollContainer.ScrollToTime(playInitialTime);
@@ -143,9 +138,15 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
 
                 break;
 
-            case InputAction.PlaybackPauseNoBack:
-                if (isPlaying)
+            case InputAction.PlaybackPause:
+                if (!isPlaying)
+                {
+                    playInitialTime = EditorClock.CurrentTime;
+                    EditorClock.Start();
+                }
+                else
                     EditorClock.Stop();
+
                 break;
 
             case InputAction.PlaybackGoToStart:

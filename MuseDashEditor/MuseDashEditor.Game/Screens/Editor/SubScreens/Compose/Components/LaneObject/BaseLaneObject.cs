@@ -125,10 +125,10 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : R
                 Origin = Anchor.TopLeft
             },
             longObject = new LongLaneObject(),
-            geminiObject = new SimpleLaneObject
+            geminiObject = new SimpleLaneObject(true)
             {
                 Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight,
+                Origin = Anchor.TopRight,
                 Alpha = 0
             }
         ];
@@ -356,7 +356,7 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : R
         var y = EditorConstants.GetLaneY(lane.Value);
         var offset = scrollContainer.TimeAtPosition(x);
 
-        var otherObject = MapUtils.GetObjectAt(editorDataHolder.CurrentMap.Value.GameObjects, offset, lane.Value);
+        var otherObject = MapUtils.GetObjectAt(editorDataHolder.CurrentMap.Value!.GameObjects, offset, lane.Value);
         if (otherObject is not null && otherObject.Id != gameObject.Id)
             return;
 

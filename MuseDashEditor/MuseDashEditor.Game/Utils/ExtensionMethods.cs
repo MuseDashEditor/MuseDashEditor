@@ -55,7 +55,7 @@ public static class ExtensionMethods
         var currentTimingPointAtTime = dataHolder.GetTimingPointAtTime(time);
         if (currentTimingPointAtTime == null) return null;
 
-        var timingPoints = dataHolder.CurrentMap.Value.TimingPoints;
+        var timingPoints = dataHolder.CurrentMap.Value!.TimingPoints;
 
         TimingPointObject? nextTimingPoint = null;
 

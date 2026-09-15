@@ -31,8 +31,8 @@ public partial class EditorDataHolder : IDependencyInjectionCandidate
     [Resolved]
     protected AudioManager AudioManager { get; private set; } = null!;
 
-    public readonly Bindable<Chart.Chart> CurrentChart = new();
-    public readonly Bindable<Map> CurrentMap = new();
+    public readonly Bindable<Chart.Chart?> CurrentChart = new();
+    public readonly Bindable<Map?> CurrentMap = new();
     public readonly Bindable<Track> CurrentTrack = new();
     public readonly Bindable<Func<Stream>> CurrentTrackStreamGetter = new();
     public readonly Bindable<DifficultyType> SelectedDifficulty = new();
@@ -67,5 +67,15 @@ public partial class EditorDataHolder : IDependencyInjectionCandidate
         CurrentTrackStreamGetter.Value = () => trackStore.GetStream(musicFile.Name);
 
         CurrentChart.Value = chart;
+    }
+
+    public void CloseMap()
+    {
+        CurrentMap.Value = null;
+    }
+
+    public void CloseChart()
+    {
+        CurrentChart.Value = null;
     }
 }

@@ -47,9 +47,9 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
 
     protected override void RegenerateContent()
     {
-        foreach (var gameObject in dataHolder.CurrentMap.Value.GameObjects)
+        foreach (var gameObject in dataHolder.CurrentMap.Value!.GameObjects)
         {
-            if (gameObject.IsHoldEnd)
+            if (gameObject.IsHoldEnd || gameObject is { GeminiPairObject: not null, LaneType: not LaneType.Air and not LaneType.Air2 })
                 continue;
 
             var tickOffset = gameObject.Offset.Value;
@@ -124,7 +124,7 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
             laneObject.Y = EditorConstants.GetLaneY(gameObject.LaneType);
 
             laneObject.GameObject = gameObject;
-            laneObject.SceneType = SceneType.SpaceStation; // TODO: scene at time
+            laneObject.SceneType = dataHolder.GetSceneAtTime(tickOffset);
             laneObject.LaneType = gameObject.LaneType;
             laneObject.LaneModifier = gameObject.LaneModifier;
 

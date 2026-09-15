@@ -22,14 +22,23 @@ public enum TextureType
     Large1,
     Large2,
     Hammer,
+
+    [SpecialTexture(true)]
     Gemini,
+
+    [SpecialTexture(false, true)] // Actually false, rainy night has darker holds
     Hold,
 
-    [SpecialTexture(false, true)]
+    [SpecialTexture(false, true)] // Actually false, rainy night has darker holds
     HoldBody,
+
+    [SpecialTexture(true)]
     Masher,
+
     Gear,
     Raider,
+
+    [SpecialTexture(true)]
     Boss,
 
     [SpecialTexture(false, true)]

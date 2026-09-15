@@ -89,7 +89,7 @@ public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPoint
 
     protected override void RegenerateContent()
     {
-        for (var i = 0; i < dataHolder.CurrentMap.Value.TimingPoints.Count; i++)
+        for (var i = 0; i < dataHolder.CurrentMap.Value!.TimingPoints.Count; i++)
         {
             generateTickForTimingPoint(i, dataHolder.CurrentMap.Value.TimingPoints[i]);
         }
@@ -97,7 +97,7 @@ public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPoint
 
     private void generateTickForTimingPoint(int pointIndex, TimingPointObject currentTimingPoint)
     {
-        var timingPoints = dataHolder.CurrentMap.Value.TimingPoints;
+        var timingPoints = dataHolder.CurrentMap.Value!.TimingPoints;
         var isLastPoint = pointIndex == timingPoints.Count - 1;
         var nextPoint = isLastPoint ? null : timingPoints[pointIndex + 1];
 

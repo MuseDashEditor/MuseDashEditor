@@ -68,7 +68,7 @@ public partial class MetadataField : CompositeComponent
         dataHolder.CurrentChart.BindValueChanged(loadNewChart, true);
     }
 
-    private void loadNewChart(ValueChangedEvent<Chart> evt)
+    private void loadNewChart(ValueChangedEvent<Chart?> evt)
     {
         var chart = evt.NewValue;
         if (chart == null) return;

@@ -44,4 +44,7 @@ public enum SceneType
 
     [SceneData("09_djmax")]
     DjMax = 9,
+
+    [SceneData("10_miku")]
+    Miku = 10,
 }

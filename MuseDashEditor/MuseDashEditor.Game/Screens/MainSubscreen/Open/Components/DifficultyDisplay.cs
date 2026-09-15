@@ -38,7 +38,7 @@ public partial class DifficultyDisplay : BasicButton
         AutoSizeAxes = Axes.Both;
         Colour = Colour4.White;
 
-        var chartInfoRaw = dataHolder.CurrentChart.Value.ChartInfo.Raw;
+        var chartInfoRaw = dataHolder.CurrentChart.Value!.ChartInfo.Raw;
         string difficultyValue = DifficultyName switch
         {
             "Easy" => chartInfoRaw.difficulty1,

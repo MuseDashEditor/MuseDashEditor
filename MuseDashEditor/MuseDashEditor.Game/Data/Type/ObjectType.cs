@@ -104,16 +104,16 @@ public enum ObjectType
     [DesignObjectData] Speed3High = 32,                  // 0W
 
     // SceneSwitchObjects
-    [DesignObjectData] SceneSwitchSpaceStation = 60,     // 1O
-    [DesignObjectData] SceneSwitchRetrocity = 61,        // 1P
-    [DesignObjectData] SceneSwitchCastle = 62,           // 1Q
-    [DesignObjectData] SceneSwitchRainyNight = 63,       // 1R
-    [DesignObjectData] SceneSwitchCandyland = 64,        // 1S
-    [DesignObjectData] SceneSwitchOriental = 65,         // 1T
-    [DesignObjectData] SceneSwitchGrooveCoaster = 66,    // 1U
-    [DesignObjectData] SceneSwitchTouhou = 67,           // 1V
-    [DesignObjectData] SceneSwitchDjmax = 68,            // 1W
-    [DesignObjectData] SceneSwitchMiku = 69,             // 1X
+    [SceneSwitchObjectData(SceneType.SpaceStation)] SceneSwitchSpaceStation = 60, // 1O
+    [SceneSwitchObjectData(SceneType.Retrocity)] SceneSwitchRetrocity = 61,       // 1P
+    [SceneSwitchObjectData(SceneType.Castle)] SceneSwitchCastle = 62,             // 1Q
+    [SceneSwitchObjectData(SceneType.RainyNight)] SceneSwitchRainyNight = 63,     // 1R
+    [SceneSwitchObjectData(SceneType.Candyland)] SceneSwitchCandyland = 64,       // 1S
+    [SceneSwitchObjectData(SceneType.Oriental)] SceneSwitchOriental = 65,         // 1T
+    [SceneSwitchObjectData(SceneType.LetsGroove)] SceneSwitchGrooveCoaster = 66,  // 1U
+    [SceneSwitchObjectData(SceneType.Touhou)] SceneSwitchTouhou = 67,             // 1V
+    [SceneSwitchObjectData(SceneType.DjMax)] SceneSwitchDjmax = 68,               // 1W
+    [SceneSwitchObjectData(SceneType.Miku)] SceneSwitchMiku = 69,                 // 1X
 
     // DesignObjects
     [DesignObjectData] HideNotes = 55,                   // 1J

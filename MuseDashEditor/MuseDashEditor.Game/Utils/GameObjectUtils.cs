@@ -65,7 +65,9 @@ public static class GameObjectUtils
             };
 
         var path = $"Icons/Object/{scenePath}/{objectData.TextureType.ToString().ToLowerInvariant()}{suffix}";
-        return textureStore.Get(path);
+        var commonPath = $"Icons/Object/Common/{objectData.TextureType.ToString().ToLowerInvariant()}{suffix}";
+
+        return textureStore.Get(path) ?? textureStore.Get(commonPath);
     }
 
     public static Texture? GetLaneBackgroundTexture(this ITextureStore textureStore, LaneType laneType)

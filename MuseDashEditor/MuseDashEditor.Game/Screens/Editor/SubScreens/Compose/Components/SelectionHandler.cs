@@ -209,6 +209,9 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
 
         foreach (var drawable in laneContentContainer.Children)
         {
+            if (!drawable.IsUsed)
+                continue;
+
             if (drawable.ScreenSpaceDrawQuad.Intersects(selectionQuad))
             {
                 hoveredObjects.Add(drawable.GameObject);

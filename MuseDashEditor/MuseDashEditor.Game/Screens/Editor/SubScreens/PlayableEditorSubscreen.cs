@@ -45,6 +45,11 @@ public partial class PlayableEditorSubscreen : EditorSubscreen, IKeyBindingHandl
             )
                 EditorClock.Stop();
         });
+
+        EditorClock.OnTimeChanged += time =>
+        {
+            EditorDataHolder.CurrentScene.Value = EditorDataHolder.GetSceneAtTime(time);
+        };
     }
 
     public override void Show()

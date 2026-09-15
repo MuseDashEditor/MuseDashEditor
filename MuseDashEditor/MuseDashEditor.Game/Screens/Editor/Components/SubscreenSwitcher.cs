@@ -43,6 +43,15 @@ public partial class SubscreenSwitcher : TabControl<EditorSubscreenType>
 
         foreach (var val in values)
             AddItem(val);
+
+        Current.BindValueChanged(@event =>
+        {
+            var oldValue = @event.OldValue;
+            var newValue = @event.NewValue;
+
+            TabMap[oldValue].Children[0].Colour = MdeColors.Background4;
+            TabMap[newValue].Children[0].Colour = MdeColors.Background3;
+        }, true);
     }
 
     protected override Dropdown<EditorSubscreenType> CreateDropdown()

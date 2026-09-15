@@ -44,7 +44,7 @@ public partial class TimingPointsTableContainer : TableContainer
 
     private static Drawable[,] buildRows(EditorDataHolder dataHolder, EditorClock editorClock)
     {
-        return dataHolder.CurrentMap.Value.TimingPoints.Select((timingPoint, index) =>
+        return dataHolder.CurrentMap.Value!.TimingPoints.Select((timingPoint, index) =>
         {
             var icon = new SpriteIcon
             {

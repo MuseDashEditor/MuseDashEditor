@@ -51,8 +51,9 @@ public partial class EditorBackground : Sprite
         }
         else
         {
-            var textureName = $"Scenes/{sceneData.ResourcePath}/background";
-            Texture = Textures.Get(textureName) ?? Textures.Get("default_background");
+            var textureName = $"Scenes/scene_{sceneData.ResourcePath}/background";
+            var sceneTexture = Textures.Get(textureName);
+            Texture = sceneTexture ?? Textures.Get("default_background");
         }
     }
 }

@@ -108,7 +108,7 @@ public partial class DifficultySelectorScreen : Screen
     private void OnDifficultySelected(DifficultyType difficulty)
     {
         DataHolder.SelectedDifficulty.Value = difficulty;
-        var currentChart = DataHolder.CurrentChart.Value;
+        var currentChart = DataHolder.CurrentChart.Value!;
         currentChart.ChartInfo.LoadDataFromMap((int)difficulty);
 
         var isNewMap = !currentChart.Maps.TryGetValue(difficulty, out var map);
@@ -126,6 +126,7 @@ public partial class DifficultySelectorScreen : Screen
         }
 
         DataHolder.CurrentMap.Value = map;
+        DataHolder.CurrentScene.Value = map.Metadata.InitialScene.Value;
         MapUtils.PreProcessMap(DataHolder.CurrentMap.Value);
 
         this.Exit();

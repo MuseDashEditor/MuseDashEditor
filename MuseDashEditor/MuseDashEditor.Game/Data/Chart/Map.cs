@@ -28,6 +28,7 @@ public record Map(
 
     public readonly List<GameObject> GameObjects = [];
     public readonly List<TimingPointObject> TimingPoints = [];
+    public readonly SortedDictionary<double, SceneType> SceneAtTime = new();
 
     public readonly SortedDictionary<int, Dictionary<(LaneModifierType, LaneType), int[]>> RawMapData = new();
 }

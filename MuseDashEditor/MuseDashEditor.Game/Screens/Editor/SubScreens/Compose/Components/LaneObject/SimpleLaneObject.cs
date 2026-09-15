@@ -22,7 +22,7 @@ using osuTK;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneObject;
 
-public partial class SimpleLaneObject : Container
+public partial class SimpleLaneObject(bool inverted = false) : Container
 {
     [Resolved]
     private TextureStore textureStore { get; set; } = null!;
@@ -37,7 +37,7 @@ public partial class SimpleLaneObject : Container
     private void load()
     {
         Name = "SimpleLaneObject";
-        Height = BaseLaneObject.BASE_SIZE;
+        Height = inverted ? -BaseLaneObject.BASE_SIZE : BaseLaneObject.BASE_SIZE; // Gemini
         Width = BaseLaneObject.BASE_SIZE;
 
         Children =

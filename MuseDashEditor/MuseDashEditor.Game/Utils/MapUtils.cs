@@ -13,6 +13,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MuseDashEditor.Game.Data.Chart;
+using MuseDashEditor.Game.Data.Object.DesignObject;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
 using osu.Framework.Logging;
@@ -75,6 +76,13 @@ public static class MapUtils
                 }
 
                 gameObject.GeminiPairObject = otherGemini;
+            }
+
+            map.SceneAtTime[0] = map.Metadata.InitialScene.Value;
+
+            if (gameObject.DesignObjectData is SceneSwitchObjectData sceneSwitchObjectData)
+            {
+                map.SceneAtTime[gameObject.Offset.Value] = sceneSwitchObjectData.TargetScene;
             }
         }
     }

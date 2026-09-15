@@ -10,12 +10,15 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System.Reflection;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Project;
 using MuseDashEditor.Game.Screens;
 using MuseDashEditor.Game.Utils;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 
 namespace MuseDashEditor.Game;
@@ -46,6 +49,20 @@ public partial class MuseDashEditorGame : MuseDashEditorGameBase
         MdeSounds.Preload();
 
         Content.Add(ScreenStack);
+    }
+
+    public override void SetHost(GameHost host)
+    {
+        base.SetHost(host);
+
+        if (!RuntimeInfo.IsApple)
+        {
+            var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "icon.ico");
+            if (iconStream != null)
+                host.Window.SetIconFromStream(iconStream);
+        }
+
+        host.Window.Title = Name;
     }
 
     protected override void LoadComplete()

@@ -37,9 +37,9 @@ namespace MuseDashEditor.Game;
 public partial class MuseDashEditorGameBase : osu.Framework.Game
 {
 #if DEBUG
-    private const string game_name = "MuseDashEditor (development)";
+    public const string GAME_NAME = "MuseDashEditor (development)";
 #else
-    private const string game_name = "MuseDashEditor";
+    public const string GAME_NAME = "MuseDashEditor";
 #endif
 
     public const string MDE_PROTOCOL = "mde://";
@@ -52,7 +52,7 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
 
     protected MuseDashEditorGameBase()
     {
-        Name = game_name;
+        Name = GAME_NAME;
     }
 
     public override void SetHost(GameHost host)

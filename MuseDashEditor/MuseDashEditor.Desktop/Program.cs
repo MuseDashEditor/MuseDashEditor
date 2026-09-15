@@ -20,7 +20,11 @@ public static class Program
 {
     public static void Main()
     {
-        using GameHost host = Host.GetSuitableDesktopHost(@"MuseDashEditor");
+        var hostOptions = new HostOptions
+        {
+            FriendlyGameName = MuseDashEditorGameBase.GAME_NAME,
+        };
+        using GameHost host = Host.GetSuitableDesktopHost(@"MuseDashEditor", hostOptions);
         using osu.Framework.Game game = new MuseDashEditorGame();
         host.Run(game);
     }

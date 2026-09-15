@@ -14,6 +14,8 @@ using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osuTK;
 using Box = osu.Framework.Graphics.Shapes.Box;
 
@@ -22,7 +24,7 @@ namespace MuseDashEditor.Game.Screens.Editor.Components;
 public partial class Toolbar : Container
 {
     [BackgroundDependencyLoader]
-    private void load()
+    private void load(LargeTextureStore textureStore)
     {
         RelativeSizeAxes = Axes.X;
         Height = 50;
@@ -43,6 +45,22 @@ public partial class Toolbar : Container
             },
 
             // Left part // TODO
+            new FillFlowContainer
+            {
+                Direction = FillDirection.Horizontal,
+                RelativeSizeAxes = Axes.Y,
+                AutoSizeAxes = Axes.X,
+                Children =
+                [
+                    new Sprite
+                    {
+                        Width = 125,
+                        Height = 50,
+                        Texture = textureStore.Get("title")
+                    },
+                    new EditorMenu()
+                ]
+            },
 
             // Right part
             new SubscreenSwitcher()

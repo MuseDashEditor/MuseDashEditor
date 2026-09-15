@@ -76,6 +76,10 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
                 Depth = 2
             },
             timingTrack,
+            new NewObjectBar
+            {
+                Y = -65
+            },
             selectionHandler
         ];
 
@@ -108,7 +112,7 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
     {
         List<GameObject> selectedObjects = [];
 
-        foreach (var gameObject in editorDataHolder.CurrentMap.Value.GameObjects)
+        foreach (var gameObject in editorDataHolder.CurrentMap.Value!.GameObjects)
         {
             if (gameObject.Selected.Value)
                 selectedObjects.Add(gameObject);
@@ -159,7 +163,7 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
 
     private void delete(GameObject selectedObject, bool secondGemini = false)
     {
-        editorDataHolder.CurrentMap.Value.GameObjects.Remove(selectedObject);
+        editorDataHolder.CurrentMap.Value!.GameObjects.Remove(selectedObject);
 
         if (selectedObject.LaneObject != null)
         {

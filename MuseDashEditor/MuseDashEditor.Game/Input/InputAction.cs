@@ -12,6 +12,7 @@
 
 namespace MuseDashEditor.Game.Input;
 
+// TODO: split this into categories?
 public enum InputAction
 {
     Escape,
@@ -37,5 +38,20 @@ public enum InputAction
     ZoomIn,
     ZoomOut,
     VolumeUp,
-    VolumeDown
+    VolumeDown,
+    Save,
+    Close,
+    Quit,
+    Undo,
+    Redo,
+    Select1,
+    Select2,
+    Select3,
+    Select4,
+    Select5,
+    Select6,
+    Select7,
+    Select8,
+    Select9,
+    Select10,
 }

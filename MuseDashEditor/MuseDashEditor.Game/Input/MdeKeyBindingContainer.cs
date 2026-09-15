@@ -42,6 +42,21 @@ public partial class MdeKeyBindingContainer : KeyBindingContainer<InputAction>
         new KeyBinding(new[] { InputKey.Control, InputKey.MouseWheelUp }, InputAction.ZoomIn),
         new KeyBinding(new[] { InputKey.Control, InputKey.MouseWheelDown }, InputAction.ZoomOut),
         new KeyBinding(new[] { InputKey.Alt, InputKey.MouseWheelUp }, InputAction.VolumeUp),
-        new KeyBinding(new[] { InputKey.Alt, InputKey.MouseWheelDown }, InputAction.VolumeDown)
+        new KeyBinding(new[] { InputKey.Alt, InputKey.MouseWheelDown }, InputAction.VolumeDown),
+        new KeyBinding(new[] { InputKey.Control, InputKey.S }, InputAction.Save),
+        new KeyBinding(new[] { InputKey.Control, InputKey.W }, InputAction.Close),
+        new KeyBinding(new[] { InputKey.Control, InputKey.Q }, InputAction.Quit),
+        new KeyBinding(new[] { InputKey.Control, InputKey.Z }, InputAction.Undo),
+        new KeyBinding(new[] { InputKey.Control, InputKey.Y }, InputAction.Redo),
+        new KeyBinding(new[] { InputKey.Number1 }, InputAction.Select1),
+        new KeyBinding(new[] { InputKey.Number2 }, InputAction.Select2),
+        new KeyBinding(new[] { InputKey.Number3 }, InputAction.Select3),
+        new KeyBinding(new[] { InputKey.Number4 }, InputAction.Select4),
+        new KeyBinding(new[] { InputKey.Number5 }, InputAction.Select5),
+        new KeyBinding(new[] { InputKey.Number6 }, InputAction.Select6),
+        new KeyBinding(new[] { InputKey.Number7 }, InputAction.Select7),
+        new KeyBinding(new[] { InputKey.Number8 }, InputAction.Select8),
+        new KeyBinding(new[] { InputKey.Number9 }, InputAction.Select9),
+        new KeyBinding(new[] { InputKey.Number0 }, InputAction.Select10),
     ];
 }

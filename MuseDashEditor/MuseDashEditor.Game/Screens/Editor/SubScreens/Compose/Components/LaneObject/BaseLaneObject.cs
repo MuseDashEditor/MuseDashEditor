@@ -83,6 +83,8 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : R
         set => setHoldLength(value);
     }
 
+    public bool IsPlacementObject;
+
     private GameObject gameObject = null!;
     private MovementType movementType;
     private SceneType sceneType;
@@ -239,22 +241,8 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : R
 
     protected override bool OnClick(ClickEvent e)
     {
-        if (e.Button == MouseButton.Right)
-        {
-            if (IsDragging)
-            {
-                cancelDrag();
-                return true;
-            }
-
-            // TODO context menu
-            return true;
-        }
-
-        if (base.OnClick(e))
-        {
-            return true;
-        }
+        if (IsPlacementObject)
+            return false;
 
         selectionHandler.Select(gameObject, e.ControlPressed);
         return true;

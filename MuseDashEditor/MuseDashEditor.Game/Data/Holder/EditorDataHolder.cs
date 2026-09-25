@@ -39,6 +39,9 @@ public partial class EditorDataHolder : IDependencyInjectionCandidate
     public readonly Bindable<EditorSubscreenType> SelectedSubscreen = new();
     public readonly Bindable<SceneType> CurrentScene = new();
 
+    public readonly BindableBool IsInPlacementMode = new();
+    public ObjectType PlacementObjectType;
+
     public Action OnTimingPointsChanged = () => { };
     public Action OnGameObjectsChanged = () => { };
 

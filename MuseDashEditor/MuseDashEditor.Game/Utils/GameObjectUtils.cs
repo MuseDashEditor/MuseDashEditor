@@ -13,6 +13,7 @@
 using System;
 using System.Reflection;
 using MuseDashEditor.Game.Data.Attribute;
+using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Object.DesignObject;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
@@ -86,5 +87,39 @@ public static class GameObjectUtils
     public static Texture? GetMovementTypeTexture(this ITextureStore textureStore, MovementType movementType)
     {
         return textureStore.Get($"Icons/Object/MovementType/{movementType.ToString().ToLowerInvariant()}");
+    }
+
+    public static void RemoveObject(this EditorDataHolder editorDataHolder, GameObject gameObject)
+    {
+        var gameObjects = editorDataHolder.CurrentMap.Value!.GameObjects;
+        gameObjects.Remove(gameObject);
+
+        if (gameObject.LaneObject != null)
+        {
+            gameObject.LaneObject.IsUsed = false;
+            gameObject.LaneObject = null;
+        }
+
+        if (gameObject.GeminiPairObject is not null)
+            gameObjects.Remove(gameObject.GeminiPairObject);
+
+        if (gameObject.HoldEndObject is not null)
+            gameObjects.Remove(gameObject.HoldEndObject);
+
+        editorDataHolder.OnGameObjectsChanged();
+    }
+
+    public static void AddObject(this EditorDataHolder editorDataHolder, GameObject gameObject)
+    {
+        var gameObjects = editorDataHolder.CurrentMap.Value!.GameObjects;
+        gameObjects.Add(gameObject);
+
+        if (gameObject.GeminiPairObject is not null)
+            gameObjects.Add(gameObject.GeminiPairObject);
+
+        if (gameObject.HoldEndObject is not null)
+            gameObjects.Add(gameObject.HoldEndObject);
+
+        editorDataHolder.OnGameObjectsChanged();
     }
 }

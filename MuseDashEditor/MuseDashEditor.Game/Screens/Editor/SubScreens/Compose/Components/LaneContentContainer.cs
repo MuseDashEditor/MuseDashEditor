@@ -35,6 +35,7 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
     private SelectionContainer selectionContainer { get; set; } = null!;
 
     private double lastPlayedTickOffset;
+    private BaseLaneObject? placementObject;
 
     [BackgroundDependencyLoader]
     private void load()
@@ -43,6 +44,16 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
         Origin = Anchor.CentreLeft;
 
         selectionContainer.LaneContentContainer = this;
+
+        dataHolder.IsInPlacementMode.BindValueChanged(@event =>
+        {
+            if (@event.NewValue)
+                beginPlacementMode();
+            else
+                stopPlacementMode();
+        });
+
+        dataHolder.OnGameObjectsChanged += Invalidate;
     }
 
     protected override void RegenerateContent()
@@ -232,5 +243,106 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
         }
 
         lastPlayedTickOffset = localLastPlayedTickOffset;
+    }
+
+    protected override bool OnMouseMove(MouseMoveEvent e)
+    {
+        if (!dataHolder.IsInPlacementMode.Value)
+            return false;
+
+        var pos = ToLocalSpace(e.ScreenSpaceMousePosition);
+        placementObject?.MoveObjectTo(pos.X, pos.Y - Height / 2);
+
+        return false;
+    }
+
+    protected override bool OnClick(ClickEvent e)
+    {
+        if (!dataHolder.IsInPlacementMode.Value)
+            return false;
+
+        if (e.Button == MouseButton.Left)
+        {
+            placeObject();
+        }
+
+        return base.OnClick(e);
+    }
+
+    private void placeObject()
+    {
+        if (placementObject is null)
+            return;
+
+        var templateObject = placementObject.GameObject;
+
+        var newObject = templateObject.Clone();
+
+        dataHolder.AddObject(newObject);
+        historyManager.AddAction(new AddObject(newObject));
+
+        // Special cases
+        if (templateObject.ObjectType is ObjectType.Hold or ObjectType.Masher)
+        {
+            // TODO continue placement to next object & draw body (help)
+        }
+        else if (templateObject.ObjectType is ObjectType.Gemini)
+        {
+            // TODO place pair on other lane
+        }
+    }
+
+    protected override bool OnDragStart(DragStartEvent e)
+    {
+        if (!dataHolder.IsInPlacementMode.Value)
+            return false;
+
+        // TODO place at all points
+        return base.OnDragStart(e);
+    }
+
+    private void beginPlacementMode()
+    {
+        placementObject = getOrCreateObject();
+        placementObject.IsUsed = true;
+        placementObject.IsPlacementObject = true;
+        placementObject.Alpha = 0.5f;
+
+        var offset = ScrollContainer.GetCurrentOrTargetTime();
+        var tickPosition = ScrollContainer.PositionAtTime(offset);
+
+        var objectType = dataHolder.PlacementObjectType;
+        var gameObject = new GameObject(
+            offset,
+            objectType,
+            LaneType.Air,
+            LaneModifierType.Normal
+        );
+
+        var laneType = gameObject.GameObjectData?.ValidLaneTypes.FirstOrDefault() ??
+                       gameObject.DesignObjectData?.ValidLaneTypes.FirstOrDefault() ??
+                       LaneType.Air;
+        gameObject.LaneType = laneType;
+
+        placementObject.Offset = offset;
+        placementObject.X = tickPosition;
+        placementObject.Y = EditorConstants.GetLaneY(gameObject.LaneType);
+
+        placementObject.GameObject = gameObject;
+        placementObject.SceneType = dataHolder.GetSceneAtTime(offset);
+        placementObject.LaneType = gameObject.LaneType;
+        placementObject.LaneModifier = gameObject.LaneModifier;
+
+        gameObject.LaneObject = placementObject;
+    }
+
+    private void stopPlacementMode()
+    {
+        if (placementObject is null)
+            return;
+
+        placementObject.IsUsed = false;
+        placementObject.IsPlacementObject = false;
+        placementObject.Alpha = 0;
     }
 }

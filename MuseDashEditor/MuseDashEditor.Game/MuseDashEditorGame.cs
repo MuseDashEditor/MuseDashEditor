@@ -12,6 +12,7 @@
 
 using System.Collections.Generic;
 using System.Reflection;
+using MuseDashEditor.Game.Component.Notification;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Project;
 using MuseDashEditor.Game.Screens;
@@ -38,6 +39,9 @@ public partial class MuseDashEditorGame : MuseDashEditorGameBase
     [Cached]
     protected readonly ScreenStack ScreenStack = new() { RelativeSizeAxes = Axes.Both };
 
+    [Cached]
+    protected readonly NotificationContainer NotificationContainer = new();
+
     private readonly HighPerformanceSessionManager highPerformanceSessionManager = new();
 
     [BackgroundDependencyLoader]
@@ -50,6 +54,10 @@ public partial class MuseDashEditorGame : MuseDashEditorGameBase
         MdeSounds.Preload();
 
         Content.Add(ScreenStack);
+        Content.AddRange([
+            ScreenStack,
+            NotificationContainer
+        ]);
     }
 
     public override void SetHost(GameHost host)

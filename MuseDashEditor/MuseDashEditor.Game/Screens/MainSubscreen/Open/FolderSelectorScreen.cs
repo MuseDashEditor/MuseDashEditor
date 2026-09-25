@@ -59,12 +59,11 @@ public partial class FolderSelectorScreen : Screen
                         var selectedFile = fileSelector.CurrentFile.Value;
 
                         if (selectedFile == null)
-                        {
                             return;
-                        }
 
                         var pathValue = fileSelector.CurrentFile.Value;
-                        if (pathValue == null) return;
+                        if (pathValue == null)
+                            return;
 
                         Logger.Log($"Importing chart from {pathValue.FullName}...");
 

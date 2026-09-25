@@ -42,6 +42,7 @@ public partial class EditorDataHolder : IDependencyInjectionCandidate
     public Action OnTimingPointsChanged = () => { };
     public Action OnGameObjectsChanged = () => { };
 
+    // TODO move somewhere else, to keep only data in this class, no logic
     public async Task Initialize(Storage? storage)
     {
         if (storage == null)

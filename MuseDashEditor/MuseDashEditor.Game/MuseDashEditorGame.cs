@@ -10,6 +10,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System.Collections.Generic;
 using System.Reflection;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Project;
@@ -80,5 +81,13 @@ public partial class MuseDashEditorGame : MuseDashEditorGameBase
         MdeSounds.Dispose();
 
         base.Dispose(isDisposing);
+    }
+
+    protected override void OnWindowDragDrop(List<string> paths)
+    {
+        if (paths.Count == 0)
+            return;
+
+        ImportManager.ImportManagerInstance.ProcessFileDrop(paths);
     }
 }

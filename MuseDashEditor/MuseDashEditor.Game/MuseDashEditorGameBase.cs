@@ -10,6 +10,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -30,7 +31,9 @@ using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osuTK;
+using WindowState = osu.Framework.Platform.WindowState;
 
 namespace MuseDashEditor.Game;
 
@@ -50,6 +53,9 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
     protected override Container<Drawable> Content => content;
     private Container content = null!;
 
+    private readonly List<string> dragDropFiles = [];
+    private ScheduledDelegate? dragDropImportSchedule;
+
     protected MuseDashEditorGameBase()
     {
         Name = GAME_NAME;
@@ -59,6 +65,12 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
     {
         base.SetHost(host);
         localConfig = new MdeConfigManager(host.Storage);
+
+        if (host.Window != null)
+        {
+            host.Window.DragDrop += onWindowDragDrop;
+            host.Window.WindowState = WindowState.Maximised;
+        }
     }
 
     [BackgroundDependencyLoader]
@@ -147,5 +159,34 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
     protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
     {
         return dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+    }
+
+    private void onWindowDragDrop(string path)
+    {
+        if (path.StartsWith(MDE_PROTOCOL, StringComparison.Ordinal))
+        {
+            // TODO handle link
+            return;
+        }
+
+        lock (dragDropFiles)
+        {
+            dragDropFiles.Add(path);
+            dragDropImportSchedule?.Cancel();
+            dragDropImportSchedule = Scheduler.AddDelayed(() =>
+            {
+                lock (dragDropFiles)
+                {
+                    var paths = dragDropFiles.ToList();
+                    dragDropFiles.Clear();
+
+                    OnWindowDragDrop(paths);
+                }
+            }, 100);
+        }
+    }
+
+    protected virtual void OnWindowDragDrop(List<string> paths)
+    {
     }
 }

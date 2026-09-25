@@ -10,15 +10,17 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using MuseDashEditor.Game.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 
 namespace MuseDashEditor.Game.Component.Notification;
 
-public partial class NotificationContainer : Container
+public partial class NotificationContainer : Container, IKeyBindingHandler<InputAction>
 {
     private Container notificationContainer = null!;
 
@@ -91,6 +93,29 @@ public partial class NotificationContainer : Container
     }
 
     protected override void OnKeyUp(KeyUpEvent e)
+    {
+    }
+
+    public void ShowNotification(Notification notification)
+    {
+        SetNotification(notification);
+        Show();
+    }
+
+    public bool OnPressed(KeyBindingPressEvent<InputAction> e)
+    {
+        if (!IsPresent)
+            return false;
+
+        if (e.Action != InputAction.Escape)
+            return false;
+
+        // Todo add option to prevent closing
+        Hide();
+        return true;
+    }
+
+    public void OnReleased(KeyBindingReleaseEvent<InputAction> e)
     {
     }
 }

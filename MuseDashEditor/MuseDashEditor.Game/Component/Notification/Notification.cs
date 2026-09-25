@@ -21,6 +21,9 @@ namespace MuseDashEditor.Game.Component.Notification;
 
 public partial class Notification : Container
 {
+    [Resolved]
+    private NotificationContainer notificationContainer { get; set; } = null!;
+
     protected Drawable Header { get; init; } = null!;
     protected Drawable Body { get; init; } = null!;
     protected Drawable Footer { get; init; } = null!;
@@ -59,5 +62,10 @@ public partial class Notification : Container
                 }
             }
         ];
+    }
+
+    protected void Close()
+    {
+        notificationContainer.Hide();
     }
 }

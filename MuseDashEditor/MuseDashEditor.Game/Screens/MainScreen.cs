@@ -19,6 +19,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osuTK;
 
@@ -30,7 +31,7 @@ public partial class MainScreen : Screen
     protected ScreenStack MainScreenStack { get; private set; } = null!;
 
     [BackgroundDependencyLoader]
-    private void load(LargeTextureStore textures)
+    private void load(LargeTextureStore textures, GameHost host)
     {
         InternalChildren =
         [
@@ -110,6 +111,34 @@ public partial class MainScreen : Screen
                 Font = MDEFonts.ArialUnicodeMs.With(size: 20),
                 Alpha = 0.8f,
                 Text = "Not affiliated with, endorsed by, or sponsored by PeroPeroGames. MuseDash and all related assets belong to their respective owners."
+            },
+            new FillFlowContainer
+            {
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(10),
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Position = new Vector2(-10),
+                AutoSizeAxes = Axes.X,
+                Children =
+                [
+                    new IconRoundedButton
+                    {
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomRight,
+                        Size = new Vector2(42),
+                        Icon = FontAwesome.Brands.Github,
+                        Action = () => host.OpenUrlExternally("https://github.com/MuseDashEditor")
+                    },
+                    new SpriteRoundedButton
+                    {
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomRight,
+                        Size = new Vector2(42),
+                        SpritePath = "Icons/discord",
+                        Action = () => host.OpenUrlExternally("https://discord.gg/6Fgy9Y6bFm")
+                    }
+                ]
             }
         ];
     }

@@ -54,4 +54,5 @@ public enum InputAction
     Select8,
     Select9,
     Select10,
+    Cancel,
 }

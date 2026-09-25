@@ -43,6 +43,17 @@ public class GameObject : BaseObject
     public GameObject? HoldEndObject;
     public GameObject? GeminiPairObject;
     public bool IsHoldEnd = false;
+    public double HoldDuration;
 
     public BaseLaneObject? LaneObject;
+
+    public GameObject Clone()
+    {
+        return new GameObject(
+            Offset.Value,
+            ObjectType,
+            LaneType,
+            LaneModifier
+        );
+    }
 }

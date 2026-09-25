@@ -19,8 +19,9 @@ public class GameObjectData(
     TextureType textureType,
     MovementType movementType = MovementType.None,
     LaneType[]? validLanes = null,
+    LaneModifierType[]? validLaneModifiers = null,
     SceneType[]? validScenes = null
-) : ObjectData(validLanes, validScenes)
+) : ObjectData(validLanes, validLaneModifiers, validScenes)
 {
     public HitSoundType HitSoundType => hitSoundType;
     public TextureType TextureType => textureType;

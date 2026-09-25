@@ -18,5 +18,13 @@ public class BaseLaneGameObjectData(
     HitSoundType hitSoundType,
     TextureType textureType,
     MovementType movementType = MovementType.None,
+    LaneModifierType[]? validLaneModifiers = null,
     SceneType[]? validScenes = null
-) : GameObjectData(hitSoundType, textureType, movementType, [LaneType.Air, LaneType.Air2, LaneType.Ground, LaneType.Ground2], validScenes);
+) : GameObjectData(
+    hitSoundType,
+    textureType,
+    movementType,
+    [LaneType.Air, LaneType.Air2, LaneType.Ground, LaneType.Ground2],
+    validLaneModifiers ?? [LaneModifierType.Normal, LaneModifierType.Heart],
+    validScenes
+);

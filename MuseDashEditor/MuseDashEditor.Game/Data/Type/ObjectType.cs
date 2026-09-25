@@ -17,148 +17,365 @@ namespace MuseDashEditor.Game.Data.Type;
 
 public enum ObjectType
 {
-    //@formatter:off
-    Empty = 0,                        // Used only for parsing and saving
+    Empty = 0, // Used only for parsing and saving
 
     // MapObjects
-    Music = 36,                       // 10
+    Music = 36, // 10
 
     // === HitObjects ===
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Small)]  Small = 1,                                      // 01
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Small, MovementType.Up)]  SmallUp = 2,                   // 02
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Small, MovementType.Down)]  SmallDown = 3,               // 03
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Medium1)]  Medium1 = 4,                                  // 04
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Medium1, MovementType.Up)]  Medium1Up = 5,               // 05
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Medium1, MovementType.Down)]  Medium1Down = 6,           // 06
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Medium2)]  Medium2 = 7,                                  // 07
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Medium2, MovementType.Up)]  Medium2Up = 8,               // 08
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Medium2, MovementType.Down)]  Medium2Down = 9,           // 09
-    [BaseLaneGameObjectData(HitSoundType.Large1, TextureType.Large1)] Large1 = 10,                                   // 0A
-    [BaseLaneGameObjectData(HitSoundType.Large2, TextureType.Large2)] Large2 = 11,                                   // 0B
-    [BaseLaneGameObjectData(HitSoundType.Raider, TextureType.Raider)] Raider = 12,                                   // 0C
-    [BaseLaneGameObjectData(HitSoundType.Hammer, TextureType.Hammer)] Hammer = 13,                                   // 0D
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Gemini)]  Gemini = 14,                                   // 0E
-    [BaseLaneGameObjectData(HitSoundType.Hold, TextureType.Hold)]   Hold = 15,                                       // 0F
-    [BaseLaneGameObjectData(HitSoundType.Masher, TextureType.Masher)] Masher = 16,                                   // 0G
-    [BaseLaneGameObjectData(HitSoundType.Gear, TextureType.Gear)]   Gear = 17,                                       // 0H
-    [BaseLaneGameObjectData(HitSoundType.Raider, TextureType.Raider, MovementType.Laneshift)] RaiderUpsideDown = 18, // 0I
-    [BaseLaneGameObjectData(HitSoundType.Hammer, TextureType.Hammer, MovementType.Laneshift)] HammerUpsideDown = 19, // 0J
-    [BaseLaneGameObjectData(HitSoundType.Ghost, TextureType.Ghost)]  Ghost = 73,                                     // 21
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Small)]
+    Small = 1, // 01
+
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Small, MovementType.Up)]
+    SmallUp = 2, // 02
+
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Small, MovementType.Down)]
+    SmallDown = 3, // 03
+
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Medium1)]
+    Medium1 = 4, // 04
+
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Medium1, MovementType.Up)]
+    Medium1Up = 5, // 05
+
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Medium1, MovementType.Down)]
+    Medium1Down = 6, // 06
+
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Medium2)]
+    Medium2 = 7, // 07
+
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Medium2, MovementType.Up)]
+    Medium2Up = 8, // 08
+
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Medium2, MovementType.Down)]
+    Medium2Down = 9, // 09
+
+    [BaseLaneGameObjectData(HitSoundType.Large1, TextureType.Large1)]
+    Large1 = 10, // 0A
+
+    [BaseLaneGameObjectData(HitSoundType.Large2, TextureType.Large2)]
+    Large2 = 11, // 0B
+
+    [BaseLaneGameObjectData(HitSoundType.Raider, TextureType.Raider)]
+    Raider = 12, // 0C
+
+    [BaseLaneGameObjectData(HitSoundType.Hammer, TextureType.Hammer)]
+    Hammer = 13, // 0D
+
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.Gemini)]
+    Gemini = 14, // 0E
+
+    [BaseLaneGameObjectData(HitSoundType.Hold, TextureType.Hold, MovementType.None, [LaneModifierType.Normal, LaneModifierType.Heart, LaneModifierType.Landmine])]
+    Hold = 15, // 0F
+
+    [BaseLaneGameObjectData(HitSoundType.Masher, TextureType.Masher, MovementType.None, [LaneModifierType.Normal, LaneModifierType.Heart, LaneModifierType.Landmine])]
+    Masher = 16, // 0G
+
+    [BaseLaneGameObjectData(HitSoundType.Gear, TextureType.Gear, MovementType.None, [LaneModifierType.Normal])]
+    Gear = 17, // 0H
+
+    [BaseLaneGameObjectData(HitSoundType.Raider, TextureType.Raider, MovementType.Laneshift)]
+    RaiderUpsideDown = 18, // 0I
+
+    [BaseLaneGameObjectData(HitSoundType.Hammer, TextureType.Hammer, MovementType.Laneshift)]
+    HammerUpsideDown = 19, // 0J
+
+    [BaseLaneGameObjectData(HitSoundType.Ghost, TextureType.Ghost)]
+    Ghost = 73, // 21
 
     // Collectibles
-    [BaseLaneGameObjectData(HitSoundType.Heart, TextureType.Heart)] Heart = 74,                 // 22
-    [BaseLaneGameObjectData(HitSoundType.Note, TextureType.Note)]  Note = 75,                   // 23
+    [BaseLaneGameObjectData(HitSoundType.Heart, TextureType.Heart)]
+    Heart = 74, // 22
+
+    [BaseLaneGameObjectData(HitSoundType.Note, TextureType.Note)]
+    Note = 75, // 23
 
     // Touhou special hit objects
-    [TouhouSpecialGameObjectData(HitSoundType.Note, TextureType.PItem)]  PItem = 72,                                                 // 20
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.BossBullet1)]  BossBullet1 = 120,                                    // 3C
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.BossBullet1, MovementType.Laneshift)]  BossBullet1Laneshift = 121,   // 3D
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.BossBullet2)]  BossBullet2 = 122,                                    // 3E
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.BossBullet2, MovementType.Laneshift)]  BossBullet2Laneshift = 123,   // 3F
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.MediumBullet)]  MediumBullet = 108,                                  // 30
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.MediumBullet, MovementType.Up)]  MediumBulletUp = 109,               // 31
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.MediumBullet, MovementType.Down)]  MediumBulletDown = 110,           // 32
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.MediumBullet, MovementType.Laneshift)]  MediumBulletLaneshift = 111, // 33
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.SmallBullet)]  SmallBullet = 112,                                    // 34
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.SmallBullet, MovementType.Up)]  SmallBulletUp = 113,                 // 35
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.SmallBullet, MovementType.Down)]  SmallBulletDown = 114,             // 36
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.SmallBullet, MovementType.Laneshift)]  SmallBulletLaneshift = 115,   // 37
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.LargeBullet)]  LargeBullet = 116,                                    // 38
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.LargeBullet, MovementType.Up)]  LargeBulletUp = 117,                 // 39
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.LargeBullet, MovementType.Down)]  LargeBulletDown = 118,             // 3A
-    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.LargeBullet, MovementType.Laneshift)]  LargeBulletLaneshift = 119,   // 3B
+    [TouhouSpecialGameObjectData(HitSoundType.Note, TextureType.PItem)]
+    PItem = 72, // 20
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.BossBullet1)]
+    BossBullet1 = 120, // 3C
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.BossBullet1, MovementType.Laneshift)]
+    BossBullet1Laneshift = 121, // 3D
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.BossBullet2)]
+    BossBullet2 = 122, // 3E
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.BossBullet2, MovementType.Laneshift)]
+    BossBullet2Laneshift = 123, // 3F
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.MediumBullet)]
+    MediumBullet = 108, // 30
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.MediumBullet, MovementType.Up)]
+    MediumBulletUp = 109, // 31
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.MediumBullet, MovementType.Down)]
+    MediumBulletDown = 110, // 32
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.MediumBullet, MovementType.Laneshift)]
+    MediumBulletLaneshift = 111, // 33
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.SmallBullet)]
+    SmallBullet = 112, // 34
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.SmallBullet, MovementType.Up)]
+    SmallBulletUp = 113, // 35
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.SmallBullet, MovementType.Down)]
+    SmallBulletDown = 114, // 36
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.SmallBullet, MovementType.Laneshift)]
+    SmallBulletLaneshift = 115, // 37
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.LargeBullet)]
+    LargeBullet = 116, // 38
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.LargeBullet, MovementType.Up)]
+    LargeBulletUp = 117, // 39
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.LargeBullet, MovementType.Down)]
+    LargeBulletDown = 118, // 3A
+
+    [TouhouSpecialGameObjectData(HitSoundType.Gear, TextureType.LargeBullet, MovementType.Laneshift)]
+    LargeBulletLaneshift = 119, // 3B
 
     // BossHitObjects
-    [BossGameObjectData(HitSoundType.Small, TextureType.Boss)]  BossMelee1 = 37,                      // 11
-    [BossGameObjectData(HitSoundType.Small, TextureType.Boss)]  BossMelee2 = 38,                      // 12
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.BossProjectile1)]  BossProjectile1 = 39,  // 13
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.BossProjectile2)]  BossProjectile2 = 40,  // 14
-    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.BossProjectile3)]  BossProjectile3 = 41,  // 15
-    [BossGameObjectData(HitSoundType.Masher, TextureType.Boss)] BossMasher1 = 42,                     // 16
-    [BossGameObjectData(HitSoundType.Masher, TextureType.Boss)] BossMasher2 = 43,                     // 17
-    [BaseLaneGameObjectData(HitSoundType.Gear, TextureType.Gear)]   BossGear = 44,                    // 18
+    [BossGameObjectData(HitSoundType.Small, TextureType.Boss)]
+    BossMelee1 = 37, // 11
+
+    [BossGameObjectData(HitSoundType.Small, TextureType.Boss)]
+    BossMelee2 = 38, // 12
+
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.BossProjectile1)]
+    BossProjectile1 = 39, // 13
+
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.BossProjectile2)]
+    BossProjectile2 = 40, // 14
+
+    [BaseLaneGameObjectData(HitSoundType.Small, TextureType.BossProjectile3)]
+    BossProjectile3 = 41, // 15
+
+    [BossGameObjectData(HitSoundType.Masher, TextureType.Boss)]
+    BossMasher1 = 42, // 16
+
+    [BossGameObjectData(HitSoundType.Masher, TextureType.Boss)]
+    BossMasher2 = 43, // 17
+
+    [BaseLaneGameObjectData(HitSoundType.Gear, TextureType.Gear)]
+    BossGear = 44, // 18
 
     // === SpecialObjects ===
 
     // Boss
-    [DesignObjectData] BossEntrance = 46,                // 1A
-    [DesignObjectData] BossExit = 47,                    // 1B
-    [DesignObjectData] BossReadyPhase1 = 48,             // 1C
-    [DesignObjectData] BossEndPhase1 = 49,               // 1D
-    [DesignObjectData] BossReadyPhase2 = 50,             // 1E
-    [DesignObjectData] BossEndPhase2 = 51,               // 1F
-    [DesignObjectData] BossSwapPhase1To2 = 52,           // 1G
-    [DesignObjectData] BossSwapPhase2To1 = 53,           // 1H
-    [DesignObjectData] HideBoss = 57,                    // 1L
-    [DesignObjectData] UnhideBoss = 58,                  // 1M
+    [DesignObjectData]
+    BossEntrance = 46, // 1A
+
+    [DesignObjectData]
+    BossExit = 47, // 1B
+
+    [DesignObjectData]
+    BossReadyPhase1 = 48, // 1C
+
+    [DesignObjectData]
+    BossEndPhase1 = 49, // 1D
+
+    [DesignObjectData]
+    BossReadyPhase2 = 50, // 1E
+
+    [DesignObjectData]
+    BossEndPhase2 = 51, // 1F
+
+    [DesignObjectData]
+    BossSwapPhase1To2 = 52, // 1G
+
+    [DesignObjectData]
+    BossSwapPhase2To1 = 53, // 1H
+
+    [DesignObjectData]
+    HideBoss = 57, // 1L
+
+    [DesignObjectData]
+    UnhideBoss = 58, // 1M
 
     // SpeedChangeObjects
-    [DesignObjectData] Speed1Both = 24,                  // 0O
-    [DesignObjectData] Speed2Both = 25,                  // 0P
-    [DesignObjectData] Speed3Both = 26,                  // 0Q
-    [DesignObjectData] Speed1Low = 27,                   // 0R
-    [DesignObjectData] Speed2Low = 28,                   // 0S
-    [DesignObjectData] Speed3Low = 29,                   // 0T
-    [DesignObjectData] Speed1High = 30,                  // 0U
-    [DesignObjectData] Speed2High = 31,                  // 0V
-    [DesignObjectData] Speed3High = 32,                  // 0W
+    [DesignObjectData]
+    Speed1Both = 24, // 0O
+
+    [DesignObjectData]
+    Speed2Both = 25, // 0P
+
+    [DesignObjectData]
+    Speed3Both = 26, // 0Q
+
+    [DesignObjectData]
+    Speed1Low = 27, // 0R
+
+    [DesignObjectData]
+    Speed2Low = 28, // 0S
+
+    [DesignObjectData]
+    Speed3Low = 29, // 0T
+
+    [DesignObjectData]
+    Speed1High = 30, // 0U
+
+    [DesignObjectData]
+    Speed2High = 31, // 0V
+
+    [DesignObjectData]
+    Speed3High = 32, // 0W
 
     // SceneSwitchObjects
-    [SceneSwitchObjectData(SceneType.SpaceStation)] SceneSwitchSpaceStation = 60, // 1O
-    [SceneSwitchObjectData(SceneType.Retrocity)] SceneSwitchRetrocity = 61,       // 1P
-    [SceneSwitchObjectData(SceneType.Castle)] SceneSwitchCastle = 62,             // 1Q
-    [SceneSwitchObjectData(SceneType.RainyNight)] SceneSwitchRainyNight = 63,     // 1R
-    [SceneSwitchObjectData(SceneType.Candyland)] SceneSwitchCandyland = 64,       // 1S
-    [SceneSwitchObjectData(SceneType.Oriental)] SceneSwitchOriental = 65,         // 1T
-    [SceneSwitchObjectData(SceneType.LetsGroove)] SceneSwitchGrooveCoaster = 66,  // 1U
-    [SceneSwitchObjectData(SceneType.Touhou)] SceneSwitchTouhou = 67,             // 1V
-    [SceneSwitchObjectData(SceneType.DjMax)] SceneSwitchDjmax = 68,               // 1W
-    [SceneSwitchObjectData(SceneType.Miku)] SceneSwitchMiku = 69,                 // 1X
+    [SceneSwitchObjectData(SceneType.SpaceStation)]
+    SceneSwitchSpaceStation = 60, // 1O
+
+    [SceneSwitchObjectData(SceneType.Retrocity)]
+    SceneSwitchRetrocity = 61, // 1P
+
+    [SceneSwitchObjectData(SceneType.Castle)]
+    SceneSwitchCastle = 62, // 1Q
+
+    [SceneSwitchObjectData(SceneType.RainyNight)]
+    SceneSwitchRainyNight = 63, // 1R
+
+    [SceneSwitchObjectData(SceneType.Candyland)]
+    SceneSwitchCandyland = 64, // 1S
+
+    [SceneSwitchObjectData(SceneType.Oriental)]
+    SceneSwitchOriental = 65, // 1T
+
+    [SceneSwitchObjectData(SceneType.LetsGroove)]
+    SceneSwitchGrooveCoaster = 66, // 1U
+
+    [SceneSwitchObjectData(SceneType.Touhou)]
+    SceneSwitchTouhou = 67, // 1V
+
+    [SceneSwitchObjectData(SceneType.DjMax)]
+    SceneSwitchDjmax = 68, // 1W
+
+    [SceneSwitchObjectData(SceneType.Miku)]
+    SceneSwitchMiku = 69, // 1X
 
     // DesignObjects
-    [DesignObjectData] HideNotes = 55,                   // 1J
-    [DesignObjectData] UnhideNotes = 56,                 // 1K
-    [DesignObjectData] HideBackground = 77,              // 25
-    [DesignObjectData] UnhideBackground = 78,            // 26
-    [DesignObjectData] ScreenScrollUp = 79,              // 27
-    [DesignObjectData] ScreenScrollDown = 80,            // 28
-    [DesignObjectData] ScreenScrollOff = 81,             // 29
-    [DesignObjectData] ScanlineRipplesOn = 82,           // 2A
-    [DesignObjectData] ScanlineRipplesOff = 83,          // 2B
-    [DesignObjectData] ChromaticAberrationOn = 84,       // 2C
-    [DesignObjectData] ChromaticAberrationOff = 85,      // 2D
-    [DesignObjectData] VignetteOn = 86,                  // 2E
-    [DesignObjectData] VignetteOff = 87,                 // 2F
-    [DesignObjectData] TvStaticOn = 88,                  // 2G
-    [DesignObjectData] TvStaticOff = 89,                 // 2H
-    [DesignObjectData] FlashbangStart = 90,              // 2I
-    [DesignObjectData] FlashbangMid = 91,                // 2J
-    [DesignObjectData] FlashbangEnd = 92,                // 2K
-    [DesignObjectData] BgStopOn = 95,                    // 2N
-    [DesignObjectData] BgStopOff = 96,                   // 2O
-    [DesignObjectData] MosaicOn = 97,                    // 2P
-    [DesignObjectData] MosaicOff = 98,                   // 2Q
-    [DesignObjectData] SepiaOn = 99,                     // 2R
-    [DesignObjectData] SepiaOff = 100,                   // 2S
-    [DesignObjectData] FocusLinesBlack = 101,            // 2T
-    [DesignObjectData] FocusLinesWhite = 102,            // 2U
-    [DesignObjectData] FocusLinesOff = 103,              // 2V
-    [DesignObjectData] FilmGrainOn = 104,                // 2W
-    [DesignObjectData] FilmGrainOff = 105,               // 2X
-    [DesignObjectData] FlashbangColorWhite = 454,        // CM
-    [DesignObjectData] FlashbangColorBlack = 455,        // CN
-    [DesignObjectData] FlashbangColorRed = 456,          // CO
-    [DesignObjectData] FlashbangColorGreen = 457,        // CP
-    [DesignObjectData] FlashbangColorBlue = 458,         // CQ
-    [DesignObjectData] FlashbangColorCyan = 459,         // CR
-    [DesignObjectData] FlashbangColorMagenta = 460,      // CS
-    [DesignObjectData] FlashbangColorYellow = 461,       // CT
+    [DesignObjectData]
+    HideNotes = 55, // 1J
+
+    [DesignObjectData]
+    UnhideNotes = 56, // 1K
+
+    [DesignObjectData]
+    HideBackground = 77, // 25
+
+    [DesignObjectData]
+    UnhideBackground = 78, // 26
+
+    [DesignObjectData]
+    ScreenScrollUp = 79, // 27
+
+    [DesignObjectData]
+    ScreenScrollDown = 80, // 28
+
+    [DesignObjectData]
+    ScreenScrollOff = 81, // 29
+
+    [DesignObjectData]
+    ScanlineRipplesOn = 82, // 2A
+
+    [DesignObjectData]
+    ScanlineRipplesOff = 83, // 2B
+
+    [DesignObjectData]
+    ChromaticAberrationOn = 84, // 2C
+
+    [DesignObjectData]
+    ChromaticAberrationOff = 85, // 2D
+
+    [DesignObjectData]
+    VignetteOn = 86, // 2E
+
+    [DesignObjectData]
+    VignetteOff = 87, // 2F
+
+    [DesignObjectData]
+    TvStaticOn = 88, // 2G
+
+    [DesignObjectData]
+    TvStaticOff = 89, // 2H
+
+    [DesignObjectData]
+    FlashbangStart = 90, // 2I
+
+    [DesignObjectData]
+    FlashbangMid = 91, // 2J
+
+    [DesignObjectData]
+    FlashbangEnd = 92, // 2K
+
+    [DesignObjectData]
+    BgStopOn = 95, // 2N
+
+    [DesignObjectData]
+    BgStopOff = 96, // 2O
+
+    [DesignObjectData]
+    MosaicOn = 97, // 2P
+
+    [DesignObjectData]
+    MosaicOff = 98, // 2Q
+
+    [DesignObjectData]
+    SepiaOn = 99, // 2R
+
+    [DesignObjectData]
+    SepiaOff = 100, // 2S
+
+    [DesignObjectData]
+    FocusLinesBlack = 101, // 2T
+
+    [DesignObjectData]
+    FocusLinesWhite = 102, // 2U
+
+    [DesignObjectData]
+    FocusLinesOff = 103, // 2V
+
+    [DesignObjectData]
+    FilmGrainOn = 104, // 2W
+
+    [DesignObjectData]
+    FilmGrainOff = 105, // 2X
+
+    [DesignObjectData]
+    FlashbangColorWhite = 454, // CM
+
+    [DesignObjectData]
+    FlashbangColorBlack = 455, // CN
+
+    [DesignObjectData]
+    FlashbangColorRed = 456, // CO
+
+    [DesignObjectData]
+    FlashbangColorGreen = 457, // CP
+
+    [DesignObjectData]
+    FlashbangColorBlue = 458, // CQ
+
+    [DesignObjectData]
+    FlashbangColorCyan = 459, // CR
+
+    [DesignObjectData]
+    FlashbangColorMagenta = 460, // CS
+
+    [DesignObjectData]
+    FlashbangColorYellow = 461, // CT
 
     // Other
-    AutoplayOn = 106,                 // 2Y
-    AutoplayOff = 107,                // 2Z
+    AutoplayOn = 106, // 2Y
+    AutoplayOff = 107, // 2Z
 
-    // Cheats
-    [GameObjectData(HitSoundType.Hold, TextureType.HoldBody)] HoldBody = 999
-    //@formatter:on
+    // Hacks
+    [GameObjectData(HitSoundType.Hold, TextureType.HoldBody)]
+    HoldBody = 999
 }

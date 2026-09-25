@@ -17,5 +17,13 @@ namespace MuseDashEditor.Game.Data.Object.GameObject;
 public class BossGameObjectData(
     HitSoundType hitSoundType,
     TextureType textureType,
+    LaneModifierType[]? validLaneModifiers = null,
     SceneType[]? validScenes = null
-) : GameObjectData(hitSoundType, textureType, MovementType.None, [LaneType.Special, LaneType.Special2], validScenes);
+) : GameObjectData(
+    hitSoundType,
+    textureType,
+    MovementType.None,
+    [LaneType.Special, LaneType.Special2],
+    validLaneModifiers ?? [LaneModifierType.Normal, LaneModifierType.Heart],
+    validScenes
+);

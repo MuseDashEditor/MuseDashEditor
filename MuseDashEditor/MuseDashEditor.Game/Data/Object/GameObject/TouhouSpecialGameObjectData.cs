@@ -17,5 +17,6 @@ namespace MuseDashEditor.Game.Data.Object.GameObject;
 public class TouhouSpecialGameObjectData(
     HitSoundType hitSoundType,
     TextureType textureType,
-    MovementType movementType = MovementType.None
-) : BaseLaneGameObjectData(hitSoundType, textureType, movementType, [SceneType.Touhou]);
+    MovementType movementType = MovementType.None,
+    LaneModifierType[]? validLaneModifiers = null
+) : BaseLaneGameObjectData(hitSoundType, textureType, movementType, validLaneModifiers, [SceneType.Touhou]);

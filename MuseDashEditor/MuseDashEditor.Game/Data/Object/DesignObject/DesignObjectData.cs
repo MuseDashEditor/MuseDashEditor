@@ -16,4 +16,4 @@ namespace MuseDashEditor.Game.Data.Object.DesignObject;
 
 public class DesignObjectData(
     SceneType[]? validScenes = null
-) : ObjectData([LaneType.Special, LaneType.Special2], validScenes);
+) : ObjectData([LaneType.Special, LaneType.Special2], [LaneModifierType.Normal], validScenes);

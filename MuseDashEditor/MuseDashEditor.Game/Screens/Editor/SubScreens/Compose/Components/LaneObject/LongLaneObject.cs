@@ -13,8 +13,10 @@
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osuTK;
@@ -39,6 +41,10 @@ public partial class LongLaneObject : Container
 
     private int currentNotesTickIndex;
     private Texture notesTexture = null!;
+
+    private readonly Cached halfCircleZonesCache = new();
+    private Quad leftCircleScreenSpaceDrawQuad;
+    private Quad rightCircleScreenSpaceDrawQuad;
 
     [BackgroundDependencyLoader]
     private void load()
@@ -125,6 +131,30 @@ public partial class LongLaneObject : Container
         ];
     }
 
+    protected override void UpdateAfterChildren()
+    {
+        if (halfCircleZonesCache.IsValid)
+            return;
+
+        var lcssdq = leftCircleSprite.ScreenSpaceDrawQuad;
+        leftCircleScreenSpaceDrawQuad = new Quad(
+            lcssdq.TopLeft,
+            new Vector2(lcssdq.TopRight.X - BaseLaneObject.BASE_SIZE / 2, lcssdq.TopRight.Y),
+            lcssdq.BottomLeft,
+            new Vector2(lcssdq.BottomRight.X - BaseLaneObject.BASE_SIZE / 2, lcssdq.BottomRight.Y)
+        );
+
+        var rcssdq = rightCircleSprite.ScreenSpaceDrawQuad;
+        rightCircleScreenSpaceDrawQuad = new Quad(
+            new Vector2(rcssdq.TopLeft.X + BaseLaneObject.BASE_SIZE / 2, rcssdq.TopLeft.Y),
+            rcssdq.TopRight,
+            new Vector2(rcssdq.BottomLeft.X + BaseLaneObject.BASE_SIZE / 2, rcssdq.BottomLeft.Y),
+            rcssdq.BottomRight
+        );
+
+        halfCircleZonesCache.Validate();
+    }
+
     public void UpdateObjectTextures(ObjectType objectType, SceneType sceneType, LaneType laneType,
                                      LaneModifierType leftLaneModifier, LaneModifierType rightLaneModifier)
     {
@@ -185,5 +215,20 @@ public partial class LongLaneObject : Container
 
         currentNotesTickIndex++;
         return child;
+    }
+
+    public void InvalidateSsdq()
+    {
+        halfCircleZonesCache.Invalidate();
+    }
+
+    public bool IsInLeftCircle(Vector2 pos)
+    {
+        return leftCircleScreenSpaceDrawQuad.Contains(pos);
+    }
+
+    public bool IsInRightCircle(Vector2 pos)
+    {
+        return rightCircleScreenSpaceDrawQuad.Contains(pos);
     }
 }

@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using System;
+using System.Linq;
 using MuseDashEditor.Game.Component;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Object.GameObject;
@@ -20,6 +21,8 @@ using MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneObjec
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
+using osuTK.Input;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components;
 
@@ -125,10 +128,10 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
                 }
             }
 
-            if (laneObject != null)
+            if (laneObject?.IsResizing ?? false)
                 continue;
 
-            laneObject = getOrCreateObject();
+            laneObject ??= getOrCreateObject();
             laneObject.IsUsed = true;
             laneObject.Offset = tickOffset;
             laneObject.X = tickPosition;

@@ -10,6 +10,8 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Type;
@@ -28,9 +30,21 @@ using osuTK;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components;
 
-public sealed partial class NewObjectBar : FillFlowContainer<NewObjectContainer>
+public sealed partial class NewObjectBar : FillFlowContainer<Container>, IKeyBindingHandler<InputAction>
 {
     internal NewObjectContainer? SelectedContainer;
+
+    private readonly List<ObjectType> possibleObjectTypes = [];
+
+    private readonly InputAction[] actions =
+    [
+        InputAction.Select1, InputAction.Select2, InputAction.Select3, InputAction.Select4, InputAction.Select5,
+        InputAction.Select6, InputAction.Select7, InputAction.Select8, InputAction.Select9, InputAction.Select10
+    ];
+
+    private int currentPage;
+    private bool select1IsPreviousPage;
+    private bool select10IsNextPage;
 
     public NewObjectBar()
     {
@@ -39,62 +53,223 @@ public sealed partial class NewObjectBar : FillFlowContainer<NewObjectContainer>
         Height = 100;
         Anchor = Anchor.BottomLeft;
         Origin = Anchor.BottomLeft;
-        Children =
-        [
-            new NewObjectContainer(this, ObjectType.Small, InputAction.Select1),
-            new NewObjectContainer(this, ObjectType.Medium1, InputAction.Select2),
-            new NewObjectContainer(this, ObjectType.Medium2, InputAction.Select3),
-            new NewObjectContainer(this, ObjectType.Large1, InputAction.Select4),
-            new NewObjectContainer(this, ObjectType.Large2, InputAction.Select5),
-            new NewObjectContainer(this, ObjectType.Raider, InputAction.Select6),
-            new NewObjectContainer(this, ObjectType.Hammer, InputAction.Select7),
-            new NewObjectContainer(this, ObjectType.Gemini, InputAction.Select8),
-            new NewObjectContainer(this, ObjectType.Hold, InputAction.Select9),
-            new NewObjectContainer(this, ObjectType.Masher, InputAction.Select10),
-            new NewObjectContainer(this, ObjectType.Gear, null),
-            new NewObjectContainer(this, ObjectType.Ghost, null),
-            new NewObjectContainer(this, ObjectType.Heart, null),
-            new NewObjectContainer(this, ObjectType.Note, null)
-        ];
+
+        foreach (ObjectType objectType in Enum.GetValuesAsUnderlyingType<ObjectType>())
+        {
+            var gameObjectData = GameObjectUtils.GetGameObjectData(objectType);
+
+            if (gameObjectData is null)
+                continue;
+
+            if (gameObjectData.MovementType != MovementType.None || objectType == ObjectType.HoldBody)
+                continue;
+
+            possibleObjectTypes.Add(objectType);
+        }
+
+        updatePages();
+    }
+
+    public bool OnPressed(KeyBindingPressEvent<InputAction> e)
+    {
+        if (select1IsPreviousPage && e.Action is InputAction.Select1)
+        {
+            NavigateToPreviousPage();
+            return true;
+        }
+
+        if (select10IsNextPage && e.Action is InputAction.Select10)
+        {
+            NavigateToNextPage();
+            return true;
+        }
+
+        if (SelectedContainer is null || e.Action is not InputAction.Cancel and not InputAction.Escape)
+            return false;
+
+        SelectedContainer.Unselect();
+        return true;
+    }
+
+    internal void NavigateToNextPage()
+    {
+        currentPage++;
+        updatePages();
+    }
+
+    internal void NavigateToPreviousPage()
+    {
+        currentPage--;
+        updatePages();
+    }
+
+    private void updatePages()
+    {
+        SelectedContainer?.Unselect();
+
+        var itemsPerPage = 10;
+        select1IsPreviousPage = false;
+        select10IsNextPage = false;
+
+        if (currentPage > 0)
+        {
+            itemsPerPage--;
+            select1IsPreviousPage = true;
+        }
+
+        var itemsInPreviousPages = currentPage > 0 ? 9 + (currentPage - 1) * 8 : 0;
+        var remainingItems = possibleObjectTypes.Count - itemsInPreviousPages;
+
+        if (remainingItems > 9)
+        {
+            itemsPerPage--;
+            select10IsNextPage = true;
+        }
+
+        var itemsInCurrentPage = possibleObjectTypes.Slice(
+            itemsInPreviousPages,
+            Math.Min(itemsPerPage, possibleObjectTypes.Count - itemsInPreviousPages)
+        );
+
+        Clear();
+
+        var actionIndex = 0;
+
+        if (select1IsPreviousPage)
+        {
+            Add(new PreviousPageSwitcher(this));
+            actionIndex++;
+        }
+
+        foreach (var objectType in itemsInCurrentPage)
+        {
+            Add(new NewObjectContainer(this, objectType, actions[actionIndex++]));
+        }
+
+        if (select10IsNextPage)
+            Add(new NextPageSwitcher(this));
+    }
+
+    public void OnReleased(KeyBindingReleaseEvent<InputAction> e)
+    {
     }
 }
 
-public partial class NewObjectContainer : Container, IKeyBindingHandler<InputAction>
+internal abstract partial class BaseContainer : Container
 {
-    private readonly NewObjectBar newObjectBar;
-    private readonly ObjectType objectType;
-    private readonly InputAction? inputAction;
-    private readonly Box backgroundBox;
-    private readonly Sprite icon;
-    private bool selected;
+    protected readonly Box BackgroundBox;
+    protected bool Selected;
 
-    public NewObjectContainer(NewObjectBar newObjectBar, ObjectType objectType, InputAction? inputAction)
+    protected BaseContainer()
     {
-        this.newObjectBar = newObjectBar;
-        this.objectType = objectType;
-        this.inputAction = inputAction;
-
         Width = 100;
         Height = 100;
         Children =
         [
-            backgroundBox = new Box
+            BackgroundBox = new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = MdeColors.Background4
             },
-            icon = new Sprite
-            {
-                RelativeSizeAxes = Axes.Both,
-                Size = new Vector2(0.75f),
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre
-            }
+            GetContent()
         ];
     }
 
+    protected abstract Drawable GetContent();
+
+    protected override bool OnHover(HoverEvent e)
+    {
+        if (!IsPresent)
+            return false;
+
+        if (Selected)
+            return true;
+
+        BackgroundBox.TransformTo(nameof(Colour), (ColourInfo)MdeColors.Background2, 150);
+        return true;
+    }
+
+    protected override void OnHoverLost(HoverLostEvent e)
+    {
+        if (Selected || !IsPresent)
+            return;
+
+        BackgroundBox.TransformTo(nameof(Colour), (ColourInfo)MdeColors.Background4, 150);
+    }
+
+    protected override bool OnClick(ClickEvent e)
+    {
+        if (!IsPresent)
+            return false;
+
+        if (Selected)
+            Unselect();
+        else
+            Select();
+
+        return true;
+    }
+
+    protected virtual void Select()
+    {
+    }
+
+    internal virtual void Unselect()
+    {
+    }
+}
+
+internal sealed partial class PreviousPageSwitcher(NewObjectBar newObjectBar) : BaseContainer
+{
+    protected override Drawable GetContent() => new SpriteIcon
+    {
+        RelativeSizeAxes = Axes.Both,
+        Size = new Vector2(0.35f),
+        Origin = Anchor.Centre,
+        Anchor = Anchor.Centre,
+        Icon = FontAwesome.Solid.ChevronLeft
+    };
+
+    protected override bool OnClick(ClickEvent e)
+    {
+        if (!IsPresent)
+            return false;
+
+        newObjectBar.NavigateToPreviousPage();
+        return true;
+    }
+}
+
+internal sealed partial class NextPageSwitcher(NewObjectBar newObjectBar) : BaseContainer
+{
+    protected override Drawable GetContent() => new SpriteIcon
+    {
+        RelativeSizeAxes = Axes.Both,
+        Size = new Vector2(0.35f),
+        Origin = Anchor.Centre,
+        Anchor = Anchor.Centre,
+        Icon = FontAwesome.Solid.ChevronRight
+    };
+
+    protected override bool OnClick(ClickEvent e)
+    {
+        if (!IsPresent)
+            return false;
+
+        newObjectBar.NavigateToNextPage();
+        return true;
+    }
+}
+
+internal partial class NewObjectContainer(NewObjectBar newObjectBar, ObjectType objectType, InputAction? inputAction) : BaseContainer, IKeyBindingHandler<InputAction>
+{
+    [Resolved]
+    private EditorDataHolder editorDataHolder { get; set; } = null!;
+
+    private Sprite icon = null!;
+
     [BackgroundDependencyLoader]
-    private void load(LargeTextureStore textureStore, EditorDataHolder editorDataHolder)
+    private void load(LargeTextureStore textureStore)
     {
         var objectData = GameObjectUtils.GetGameObjectData(objectType);
         var laneType = objectData?.ValidLaneTypes.LastOrDefault(LaneType.Ground) ?? LaneType.Ground;
@@ -108,45 +283,21 @@ public partial class NewObjectContainer : Container, IKeyBindingHandler<InputAct
         }, true);
     }
 
-    protected override bool OnHover(HoverEvent e)
-    {
-        if (selected)
-            return true;
-
-        backgroundBox.TransformTo(nameof(Colour), (ColourInfo)MdeColors.Background2, 150);
-        return true;
-    }
-
-    protected override void OnHoverLost(HoverLostEvent e)
-    {
-        if (selected)
-            return;
-
-        backgroundBox.TransformTo(nameof(Colour), (ColourInfo)MdeColors.Background4, 150);
-    }
-
-    protected override bool OnClick(ClickEvent e)
-    {
-        if (selected)
-            unselect();
-        else
-            select();
-
-        return true;
-    }
-
     public bool OnPressed(KeyBindingPressEvent<InputAction> e)
     {
+        if (!IsPresent)
+            return false;
+
         if (e.Action != inputAction)
             return false;
 
         if (e.Repeat)
             return true;
 
-        if (selected)
-            unselect();
+        if (Selected)
+            Unselect();
         else
-            select();
+            Select();
 
         return true;
     }
@@ -155,26 +306,38 @@ public partial class NewObjectContainer : Container, IKeyBindingHandler<InputAct
     {
     }
 
-    private void select()
+    protected override void Select()
     {
-        if (selected)
+        if (Selected)
             return;
 
-        newObjectBar.SelectedContainer?.unselect();
+        newObjectBar.SelectedContainer?.Unselect();
         newObjectBar.SelectedContainer = this;
 
-        backgroundBox.TransformTo(nameof(Colour), (ColourInfo)MdeColors.Background1, 150);
-        selected = true;
+        editorDataHolder.PlacementObjectType = objectType;
+        editorDataHolder.IsInPlacementMode.Value = true;
+
+        BackgroundBox.TransformTo(nameof(Colour), (ColourInfo)MdeColors.Background1, 150);
+        Selected = true;
     }
 
-    private void unselect()
+    internal override void Unselect()
     {
-        if (!selected)
+        if (!Selected)
             return;
 
         newObjectBar.SelectedContainer = null;
-        backgroundBox.TransformTo(nameof(Colour), (ColourInfo)(IsHovered ? MdeColors.Background2 : MdeColors.Background4), 150);
+        BackgroundBox.TransformTo(nameof(Colour), (ColourInfo)(IsHovered ? MdeColors.Background2 : MdeColors.Background4), 150);
 
-        selected = false;
+        editorDataHolder.IsInPlacementMode.Value = false;
+        Selected = false;
     }
+
+    protected override Drawable GetContent() => icon = new Sprite
+    {
+        RelativeSizeAxes = Axes.Both,
+        Size = new Vector2(0.75f),
+        Origin = Anchor.Centre,
+        Anchor = Anchor.Centre
+    };
 }

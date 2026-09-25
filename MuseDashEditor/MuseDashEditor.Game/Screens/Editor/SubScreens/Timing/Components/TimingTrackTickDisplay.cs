@@ -178,8 +178,11 @@ public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPoint
         var colors = new Dictionary<int, ColourInfo>
         {
             { 2, Color4.Red },
+            { 3, Color4.Red },
             { 4, Color4.Blue },
+            { 6, Color4.Blue },
             { 8, Color4.Green },
+            { 9, Color4.Green },
             { 16, Color4.Yellow },
             { 32, Color4.Purple },
             { 64, Color4.Orange },

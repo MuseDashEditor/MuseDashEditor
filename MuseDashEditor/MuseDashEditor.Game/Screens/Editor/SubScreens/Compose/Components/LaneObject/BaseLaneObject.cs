@@ -19,6 +19,8 @@ using MuseDashEditor.Game.Data.Object;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Editor.Clock;
+using MuseDashEditor.Game.History;
+using MuseDashEditor.Game.History.Actions;
 using MuseDashEditor.Game.Screens.Editor.Components;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
@@ -54,6 +56,9 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : R
 
     [Resolved]
     private MdeCursorContainer cursorContainer { get; set; } = null!;
+
+    [Resolved]
+    private HistoryManager historyManager { get; set; } = null!;
 
     public double Offset { get; set; }
 
@@ -405,12 +410,16 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : R
             return;
         }
 
+        historyManager.StartCompound();
+
         stopMoveObject();
 
         foreach (var selectedObject in selectionHandler.SelectedObjects)
         {
             selectedObject.LaneObject?.stopMoveObject();
         }
+
+        historyManager.EndCompound();
     }
 
     private void stopResizingObject()
@@ -427,7 +436,12 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : R
         if (longObject.IsPresent)
             longObject.InvalidateSsdq();
 
-        IsDragging = false;
+        historyManager.AddAction(new ResizeObject(
+            gameObject,
+            resizeStartDuration,
+            gameObject.HoldDuration,
+            resizingLeft
+        ));
     }
 
     private void stopMoveObject()
@@ -443,6 +457,14 @@ public partial class BaseLaneObject(ZoomableScrollContainer scrollContainer) : R
 
         if (longObject.IsPresent)
             longObject.InvalidateSsdq();
+
+        historyManager.AddAction(new MoveObject(
+            gameObject,
+            dragStartLane,
+            laneType,
+            dragStartOffset,
+            gameObject.Offset.Value
+        ));
     }
 
     protected override void OnDrag(DragEvent e)

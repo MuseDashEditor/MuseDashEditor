@@ -12,14 +12,16 @@
 
 using MuseDashEditor.Game.Component.Common.Menu;
 using MuseDashEditor.Game.Component.Common.Menu.Item;
+using MuseDashEditor.Game.History;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 
 namespace MuseDashEditor.Game.Screens.Editor.Components;
 
-public partial class EditorMenu : MdeMenu
+public partial class EditorMenu() : MdeMenu(Direction.Horizontal, true)
 {
-    public EditorMenu()
-        : base(Direction.Horizontal, true)
+    [BackgroundDependencyLoader]
+    private void load(HistoryManager historyManager)
     {
         Items =
         [
@@ -65,6 +67,9 @@ public partial class EditorMenu : MdeMenu
             {
                 Items =
                 [
+                    new ActionMenuItem("Undo", historyManager.Undo),
+                    new ActionMenuItem("Redo", historyManager.Redo),
+                    new SeparatorMenuItem(),
                     new ActionMenuItem("Copy", () => { }),
                     new ActionMenuItem("Cut", () => { }),
                     new ActionMenuItem("Paste", () => { }),

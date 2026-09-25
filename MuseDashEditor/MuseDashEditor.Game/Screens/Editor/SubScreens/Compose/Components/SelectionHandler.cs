@@ -12,9 +12,8 @@
 
 using System;
 using System.Collections.Generic;
-using MuseDashEditor.Game.Data.Object;
+using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Object.GameObject;
-using MuseDashEditor.Game.Editor.Clock;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
@@ -31,10 +30,12 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
     private SelectionContainer selectionContainer { get; set; } = null!;
 
     [Resolved]
-    private EditorClock editorClock { get; set; } = null!;
+    private EditorDataHolder editorDataHolder { get; set; } = null!;
 
-    private readonly HashSet<BaseObject> selectedObjects = [];
-    private readonly HashSet<BaseObject> selectedBeforeDrag = [];
+    public int SelectionCount => SelectedObjects.Count;
+
+    public readonly HashSet<GameObject> SelectedObjects = [];
+    private readonly HashSet<GameObject> selectedBeforeDrag = [];
 
     private Vector2 startPosition;
     private Vector2 stopPosition;
@@ -66,12 +67,12 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
 
     private void unselectAll()
     {
-        foreach (var selectedObject in selectedObjects)
+        foreach (var selectedObject in SelectedObjects)
         {
             selectedObject.Selected.Value = false;
         }
 
-        selectedObjects.Clear();
+        SelectedObjects.Clear();
     }
 
     protected override bool OnClick(ClickEvent e)
@@ -92,7 +93,7 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
         if (!isSelectionActive)
             return;
 
-        var hoveredObjects = new HashSet<BaseObject>();
+        var hoveredObjects = new HashSet<GameObject>();
         var selectionQuad = selectionBox.ScreenSpaceDrawQuad;
 
         foreach (var baseLaneObject in laneContentContainer.Children)
@@ -116,7 +117,7 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
         foreach (var selectedObject in hoveredObjects)
         {
             selectedObject.Selected.Value = true;
-            selectedObjects.Add(selectedObject);
+            SelectedObjects.Add(selectedObject);
         }
 
         selectionContainer.UpdateSelection();
@@ -157,6 +158,9 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
         if (base.OnDragStart(e))
             return false;
 
+        if (editorDataHolder.IsInPlacementMode.Value)
+            return false;
+
         foreach (var baseLaneObject in laneContentContainer.Children)
         {
             if (baseLaneObject.ScreenSpaceDrawQuad.Contains(e.ScreenSpaceMouseDownPosition))
@@ -177,7 +181,7 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
         }
         else
         {
-            foreach (var selectedObject in selectedObjects)
+            foreach (var selectedObject in SelectedObjects)
             {
                 selectedBeforeDrag.Add(selectedObject);
             }
@@ -226,13 +230,13 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
         foreach (var selectedObject in hoveredObjects)
         {
             selectedObject.Selected.Value = true;
-            selectedObjects.Add(selectedObject);
+            SelectedObjects.Add(selectedObject);
         }
 
         selectionContainer.UpdateSelection();
     }
 
-    public void Select(GameObject gameObject, bool addToSelection)
+    public void Select(GameObject gameObject, bool addToSelection = false)
     {
         var wasSelected = gameObject.Selected.Value;
 
@@ -243,12 +247,12 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
 
         if (wasSelected)
         {
-            selectedObjects.Remove(gameObject);
+            SelectedObjects.Remove(gameObject);
             gameObject.Selected.Value = false;
         }
         else
         {
-            selectedObjects.Add(gameObject);
+            SelectedObjects.Add(gameObject);
             gameObject.Selected.Value = true;
         }
 
@@ -258,6 +262,6 @@ public partial class SelectionHandler(LaneContentContainer laneContentContainer)
     public void Unselect(GameObject selectedObject)
     {
         selectedObject.Selected.Value = false;
-        selectedObjects.Remove(selectedObject);
+        SelectedObjects.Remove(selectedObject);
     }
 }

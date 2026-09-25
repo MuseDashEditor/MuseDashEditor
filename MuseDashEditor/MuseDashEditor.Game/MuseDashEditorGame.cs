@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using MuseDashEditor.Game.Component.Notification;
 using MuseDashEditor.Game.Data.Holder;
+using MuseDashEditor.Game.History;
 using MuseDashEditor.Game.Project;
 using MuseDashEditor.Game.Screens;
 using MuseDashEditor.Game.Utils;
@@ -53,6 +54,7 @@ public partial class MuseDashEditorGame : MuseDashEditorGameBase
         Dependencies.Inject(DataHolder);
         Dependencies.Inject(ProjectManager);
         Dependencies.Inject(MdeSounds);
+        Dependencies.Inject(ImportManager.ImportManagerInstance);
 
         MdeSounds.Preload();
 

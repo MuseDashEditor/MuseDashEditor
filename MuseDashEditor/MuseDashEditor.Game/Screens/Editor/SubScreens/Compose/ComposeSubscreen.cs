@@ -13,6 +13,8 @@
 using System.Collections.Generic;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Object.GameObject;
+using MuseDashEditor.Game.History;
+using MuseDashEditor.Game.History.Actions;
 using MuseDashEditor.Game.Input;
 using MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components;
 using MuseDashEditor.Game.Screens.Editor.SubScreens.Timing.Components;
@@ -38,6 +40,9 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
 
     [Cached]
     private readonly SelectionContainer selectionContainer = new();
+
+    [Resolved]
+    private HistoryManager historyManager { get; set; } = null!;
 
     public ComposeSubscreen()
     {
@@ -121,9 +126,12 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
         switch (e.Action)
         {
             case InputAction.Delete:
+                historyManager.AddAction(new RemoveMultipleObjects(selectedObjects));
+
                 foreach (var selectedObject in selectedObjects)
                 {
-                    delete(selectedObject);
+                    selectionHandler.Unselect(selectedObject);
+                    editorDataHolder.RemoveObject(selectedObject);
                 }
 
                 laneContentContainer.Invalidate();
@@ -147,6 +155,7 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
             case InputAction.Paste:
             case InputAction.ZoomIn:
             case InputAction.ZoomOut:
+                // TODO
                 return true;
 
             default:
@@ -159,25 +168,5 @@ public partial class ComposeSubscreen : PlayableEditorSubscreen
     private void flip(GameObject selectedObject)
     {
         // TODO
-    }
-
-    private void delete(GameObject selectedObject, bool secondGemini = false)
-    {
-        editorDataHolder.CurrentMap.Value!.GameObjects.Remove(selectedObject);
-
-        if (selectedObject.LaneObject != null)
-        {
-            selectedObject.LaneObject.IsUsed = false;
-            selectedObject.LaneObject = null;
-        }
-
-        if (selectedObject.Selected.Value)
-            selectionHandler.Unselect(selectedObject);
-
-        if (!secondGemini && selectedObject.GeminiPairObject != null)
-            delete(selectedObject.GeminiPairObject, true);
-
-        if (selectedObject.HoldEndObject != null)
-            delete(selectedObject.HoldEndObject);
     }
 }

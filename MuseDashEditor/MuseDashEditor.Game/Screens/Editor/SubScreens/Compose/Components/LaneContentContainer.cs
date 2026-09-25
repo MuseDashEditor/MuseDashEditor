@@ -17,6 +17,8 @@ using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Editor.Clock;
+using MuseDashEditor.Game.History;
+using MuseDashEditor.Game.History.Actions;
 using MuseDashEditor.Game.Screens.Editor.SubScreens.Compose.Components.LaneObject;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
@@ -36,6 +38,9 @@ public partial class LaneContentContainer() : AutoRefreshContainer<BaseLaneObjec
 
     [Resolved]
     private SelectionContainer selectionContainer { get; set; } = null!;
+
+    [Resolved]
+    private HistoryManager historyManager { get; set; } = null!;
 
     private double lastPlayedTickOffset;
     private BaseLaneObject? placementObject;

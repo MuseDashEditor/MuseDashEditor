@@ -10,6 +10,8 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System;
+using System.Threading;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Utils;
@@ -18,6 +20,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Logging;
 using osuTK;
 
 namespace MuseDashEditor.Game.Screens.Editor.Components;
@@ -26,6 +29,8 @@ public partial class EditorBackground : Sprite
 {
     [Resolved]
     protected LargeTextureStore Textures { get; private set; } = null!;
+
+    private CancellationTokenSource currentSceneChangeTokenSource = new();
 
     [BackgroundDependencyLoader]
     private void load(EditorDataHolder dataHolder)
@@ -42,18 +47,58 @@ public partial class EditorBackground : Sprite
 
     private void OnSceneChange(ValueChangedEvent<SceneType> valueChangedEvent)
     {
-        var newScene = valueChangedEvent.NewValue;
-        var sceneData = SceneUtils.GetSceneData(newScene);
+        CancellationTokenSource oldSource;
 
-        if (sceneData is null)
+        lock (currentSceneChangeTokenSource)
         {
-            Texture = Textures.Get("default_background");
+            currentSceneChangeTokenSource.Cancel();
+            oldSource = currentSceneChangeTokenSource;
+            currentSceneChangeTokenSource = new CancellationTokenSource();
+
+            var newScene = valueChangedEvent.NewValue;
+            var sceneData = SceneUtils.GetSceneData(newScene);
+
+            var cancellationToken = currentSceneChangeTokenSource.Token;
+
+            if (sceneData is null)
+            {
+                Schedule(async void () =>
+                {
+                    try
+                    {
+                        var texture = await Textures.GetAsync("default_background", cancellationToken);
+                        if (cancellationToken.IsCancellationRequested)
+                            return;
+
+                        Texture = texture;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, "Failed to load default scene background");
+                    }
+                });
+            }
+            else
+            {
+                Schedule(async void () =>
+                {
+                    try
+                    {
+                        var textureName = $"Scenes/scene_{sceneData.ResourcePath}/background";
+                        var texture = await Textures.GetAsync(textureName, cancellationToken);
+                        if (cancellationToken.IsCancellationRequested)
+                            return;
+
+                        Texture = texture;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, "Failed to load scene background");
+                    }
+                });
+            }
         }
-        else
-        {
-            var textureName = $"Scenes/scene_{sceneData.ResourcePath}/background";
-            var sceneTexture = Textures.Get(textureName);
-            Texture = sceneTexture ?? Textures.Get("default_background");
-        }
+
+        oldSource.Dispose();
     }
 }

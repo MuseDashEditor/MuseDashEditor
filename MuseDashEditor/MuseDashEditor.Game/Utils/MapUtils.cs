@@ -16,6 +16,7 @@ using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Object.DesignObject;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
+using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Utils;
 
@@ -62,6 +63,7 @@ public static class MapUtils
                 }
 
                 gameObject.HoldEndObject = nextObject;
+                gameObject.HoldDuration = nextObject.Offset.Value - gameObject.Offset.Value;
             }
 
             if (objectType == ObjectType.Gemini)
@@ -87,7 +89,7 @@ public static class MapUtils
         }
     }
 
-    private static GameObject? getNextObjectOfType(List<GameObject> gameObjects, ObjectType objectType, int startIndex,
+    private static GameObject? getNextObjectOfType(SortedList<GameObject> gameObjects, ObjectType objectType, int startIndex,
                                                    LaneType laneType, LaneModifierType laneModifier)
     {
         for (var index = startIndex + 1; index < gameObjects.Count; index++)
@@ -105,7 +107,7 @@ public static class MapUtils
         return null;
     }
 
-    private static GameObject? findOtherGemini(List<GameObject> gameObjects, GameObject gameObject)
+    private static GameObject? findOtherGemini(SortedList<GameObject> gameObjects, GameObject gameObject)
     {
         var offsetValue = gameObject.Offset.Value;
         var isAir = gameObject.LaneType is LaneType.Air or LaneType.Air2;
@@ -128,7 +130,7 @@ public static class MapUtils
         return null;
     }
 
-    public static GameObject? GetObjectAt(List<GameObject> gameObjects, double offset, LaneType lane)
+    public static GameObject? GetObjectAt(SortedList<GameObject> gameObjects, double offset, LaneType lane)
     {
         return gameObjects.Where(gameObject => gameObject.LaneType == lane)
                           .FirstOrDefault(gameObject => Precision.AlmostEquals(offset, gameObject.Offset.Value, 1E-2));

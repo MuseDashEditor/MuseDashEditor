@@ -12,6 +12,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using MuseDashEditor.Game.Data.Collection;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Object.MappingObject;
 using MuseDashEditor.Game.Data.Type;
@@ -26,8 +27,8 @@ public record Map(
 {
     public readonly MapMetadata Metadata = new();
 
-    public readonly List<GameObject> GameObjects = [];
-    public readonly List<TimingPointObject> TimingPoints = [];
+    public readonly BaseObjectList<GameObject> GameObjects = [];
+    public readonly BaseObjectList<TimingPointObject> TimingPoints = [];
     public readonly SortedDictionary<double, SceneType> SceneAtTime = new();
 
     public readonly SortedDictionary<int, Dictionary<(LaneModifierType, LaneType), int[]>> RawMapData = new();

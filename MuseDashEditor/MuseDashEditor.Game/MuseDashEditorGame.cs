@@ -42,6 +42,9 @@ public partial class MuseDashEditorGame : MuseDashEditorGameBase
     [Cached]
     protected readonly NotificationContainer NotificationContainer = new();
 
+    [Cached]
+    protected readonly HistoryManager HistoryManager = new();
+
     private readonly HighPerformanceSessionManager highPerformanceSessionManager = new();
 
     [BackgroundDependencyLoader]
@@ -53,8 +56,8 @@ public partial class MuseDashEditorGame : MuseDashEditorGameBase
 
         MdeSounds.Preload();
 
-        Content.Add(ScreenStack);
         Content.AddRange([
+            HistoryManager,
             ScreenStack,
             NotificationContainer
         ]);

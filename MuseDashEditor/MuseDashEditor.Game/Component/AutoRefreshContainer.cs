@@ -35,14 +35,8 @@ public abstract partial class AutoRefreshContainer<T>(float offset) : Container<
     [BackgroundDependencyLoader]
     private void load(EditorClock editorClock)
     {
-        editorClock.OnSeek += () =>
-        {
-            ContentCache.Invalidate();
-        };
-        ScrollContainer.OnDrawWidthChanged += () =>
-        {
-            ContentCache.Invalidate();
-        };
+        editorClock.OnSeek += Invalidate;
+        ScrollContainer.OnDrawWidthChanged += Invalidate;
     }
 
     public void Invalidate()
@@ -88,15 +82,19 @@ public abstract partial class AutoRefreshContainer<T>(float offset) : Container<
         while (CurrentTickIndex < Math.Min(usedTicks + 16, Count))
         {
             var refreshableObject = Children[CurrentTickIndex++];
-            if (refreshableObject is RefreshableObject { IsUsed: false })
-                refreshableObject.Alpha = 0;
+            if (refreshableObject is RefreshableObject { IsUsed: true })
+                continue;
+
+            refreshableObject.Alpha = 0;
         }
 
         while (CurrentTickIndex < Count)
         {
             var refreshableObject = Children[CurrentTickIndex++];
-            if (refreshableObject is RefreshableObject { IsUsed: false })
-                refreshableObject.Expire();
+            if (refreshableObject is RefreshableObject { IsUsed: true })
+                continue;
+
+            refreshableObject.Expire();
         }
 
         ContentCache.Validate();

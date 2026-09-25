@@ -22,13 +22,12 @@ using MuseDashEditor.Game.Data.Object.MappingObject;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 
 namespace MuseDashEditor.Game.Conversion.MdeFormat;
 
-public static class MdeChartLoader
+public class MdeMapParser : MapParser
 {
-    public static async Task<Map?> Parse(FileInfo file)
+    public override async Task<Map?> Parse(FileInfo file)
     {
         Logger.Log($"Parsing map from file: {file.FullName}...");
 
@@ -98,40 +97,6 @@ public static class MdeChartLoader
                 (LaneType)Base36Converter.FromBase36([chartObject.ChannelType[1]]),
                 (LaneModifierType)Base36Converter.FromBase36([chartObject.ChannelType[0]])
             ));
-        }
-    }
-
-    public static async Task ConvertFromBms(Storage storage)
-    {
-        Logger.Log("Converting maps from BMS to MDEM...");
-
-        foreach (var filePath in storage.GetFiles(".", "*.bms"))
-        {
-            var oldFilePath = storage.GetFullPath(filePath);
-
-            Logger.Log($"Converting from {oldFilePath}...");
-
-            var fileInfo = new FileInfo(oldFilePath);
-            if (!fileInfo.Exists)
-                continue;
-
-            var mapName = Path.GetFileNameWithoutExtension(fileInfo.FullName);
-            var newFileName = $"{mapName}.mdem";
-
-            var newFile = new FileInfo(storage.GetFullPath(newFileName));
-
-            await BmsParser.Parse(fileInfo)
-                           .ContinueWith(task =>
-                           {
-                               if (!task.IsCompletedSuccessfully || task.Result is null)
-                                   return Task.CompletedTask;
-
-                               return Save(newFile, task.Result);
-                           });
-
-            storage.Delete(filePath);
-
-            Logger.Log($"Converted to {newFileName}!");
         }
     }
 }

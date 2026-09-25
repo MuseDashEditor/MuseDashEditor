@@ -17,7 +17,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using MuseDashEditor.Game.Conversion.MdeFormat;
+using MuseDashEditor.Game.Conversion.Converter;
 using MuseDashEditor.Game.Data.Project;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
@@ -52,7 +52,7 @@ public partial class ProjectManager : IDependencyInjectionCandidate
         return projectStorage;
     }
 
-    public async Task<Storage?> ImportChart(string pathValueFullName)
+    public async Task<Storage?> ImportChart(string pathValueFullName, bool convertToMde = false)
     {
         var inputFileInfo = new FileInfo(pathValueFullName);
         if (!inputFileInfo.Exists)
@@ -75,7 +75,8 @@ public partial class ProjectManager : IDependencyInjectionCandidate
         await using var sourceStream = inputFileInfo.OpenRead();
         ZipFile.ExtractToDirectory(sourceStream, storagePath);
 
-        await MdeChartLoader.ConvertFromBms(storage);
+        if (convertToMde)
+            await BmsToMdeConverter.ConvertFromBms(storage);
 
         return storage;
     }

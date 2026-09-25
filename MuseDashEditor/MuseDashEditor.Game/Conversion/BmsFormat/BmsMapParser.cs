@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using MuseDashEditor.Game.Conversion.Parser;
 using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Object.MappingObject;
@@ -22,11 +23,11 @@ using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Logging;
 
-namespace MuseDashEditor.Game.Conversion.Parser;
+namespace MuseDashEditor.Game.Conversion.BmsFormat;
 
-public static class BmsParser
+public class BmsMapParser : MapParser
 {
-    public static async Task<Map?> Parse(FileInfo file)
+    public override async Task<Map?> Parse(FileInfo file)
     {
         Logger.Log($"Parsing map from file: {file.FullName}...");
 
@@ -158,7 +159,6 @@ public static class BmsParser
             }
         }
 
-        map.GameObjects.Sort((g1, g2) => g1.Offset.Value.CompareTo(g2.Offset.Value));
         Logger.Log($"Parsed {map.GameObjects.Count} objects");
     }
 

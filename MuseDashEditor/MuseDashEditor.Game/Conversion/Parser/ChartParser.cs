@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using MuseDashEditor.Game.Conversion.MdeFormat;
 using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Type;
 using osu.Framework.Logging;
@@ -30,38 +29,26 @@ public static class ChartParser
 
         var maps = new Dictionary<DifficultyType, Map>();
 
-        var bmsFiles = directory.GetFiles("*.bms");
-
-        foreach (var file in bmsFiles)
+        foreach (var file in directory.GetFiles())
         {
             if (!int.TryParse(file.Name.AsSpan(3, 1), out var mapNumber))
-            {
-                Logger.Log($"Invalid map number in file name: {file.Name}", level: LogLevel.Important);
                 continue;
+
+            if (!Enum.IsDefined(typeof(DifficultyType), mapNumber))
+                continue;
+
+            var parser = MapParser.GetParser(file);
+            if (parser is null)
+                continue;
+
+            if (maps.ContainsKey((DifficultyType)mapNumber))
+            {
+                Logger.Log($"Multiple files found for difficulty {mapNumber}!", LoggingTarget.Runtime, LogLevel.Important);
             }
 
-            if (!Enum.IsDefined(typeof(DifficultyType), mapNumber)) continue;
-
-            var map = await BmsParser.Parse(file);
-            if (map == null) continue;
-
-            maps[(DifficultyType)mapNumber] = map;
-        }
-
-        var mdeMapFiles = directory.GetFiles("*.mdem");
-
-        foreach (var file in mdeMapFiles)
-        {
-            if (!int.TryParse(file.Name.AsSpan(3, 1), out var mapNumber))
-            {
-                Logger.Log($"Invalid map number in file name: {file.Name}", level: LogLevel.Important);
+            var map = await parser.Parse(file);
+            if (map == null)
                 continue;
-            }
-
-            if (!Enum.IsDefined(typeof(DifficultyType), mapNumber)) continue;
-
-            var map = await MdeChartLoader.Parse(file);
-            if (map == null) continue;
 
             maps[(DifficultyType)mapNumber] = map;
         }

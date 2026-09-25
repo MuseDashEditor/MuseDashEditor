@@ -63,7 +63,19 @@ public partial class Toolbar : Container
             },
 
             // Right part
-            new SubscreenSwitcher()
+            new FillFlowContainer
+            {
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                Direction = FillDirection.Horizontal,
+                RelativeSizeAxes = Axes.Y,
+                AutoSizeAxes = Axes.X,
+                Children =
+                [
+                    // new
+                    new SubscreenSwitcher()
+                ]
+            }
         ];
     }
 }

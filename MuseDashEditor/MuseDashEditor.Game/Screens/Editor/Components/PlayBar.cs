@@ -14,12 +14,10 @@ using System;
 using MuseDashEditor.Game.Editor.Clock;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osuTK;
 
 namespace MuseDashEditor.Game.Screens.Editor.Components;
@@ -31,7 +29,6 @@ public partial class PlayBar : CompositeDrawable
 
     private SpriteText percentText = null!;
     private SpriteText timerText = null!;
-    private BasicSliderBar<double> slider = null!;
 
     [BackgroundDependencyLoader]
     private void load()
@@ -83,24 +80,7 @@ public partial class PlayBar : CompositeDrawable
                                 }
                             ]
                         },
-                        slider = new BasicSliderBar<double>
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Size = new Vector2(1320, 20),
-
-                            BackgroundColour = MdeColors.Dark4,
-                            SelectionColour = MdeColors.Dark2,
-                            FocusColour = MdeColors.Dark1,
-
-                            Current = new BindableDouble
-                            {
-                                MinValue = 0,
-                                MaxValue = 1,
-                                Value = 0,
-                                Precision = 1
-                            }
-                        },
+                        new PlayBarSlider(),
                         new Box()
                     }
                 },
@@ -114,8 +94,6 @@ public partial class PlayBar : CompositeDrawable
             }
         ];
 
-        slider.Current.BindTo(EditorClock.CurrentTimeBindable);
-
         EditorClock.OnTimeChanged += onClockTimeChanged;
         onClockTimeChanged(0);
     }
@@ -124,9 +102,9 @@ public partial class PlayBar : CompositeDrawable
     {
         double minutes = Math.Floor(time / 60000);
         double seconds = Math.Floor(time / 1000) % 60;
-        double miliseconds = Math.Floor(time % 1000);
+        double milliseconds = Math.Floor(time % 1000);
 
-        var timerString = $"{minutes:00}:{seconds:00}.{miliseconds:000}";
+        var timerString = $"{minutes:00}:{seconds:00}.{milliseconds:000}";
         timerText.Text = timerString;
 
         var editorClockTrackLength = EditorClock.TrackLength;

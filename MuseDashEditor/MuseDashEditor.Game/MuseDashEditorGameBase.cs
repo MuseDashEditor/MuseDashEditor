@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using MuseDashEditor.Game.Component.Cursor;
 using MuseDashEditor.Game.Config;
 using MuseDashEditor.Game.Input;
 using MuseDashEditor.Resources;
@@ -47,6 +48,11 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
 
     public const string MDE_PROTOCOL = "mde://";
 
+    private readonly CursorDisplayContainer cursorDisplayContainer = new()
+    {
+        RelativeSizeAxes = Axes.Both
+    };
+
     private MdeConfigManager localConfig = null!;
     private DependencyContainer dependencies = null!;
 
@@ -68,6 +74,7 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
 
         if (host.Window != null)
         {
+            host.Window.CursorState |= CursorState.Hidden;
             host.Window.DragDrop += onWindowDragDrop;
             host.Window.WindowState = WindowState.Maximised;
         }
@@ -76,26 +83,6 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
     [BackgroundDependencyLoader]
     private void load(IRenderer renderer, GameHost gameHost)
     {
-        base.Content.Add(new DrawSizePreservingFillContainer
-        {
-            TargetDrawSize = new Vector2(1920, 1080),
-            Strategy = DrawSizePreservationStrategy.Minimum,
-            Children =
-            [
-                new MdeKeyBindingContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children =
-                    [
-                        content = new TooltipContainer
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        }
-                    ]
-                }
-            ]
-        });
-
         Resources.AddStore(new DllResourceStore(typeof(MuseDashEditorResources).Assembly));
 
         AddFont(Resources, @"Fonts/ArialUnicodeMS/ArialUnicodeMS");
@@ -119,8 +106,29 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
         ));
 
         dependencies.CacheAs(localConfig);
+        dependencies.CacheAs(cursorDisplayContainer.CursorContainer);
 
         disableInputHandlers();
+
+        base.Content.Add(new DrawSizePreservingFillContainer
+        {
+            TargetDrawSize = new Vector2(1920, 1080),
+            Strategy = DrawSizePreservationStrategy.Minimum,
+            Children =
+            [
+                new MdeKeyBindingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children =
+                    [
+                        cursorDisplayContainer.WithChild(content = new TooltipContainer(cursorDisplayContainer.CursorContainer)
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        })
+                    ]
+                }
+            ]
+        });
     }
 
     private void disableInputHandlers()
@@ -149,7 +157,7 @@ public partial class MuseDashEditorGameBase : osu.Framework.Game
             { FrameworkSetting.WindowedSize, new Size(1920, 1080) },
             { FrameworkSetting.WindowedPositionX, 0.5 },
             { FrameworkSetting.WindowedPositionY, 0.5 },
-            { FrameworkSetting.FrameSync, FrameSync.Limit8x },
+            { FrameworkSetting.FrameSync, FrameSync.Limit4x },
             { FrameworkSetting.ExecutionMode, ExecutionMode.MultiThreaded },
             { FrameworkSetting.ShowUnicode, true },
             { FrameworkSetting.AudioUseExperimentalWasapi, true },

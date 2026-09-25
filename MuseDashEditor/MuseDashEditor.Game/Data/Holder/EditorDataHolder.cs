@@ -31,12 +31,18 @@ public partial class EditorDataHolder : IDependencyInjectionCandidate
     [Resolved]
     protected AudioManager AudioManager { get; private set; } = null!;
 
+    public readonly Bindable<EditorState> EditorState = new();
+    public readonly BindableBool HasUnsavedChanges = new();
+
     public readonly Bindable<Chart.Chart?> CurrentChart = new();
     public readonly Bindable<Map?> CurrentMap = new();
     public readonly Bindable<Track> CurrentTrack = new();
     public readonly Bindable<Func<Stream>> CurrentTrackStreamGetter = new();
     public readonly Bindable<DifficultyType> SelectedDifficulty = new();
+
     public readonly Bindable<EditorSubscreenType> SelectedSubscreen = new();
+    public readonly BindableInt BeatDivisor = new(2);
+
     public readonly Bindable<SceneType> CurrentScene = new();
 
     public readonly BindableBool IsInPlacementMode = new();

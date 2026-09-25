@@ -236,23 +236,17 @@ public partial class ZoomableScrollContainer : ZoomableScrollContainer<Drawable>
 
     public uint GetCurrentSubBeatDisplayedCount()
     {
-        var subBeatCount = (uint)Math.Floor(currentZoom / 20);
+        var zoom = (uint)Math.Floor(currentZoom / 40);
 
-        // Bit hack (https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2)
-        subBeatCount--;
-        subBeatCount |= subBeatCount >> 1;
-        subBeatCount |= subBeatCount >> 2;
-        subBeatCount |= subBeatCount >> 4;
-        subBeatCount |= subBeatCount >> 8;
-        subBeatCount |= subBeatCount >> 16;
-        subBeatCount++;
+        var b = editorDataHolder.BeatDivisor.Value;
+        var exp = MathF.Floor(MathF.Log(zoom, b)) + 1;
+        var pow = MathF.Pow(b, exp);
+        var res = (uint)MathF.Round(pow);
 
-        subBeatCount /= 2;
+        if (res <= 0)
+            res = 1;
 
-        if (subBeatCount <= 0)
-            subBeatCount = 1;
-
-        return subBeatCount;
+        return res;
     }
 
     public void SnapToNearestPreviousSubbeat()

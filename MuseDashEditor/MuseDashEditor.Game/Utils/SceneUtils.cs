@@ -15,6 +15,7 @@ using System.Reflection;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Scene;
 using MuseDashEditor.Game.Data.Type;
+using osu.Framework.Utils;
 
 namespace MuseDashEditor.Game.Utils;
 
@@ -38,7 +39,7 @@ public static class SceneUtils
 
     public static SceneType GetSceneAtTime(this EditorDataHolder dataHolder, double time)
     {
-        var sceneType = dataHolder.CurrentMap.Value!.SceneAtTime.LastOrDefault(pair => pair.Key < time).Value;
+        var sceneType = dataHolder.CurrentMap.Value!.SceneAtTime.LastOrDefault(pair => Precision.AlmostEquals(time, pair.Key) || Precision.DefinitelyBigger(time, pair.Key)).Value;
         return sceneType == SceneType.Unknown ? dataHolder.CurrentMap.Value.Metadata.InitialScene.Value : sceneType;
     }
 }

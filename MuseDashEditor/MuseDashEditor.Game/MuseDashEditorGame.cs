@@ -13,6 +13,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using MuseDashEditor.Game.Component.Notification;
+using MuseDashEditor.Game.Component.Toast;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.History;
 using MuseDashEditor.Game.Project;
@@ -44,6 +45,9 @@ public partial class MuseDashEditorGame : MuseDashEditorGameBase
     protected readonly NotificationContainer NotificationContainer = new();
 
     [Cached]
+    protected readonly ToastContainer ToastContainer = new();
+
+    [Cached]
     protected readonly HistoryManager HistoryManager = new();
 
     private readonly HighPerformanceSessionManager highPerformanceSessionManager = new();
@@ -61,6 +65,7 @@ public partial class MuseDashEditorGame : MuseDashEditorGameBase
         Content.AddRange([
             HistoryManager,
             ScreenStack,
+            ToastContainer,
             NotificationContainer
         ]);
     }

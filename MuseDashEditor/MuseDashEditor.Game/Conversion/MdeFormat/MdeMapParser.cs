@@ -13,6 +13,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using MuseDashEditor.Game.Conversion.Parser;
@@ -71,8 +72,8 @@ public class MdeMapParser : MapParser
             objects
         );
 
-        await using var fileStream = file.OpenWrite();
-        await JsonSerializer.SerializeAsync(fileStream, chartFormat);
+        var data = JsonSerializer.Serialize(chartFormat);
+        await File.WriteAllTextAsync(file.FullName, data, Encoding.UTF8);
     }
 
     private static async Task parseMapContent(FileInfo file, Map map)

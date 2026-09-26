@@ -18,6 +18,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using MuseDashEditor.Game.Conversion.Converter;
+using MuseDashEditor.Game.Conversion.MdeFormat;
+using MuseDashEditor.Game.Data.Chart;
+using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Project;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
@@ -79,5 +82,26 @@ public partial class ProjectManager : IDependencyInjectionCandidate
             await BmsToMdeConverter.ConvertFromBms(storage);
 
         return storage;
+    }
+
+    public static async Task Save(EditorDataHolder dataHolder)
+    {
+        var map = dataHolder.CurrentMap.Value;
+        if (map is null)
+            return;
+
+        switch (map.Type)
+        {
+            case MapType.Bms:
+                // TODO
+                break;
+
+            case MapType.Mdem:
+                await MdeMapParser.Save(map.MapFile, map);
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 }

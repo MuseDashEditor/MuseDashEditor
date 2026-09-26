@@ -10,16 +10,28 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using System;
 using MuseDashEditor.Game.Component.Common.Menu;
 using MuseDashEditor.Game.Component.Common.Menu.Item;
+using MuseDashEditor.Game.Component.Toast;
+using MuseDashEditor.Game.Component.Toast.Impl;
+using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.History;
+using MuseDashEditor.Game.Project;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 
 namespace MuseDashEditor.Game.Screens.Editor.Components;
 
 public partial class EditorMenu() : MdeMenu(Direction.Horizontal, true)
 {
+    [Resolved]
+    private EditorDataHolder editorDataHolder { get; set; } = null!;
+
+    [Resolved]
+    private ToastContainer toastContainer { get; set; } = null!;
+
     [BackgroundDependencyLoader]
     private void load(HistoryManager historyManager)
     {
@@ -40,7 +52,7 @@ public partial class EditorMenu() : MdeMenu(Direction.Horizontal, true)
                         ]
                     },
                     new SeparatorMenuItem(),
-                    new ActionMenuItem("Save", () => { }),
+                    new ActionMenuItem("Save", save),
                     new ActionMenuItem("Save copy as...", () => { }),
                     new ActionMenuItem("Reset to last save", () => { }, MenuItemType.Destructive),
                     new SeparatorMenuItem(),
@@ -80,5 +92,21 @@ public partial class EditorMenu() : MdeMenu(Direction.Horizontal, true)
                 ]
             }
         ];
+    }
+
+    private void save()
+    {
+        Schedule(async void () =>
+        {
+            try
+            {
+                await ProjectManager.Save(editorDataHolder);
+                toastContainer.Show(new SavedToast());
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Failed to save map!");
+            }
+        });
     }
 }

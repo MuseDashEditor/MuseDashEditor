@@ -14,14 +14,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using MuseDashEditor.Game.Conversion.Parser;
 using MuseDashEditor.Game.Data.Chart;
+using MuseDashEditor.Game.Data.Object;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Object.MappingObject;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Logging;
+using osu.Framework.Utils;
+using MathUtils = MuseDashEditor.Game.Utils.MathUtils;
 
 namespace MuseDashEditor.Game.Conversion.BmsFormat;
 
@@ -125,32 +129,52 @@ public class BmsMapParser : MapParser
                     var objectData = data[i];
                     if (objectData == 0) continue;
 
-                    var globalIndex = Math.Round(trackId * maxDataLength + i / (double)dataCount * maxDataLength);
+                    var globalIndex = (int)Math.Round(trackId * maxDataLength + i / (double)dataCount * maxDataLength);
 
                     // Find last known offset before current index
                     var lastKnownOffsetIndex = 0;
+                    var timingPointIndex = -1;
 
                     foreach (var index in knownOffsets.Keys)
                     {
                         if (index <= globalIndex)
+                        {
                             lastKnownOffsetIndex = index;
+                            timingPointIndex++;
+                        }
                         else
                             break;
                     }
 
                     var offsetAtIndex = knownOffsets[lastKnownOffsetIndex];
                     var bpmAtIndex = bpmChangesInTrack[lastKnownOffsetIndex];
-                    var elapsedDuration = 240_000 / bpmAtIndex / maxDataLength * (globalIndex - lastKnownOffsetIndex);
+                    var objectIndexInTimingPoint = globalIndex - lastKnownOffsetIndex;
+                    var elapsedDuration = 240_000 / bpmAtIndex / maxDataLength * objectIndexInTimingPoint;
                     var objectOffset = Math.Round(offsetAtIndex + elapsedDuration);
 
                     var objectType = (ObjectType)objectData;
+
+                    var indexGcd = MathUtils.Gcd(maxDataLength, objectIndexInTimingPoint);
+                    var divisor = maxDataLength / indexGcd;
+                    var dividedObjectIndex = objectIndexInTimingPoint / indexGcd;
 
                     var gameObject = new GameObject(
                         objectOffset,
                         objectType,
                         laneType,
                         laneModifier
-                    );
+                    )
+                    {
+                        ObjectTick =
+                        {
+                            Value = new ObjectTick(
+                                timingPointIndex,
+                                divisor,
+                                dividedObjectIndex
+                            )
+                        }
+                    };
+
                     map.GameObjects.Add(gameObject);
 
                     Logger.Log(
@@ -294,5 +318,123 @@ public class BmsMapParser : MapParser
             var bpmKey = Base36Converter.FromBase36(key.AsSpan(3, 2));
             map.Metadata.BpmChangeKeys[bpmKey] = bpmValue;
         }
+    }
+
+    public static async Task Save(FileInfo file, Map map)
+    {
+        var header = buildHeader(map);
+        var content = buildContent(map);
+
+        var data = header + "\n" + content;
+
+        await File.WriteAllTextAsync(file.FullName, data, Encoding.UTF8);
+    }
+
+    private static string buildHeader(Map map)
+    {
+        var header = $"""
+                      *---------------------- HEADER FIELD
+
+                      #PLAYER {(int)map.Metadata.InitialLaneSpeed.Value}
+                      #GENRE scene_{(int)map.Metadata.InitialScene.Value:D2}
+                      #TITLE
+                      #ARTIST
+                      #LEVELDESIGN
+                      #BPM {map.Metadata.InitialBpm.Value}
+                      #PLAYLEVEL 1
+                      #RANK 1
+                      #LNTYPE 1
+
+
+                      """;
+
+        if (map.TimingPoints.Count <= 1)
+            return header;
+
+        for (var i = 0; i < map.TimingPoints.Count; i++)
+        {
+            header += "#BPM" + Base36Converter.ToBase36(i) + " " + map.TimingPoints[i].NewBpm.Value + "\n";
+        }
+
+        return header;
+    }
+
+    private static string buildContent(Map map)
+    {
+        var content = """
+                      *---------------------- MAIN DATA FIELD
+                      #00001:10
+
+
+                      """;
+
+        var currentTimingPoint = map.TimingPoints[0];
+        TimingPointObject? nextTimingPoint = map.TimingPoints.Count > 1 ? map.TimingPoints[1] : null;
+
+        var trackLength = 60 / currentTimingPoint.NewBpm.Value * 4000;
+        var elapsedDuration = 0D;
+
+        for (int track = 0; track < 1000; track++)
+        {
+            var trackStartTime = elapsedDuration;
+            var trackEndTime = elapsedDuration + trackLength;
+
+            var offsetValue = nextTimingPoint?.Offset.Value;
+
+            if (offsetValue is not null)
+            {
+                if (Precision.AlmostEquals(elapsedDuration, offsetValue.Value, 1E-2D) || trackEndTime > offsetValue)
+                {
+                    return content;
+                    ;
+                    // TODO
+                }
+            }
+
+            var objectsInTrack = map.GameObjects.Where(o => o.Offset.Value >= trackStartTime && o.Offset.Value < trackEndTime).ToList();
+            Dictionary<(LaneModifierType, LaneType), List<GameObject>> objectsPerChannel = [];
+
+            foreach (var laneModifier in Enum.GetValues<LaneModifierType>())
+            {
+                foreach (var laneType in Enum.GetValues<LaneType>())
+                {
+                    foreach (var gameObject in objectsInTrack.Where(o => o.LaneModifier == laneModifier && o.LaneType == laneType))
+                    {
+                        objectsPerChannel.ComputeIfAbsent((laneModifier, laneType), () => []).Add(gameObject);
+                    }
+                }
+            }
+
+            foreach (var (key, objects) in objectsPerChannel)
+            {
+                var channel = $"{Base36Converter.ToBase36((int)key.Item1)[1]}" +
+                              $"{Base36Converter.ToBase36((int)key.Item2)[1]}";
+
+                var lcm = MathUtils.Lcm([.. objects.Select(o => o.ObjectTick.Value.BeatDivisor)]);
+                var tickLength = trackLength / lcm;
+                var elapsedTick = (int)(elapsedDuration / tickLength);
+
+                var trackData = new List<string>(lcm);
+
+                for (int i = 0; i < lcm; i++)
+                {
+                    trackData.Add("00");
+                }
+
+                foreach (var obj in objects)
+                {
+                    var objectTick = obj.ObjectTick.Value;
+                    var tick = (objectTick.BeatIndex * lcm) / objectTick.BeatDivisor - elapsedTick;
+                    trackData[tick] = Base36Converter.ToBase36((int)obj.ObjectType);
+                }
+
+                content += $"#{track:000}{channel}:{string.Join("", trackData)}\n";
+            }
+
+            content += "\n";
+            elapsedDuration += trackLength;
+        }
+
+        return content;
     }
 }

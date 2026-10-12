@@ -15,6 +15,7 @@ using MuseDashEditor.Game.Component;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Object.MappingObject;
 using MuseDashEditor.Game.Editor.Clock;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -190,20 +191,10 @@ public partial class TimingTrackTickDisplay() : AutoRefreshContainer<TimingPoint
             { 256, Color4.Magenta }
         };
 
-        var gcd = TimingTrackTickDisplay.gcd((uint)inBeatIndex, subBeatCount);
+        var gcd = MathUtils.Gcd((uint)inBeatIndex, subBeatCount);
         var denominator = (int)(subBeatCount / gcd);
 
         return colors.TryGetValue(denominator, out var color) ? color : Color4.Blue;
-    }
-
-    private static uint gcd(uint a, uint b)
-    {
-        while (b != 0)
-        {
-            (a, b) = (b, a % b);
-        }
-
-        return a;
     }
 
     private TimingPointTick getOrCreateTick()

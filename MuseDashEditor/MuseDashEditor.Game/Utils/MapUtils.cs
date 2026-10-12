@@ -86,6 +86,12 @@ public static class MapUtils
             {
                 map.SceneAtTime[gameObject.Offset.Value] = sceneSwitchObjectData.TargetScene;
             }
+
+            // Compute object tick
+            if (gameObject.ObjectTick.Value is null)
+            {
+                // TODO
+            }
         }
     }
 
@@ -121,7 +127,7 @@ public static class MapUtils
                 continue;
 
             var isOtherAir = other.LaneType is LaneType.Air or LaneType.Air2;
-            if (isAir && isOtherAir || !isAir && !isOtherAir)
+            if ((isAir && isOtherAir) || (!isAir && !isOtherAir))
                 continue;
 
             return other;

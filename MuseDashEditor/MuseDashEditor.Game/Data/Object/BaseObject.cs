@@ -19,6 +19,8 @@ public abstract class BaseObject(double offset)
 {
     public readonly Guid Id = Guid.NewGuid();
 
+    public Bindable<ObjectTick> ObjectTick = new();
+
     public BindableDouble Offset { get; } = new(offset);
     public BindableBool Selected { get; } = new();
 }

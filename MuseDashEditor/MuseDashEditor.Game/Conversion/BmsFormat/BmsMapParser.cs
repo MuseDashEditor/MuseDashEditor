@@ -150,7 +150,7 @@ public class BmsMapParser : MapParser
                     var bpmAtIndex = bpmChangesInTrack[lastKnownOffsetIndex];
                     var objectIndexInTimingPoint = globalIndex - lastKnownOffsetIndex;
                     var elapsedDuration = 240_000 / bpmAtIndex / maxDataLength * objectIndexInTimingPoint;
-                    var objectOffset = Math.Round(offsetAtIndex + elapsedDuration);
+                    var objectOffset = offsetAtIndex + elapsedDuration;
 
                     var objectType = (ObjectType)objectData;
 

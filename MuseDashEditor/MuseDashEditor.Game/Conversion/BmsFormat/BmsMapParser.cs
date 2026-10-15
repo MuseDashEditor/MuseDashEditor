@@ -39,13 +39,13 @@ public class BmsMapParser : MapParser
 
         var content = await File.ReadAllTextAsync(file.FullName);
 
-        parseMapContent(content, map);
-        processMapContent(map);
+        ParseMapContent(content, map);
+        ProcessMapContent(map);
 
         return map;
     }
 
-    private static void processMapContent(Map map)
+    public static void ProcessMapContent(Map map)
     {
         var bpmChangesInTrack = new SortedDictionary<int, double>();
 
@@ -186,7 +186,7 @@ public class BmsMapParser : MapParser
         Logger.Log($"Parsed {map.GameObjects.Count} objects");
     }
 
-    private static void parseMapContent(string content, Map map)
+    public static void ParseMapContent(string content, Map map)
     {
         var lines = content.Split(Environment.NewLine);
 

@@ -49,7 +49,7 @@ public static class MathUtils
     public static int Lcm(List<int> list)
     {
         if (list.Count == 0)
-            return 0;
+            return 1;
 
         var lcm = list[0];
 

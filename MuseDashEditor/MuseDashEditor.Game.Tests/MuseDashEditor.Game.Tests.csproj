@@ -30,7 +30,6 @@
     <Folder Include="Data\"/>
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Resources\WACCA_ULTRA_DREAM_MEGAMIX.mdm"/>
-    <EmbeddedResource Include="Resources\WACCA_ULTRA_DREAM_MEGAMIX.mdm"/>
+    <EmbeddedResource Include="Resources\**"/>
   </ItemGroup>
 </Project>

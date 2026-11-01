@@ -12,8 +12,9 @@
 
 namespace MuseDashEditor.Game.Data.Object;
 
+// Used for BMS conversions
 public record ObjectTick(
-    int TimingPointIndex,
-    int BeatDivisor,
-    int BeatIndex
+    int TrackIndex,
+    int TrackDivisor,
+    int TrackTickIndex
 );

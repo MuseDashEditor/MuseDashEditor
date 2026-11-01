@@ -24,7 +24,6 @@ using MuseDashEditor.Game.Data.Object.MappingObject;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Logging;
-using osu.Framework.Utils;
 using MathUtils = MuseDashEditor.Game.Utils.MathUtils;
 
 namespace MuseDashEditor.Game.Conversion.BmsFormat;
@@ -86,6 +85,17 @@ public class BmsMapParser : MapParser
         if (!bpmChangesInTrack.ContainsKey(0)) bpmChangesInTrack[0] = map.Metadata.InitialBpm.Value;
 
         var knownOffsets = new SortedDictionary<int, double> { { 0, 0 } };
+        map.TimingPoints.Add(new TimingPointObject(0, 0, map.Metadata.InitialBpm.Value)
+        {
+            ObjectTick =
+            {
+                Value = new ObjectTick(
+                    0,
+                    1,
+                    0
+                )
+            }
+        });
 
         // 2. Add bpm changes to the timing points in order
         foreach (var (index, bpmChangeValue) in bpmChangesInTrack)
@@ -102,20 +112,28 @@ public class BmsMapParser : MapParser
             var elapsedDuration = 240_000 / bpmAtLastKnownOffset / maxDataLength * elapsedGlobalIndexes;
             var newOffset = lastKnownOffsetValue + elapsedDuration;
 
+            var indexGcd = MathUtils.Gcd(maxDataLength, elapsedGlobalIndexes);
+            var divisor = maxDataLength / indexGcd;
+            var dividedObjectIndex = elapsedGlobalIndexes / indexGcd;
+
             Logger.Log($"Adding offset for index {index} with value {newOffset}");
             knownOffsets.Add(index, newOffset);
+
+            // 3. Convert back to timing points
+            map.TimingPoints.Add(new TimingPointObject(index, newOffset, bpmChangeValue)
+            {
+                ObjectTick =
+                {
+                    Value = new ObjectTick(
+                        index - 1, // TODO
+                        divisor,
+                        dividedObjectIndex
+                    )
+                }
+            });
         }
 
-        // 3. Convert back to timing points
-        foreach (var (index, offset) in knownOffsets)
-        {
-            if (index == 0) continue;
-
-            var bpm = bpmChangesInTrack[index];
-            map.TimingPoints.Add(new TimingPointObject(offset, bpm));
-        }
-
-        // 3. Parse everything else now that we can get the timing of any object
+        // 4. Parse everything else now that we can get the timing of any object
         foreach (var (trackId, trackDataDictionary) in map.RawMapData)
         {
             foreach (var ((laneModifier, laneType), data) in trackDataDictionary)
@@ -154,9 +172,9 @@ public class BmsMapParser : MapParser
 
                     var objectType = (ObjectType)objectData;
 
-                    var indexGcd = MathUtils.Gcd(maxDataLength, objectIndexInTimingPoint);
-                    var divisor = maxDataLength / indexGcd;
-                    var dividedObjectIndex = objectIndexInTimingPoint / indexGcd;
+                    var indexGcd = MathUtils.Gcd(dataCount, i);
+                    var divisor = dataCount / indexGcd;
+                    var dividedObjectIndex = i / indexGcd;
 
                     var gameObject = new GameObject(
                         objectOffset,
@@ -168,7 +186,7 @@ public class BmsMapParser : MapParser
                         ObjectTick =
                         {
                             Value = new ObjectTick(
-                                timingPointIndex,
+                                trackId,
                                 divisor,
                                 dividedObjectIndex
                             )
@@ -307,8 +325,6 @@ public class BmsMapParser : MapParser
                 }
 
                 map.Metadata.InitialBpm.Value = initialBpmValue;
-                map.TimingPoints.Add(new TimingPointObject(0, initialBpmValue));
-
                 return;
             }
         }
@@ -322,12 +338,15 @@ public class BmsMapParser : MapParser
 
     public static async Task Save(FileInfo file, Map map)
     {
+        await File.WriteAllTextAsync(file.FullName, GetSaveContent(map), Encoding.UTF8);
+    }
+
+    public static string GetSaveContent(Map map)
+    {
         var header = buildHeader(map);
         var content = buildContent(map);
 
-        var data = header + "\n" + content;
-
-        await File.WriteAllTextAsync(file.FullName, data, Encoding.UTF8);
+        return (header + content).Trim();
     }
 
     private static string buildHeader(Map map)
@@ -351,10 +370,12 @@ public class BmsMapParser : MapParser
         if (map.TimingPoints.Count <= 1)
             return header;
 
-        for (var i = 0; i < map.TimingPoints.Count; i++)
+        for (var i = 1; i < map.TimingPoints.Count; i++)
         {
-            header += "#BPM" + Base36Converter.ToBase36(i) + " " + map.TimingPoints[i].NewBpm.Value + "\n";
+            header += "#BPM" + Base36Converter.ToBase36(i) + " " + map.TimingPoints[i].NewBpm.Value + Environment.NewLine;
         }
+
+        header += Environment.NewLine;
 
         return header;
     }
@@ -368,31 +389,82 @@ public class BmsMapParser : MapParser
 
                       """;
 
-        var currentTimingPoint = map.TimingPoints[0];
-        TimingPointObject? nextTimingPoint = map.TimingPoints.Count > 1 ? map.TimingPoints[1] : null;
+        var timingPointsLcm = MathUtils.Lcm([.. map.TimingPoints.Select(o => o.ObjectTick.Value.TrackDivisor)]);
 
-        var trackLength = 60 / currentTimingPoint.NewBpm.Value * 4000;
+        var currentTimingPoint = map.TimingPoints[0];
+        var currentTimingPointIndex = 0;
+
         var elapsedDuration = 0D;
 
         for (int track = 0; track < 1000; track++)
         {
             var trackStartTime = elapsedDuration;
+            var trackLength = 60 / currentTimingPoint.NewBpm.Value * 4000;
             var trackEndTime = elapsedDuration + trackLength;
 
-            var offsetValue = nextTimingPoint?.Offset.Value;
+            List<(int, int)> tpInTrack = [];
 
-            if (offsetValue is not null)
+            if (map.TimingPoints.Count > currentTimingPointIndex)
             {
-                if (Precision.AlmostEquals(elapsedDuration, offsetValue.Value, 1E-2D) || trackEndTime > offsetValue)
+                for (int tpIndex = currentTimingPointIndex + 1; tpIndex < map.TimingPoints.Count; tpIndex++)
                 {
-                    return content;
-                    ;
-                    // TODO
+                    TimingPointObject nextTimingPoint = map.TimingPoints[tpIndex];
+                    var offsetValue = nextTimingPoint.Offset.Value;
+
+                    if (!(offsetValue >= trackStartTime) || !(offsetValue < trackEndTime))
+                        continue;
+
+                    var (_, divisor, beatIndex) = nextTimingPoint.ObjectTick.Value;
+                    var tickLength = trackLength / timingPointsLcm;
+                    var elapsedTickCount = (int)(elapsedDuration / tickLength);
+                    var objectTickInTrack = (beatIndex * timingPointsLcm) / divisor - elapsedTickCount;
+
+                    tpInTrack.Add((objectTickInTrack, nextTimingPoint.Index.Value));
+
+                    var totalTicksInTrack = trackLength / tickLength;
+                    var remainingTicks = totalTicksInTrack - objectTickInTrack;
+
+                    var newTrackLength = 60 / nextTimingPoint.NewBpm.Value * 4000;
+                    var newTickLength = newTrackLength / totalTicksInTrack;
+
+                    var newRemainingTime = remainingTicks * newTickLength;
+
+                    trackEndTime = offsetValue + newRemainingTime;
+
+                    currentTimingPoint = nextTimingPoint;
+                    currentTimingPointIndex = tpIndex;
                 }
             }
 
-            var objectsInTrack = map.GameObjects.Where(o => o.Offset.Value >= trackStartTime && o.Offset.Value < trackEndTime).ToList();
-            Dictionary<(LaneModifierType, LaneType), List<GameObject>> objectsPerChannel = [];
+            if (tpInTrack.Count > 0)
+            {
+                var gcd = MathUtils.Gcd(MathUtils.Gcd([.. tpInTrack.Select(o => o.Item1)]), timingPointsLcm);
+                var divisor = timingPointsLcm / gcd;
+
+                var trackData = new List<string>(divisor);
+
+                for (int i = 0; i < divisor; i++)
+                {
+                    trackData.Add("00");
+                }
+
+                foreach (var (objectTick, index) in tpInTrack)
+                {
+                    var tick = objectTick / gcd;
+                    trackData[tick] = $"{index:00}";
+                }
+
+                content += $"#{track:000}08:{string.Join("", trackData)}{Environment.NewLine}";
+            }
+
+            // While next point != null & next point's offset < endTime:
+            // - get the current elapsed time
+            // - get the remaining possible ticks
+            // - compute the new endTime with the new bpm
+
+            Dictionary<(LaneModifierType, LaneType), List<BaseObject>> objectsPerChannel = [];
+
+            var objectsInTrack = map.GameObjects.Where(o => o.ObjectTick.Value.TrackIndex == track).ToList();
 
             foreach (var laneModifier in Enum.GetValues<LaneModifierType>())
             {
@@ -405,18 +477,21 @@ public class BmsMapParser : MapParser
                 }
             }
 
+            var writtenOneLine = false;
+
             foreach (var (key, objects) in objectsPerChannel)
             {
                 var channel = $"{Base36Converter.ToBase36((int)key.Item1)[1]}" +
                               $"{Base36Converter.ToBase36((int)key.Item2)[1]}";
 
-                var lcm = MathUtils.Lcm([.. objects.Select(o => o.ObjectTick.Value.BeatDivisor)]);
-                var tickLength = trackLength / lcm;
-                var elapsedTick = (int)(elapsedDuration / tickLength);
+                var lcm = MathUtils.Lcm([.. objects.Select(o => o.ObjectTick.Value.TrackDivisor)]);
+                var gcd = MathUtils.Gcd(MathUtils.Gcd([.. objects.Select(o => o.ObjectTick.Value.TrackTickIndex)]), lcm);
 
-                var trackData = new List<string>(lcm);
+                var divisor = lcm / gcd;
 
-                for (int i = 0; i < lcm; i++)
+                var trackData = new List<string>(divisor);
+
+                for (int i = 0; i < divisor; i++)
                 {
                     trackData.Add("00");
                 }
@@ -424,15 +499,28 @@ public class BmsMapParser : MapParser
                 foreach (var obj in objects)
                 {
                     var objectTick = obj.ObjectTick.Value;
-                    var tick = (objectTick.BeatIndex * lcm) / objectTick.BeatDivisor - elapsedTick;
-                    trackData[tick] = Base36Converter.ToBase36((int)obj.ObjectType);
+                    var tick = objectTick.TrackTickIndex * (lcm / objectTick.TrackDivisor) / gcd;
+
+                    trackData[tick] = obj switch
+                    {
+                        GameObject gameObject => Base36Converter.ToBase36((int)gameObject.ObjectType),
+                        _ => trackData[tick]
+                    };
                 }
 
-                content += $"#{track:000}{channel}:{string.Join("", trackData)}\n";
+                content += $"#{track:000}{channel}:{string.Join("", trackData)}{Environment.NewLine}";
+                writtenOneLine = true;
             }
 
-            content += "\n";
+            if (writtenOneLine)
+                content += Environment.NewLine;
+
             elapsedDuration += trackLength;
+
+            if (map.GameObjects.Count > 0 && elapsedDuration > map.GameObjects[^1].Offset.Value)
+            {
+                break;
+            }
         }
 
         return content;

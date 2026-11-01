@@ -122,7 +122,7 @@ public partial class DifficultySelectorScreen : Screen
             map.Metadata.InitialBpm.Value = 120;
             map.Metadata.InitialLaneSpeed.Value = LaneSpeed.Medium;
             map.Metadata.InitialScene.Value = SceneType.SpaceStation;
-            map.TimingPoints.Add(new TimingPointObject(0, 120));
+            map.TimingPoints.Add(new TimingPointObject(0, 0, 120));
         }
 
         DataHolder.CurrentMap.Value = map;

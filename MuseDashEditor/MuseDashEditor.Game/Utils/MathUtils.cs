@@ -36,6 +36,21 @@ public static class MathUtils
         return a;
     }
 
+    public static int Gcd(List<int> list)
+    {
+        if (list.Count == 0)
+            return 1;
+
+        var gcd = list[0];
+
+        for (int i = 1; i < list.Count; i++)
+        {
+            gcd = Gcd(gcd, list[i]);
+        }
+
+        return gcd;
+    }
+
     public static uint Lcm(uint a, uint b)
     {
         return a / Gcd(a, b) * b;

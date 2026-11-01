@@ -13,8 +13,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using MuseDashEditor.Game.Data.Chart;
+using MuseDashEditor.Game.Data.Object;
 using MuseDashEditor.Game.Data.Object.DesignObject;
 using MuseDashEditor.Game.Data.Object.GameObject;
+using MuseDashEditor.Game.Data.Object.MappingObject;
 using MuseDashEditor.Game.Data.Type;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
@@ -28,6 +30,33 @@ public static class MapUtils
     {
         var placing = new Dictionary<ObjectType, HashSet<(LaneType, LaneModifierType)>>();
         var gameObjects = map.GameObjects;
+        var timingPoints = map.TimingPoints;
+
+        TimingPointObject previousTimingPoint = null!;
+
+        for (int tpIndex = 0; tpIndex < timingPoints.Count; tpIndex++)
+        {
+            var timingPoint = timingPoints[tpIndex];
+
+            if (timingPoint.ObjectTick.Value is not null)
+                continue;
+
+            if (tpIndex == 0)
+            {
+                timingPoint.ObjectTick.Value = new ObjectTick(0, 1, 0);
+                previousTimingPoint = timingPoint;
+                continue;
+            }
+
+            var tick = GameObjectUtils.GetObjectTickAt(
+                tpIndex - 1,
+                previousTimingPoint.NewBpm.Value,
+                previousTimingPoint.Offset.Value,
+                timingPoint.Offset.Value
+            );
+
+            timingPoint.ObjectTick.Value = tick;
+        }
 
         for (var objectIndex = 0; objectIndex < gameObjects.Count; objectIndex++)
         {
@@ -90,7 +119,16 @@ public static class MapUtils
             // Compute object tick
             if (gameObject.ObjectTick.Value is null)
             {
-                // TODO
+                var timingPointAt = ExtensionMethods.GetTimingPointAtTime(gameObject.Offset.Value, false, map)!;
+
+                var tick = GameObjectUtils.GetObjectTickAt(
+                    timingPointAt.ObjectTick.Value.TrackTickIndex,
+                    timingPointAt.NewBpm.Value,
+                    timingPointAt.Offset.Value,
+                    gameObject.Offset.Value
+                );
+
+                gameObject.ObjectTick.Value = tick;
             }
         }
     }

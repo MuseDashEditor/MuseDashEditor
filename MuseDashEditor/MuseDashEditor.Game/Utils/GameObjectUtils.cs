@@ -14,6 +14,7 @@ using System;
 using System.Reflection;
 using MuseDashEditor.Game.Data.Attribute;
 using MuseDashEditor.Game.Data.Holder;
+using MuseDashEditor.Game.Data.Object;
 using MuseDashEditor.Game.Data.Object.DesignObject;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Type;
@@ -121,5 +122,32 @@ public static class GameObjectUtils
             gameObjects.Add(gameObject.HoldEndObject);
 
         editorDataHolder.OnGameObjectsChanged();
+    }
+
+    // /!\ Not precise!
+    public static ObjectTick GetObjectTickAt(int tpIndex, double tpBpm, double tpOffset, double offset)
+    {
+        var elapsedTime = offset - tpOffset;
+
+        var trackLength = 60 / tpBpm * 4000;
+        var ticks = Math.Ceiling(trackLength / 2) * 4;
+        var tickLength = trackLength / ticks;
+
+        int tickIndex = 0;
+
+        for (int i = 0; i < ticks; i++)
+        {
+            var previousTime = i * tickLength;
+
+            if (!(elapsedTime >= previousTime) || !(elapsedTime < previousTime + tickLength))
+                continue;
+
+            tickIndex = i;
+            break;
+        }
+
+        var gcd = MathUtils.Gcd((uint)tickIndex, (uint)ticks);
+
+        return new ObjectTick(0 /* TODO */, (int)(ticks / gcd), (int)(tickIndex / gcd));
     }
 }

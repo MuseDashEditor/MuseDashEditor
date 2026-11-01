@@ -14,7 +14,8 @@ using osu.Framework.Bindables;
 
 namespace MuseDashEditor.Game.Data.Object.MappingObject;
 
-public sealed class TimingPointObject(double offset, double newBpm) : MappingObject(offset)
+public sealed class TimingPointObject(int index, double offset, double newBpm) : MappingObject(offset)
 {
+    public BindableInt Index { get; } = new(index);
     public BindableDouble NewBpm { get; } = new(newBpm);
 }

@@ -18,6 +18,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using MuseDashEditor.Game.Conversion.Parser;
 using MuseDashEditor.Game.Data.Chart;
+using MuseDashEditor.Game.Data.Object;
 using MuseDashEditor.Game.Data.Object.GameObject;
 using MuseDashEditor.Game.Data.Object.MappingObject;
 using MuseDashEditor.Game.Data.Type;
@@ -34,7 +35,7 @@ public class MdeMapParser : MapParser
 
         Map map = new(file, MapType.Mdem);
 
-        await parseMapContent(file, map);
+        await ParseMapContent(file, map);
 
         return map;
     }
@@ -50,7 +51,17 @@ public class MdeMapParser : MapParser
 
         var timingPoints = new List<MdeChartTimingPoint>(map.TimingPoints.Count);
         timingPoints.AddRange(map.TimingPoints.Select(timingPointObject =>
-            new MdeChartTimingPoint(timingPointObject.Offset.Value, timingPointObject.NewBpm.Value)));
+        {
+            var objectTick = timingPointObject.ObjectTick.Value;
+
+            return new MdeChartTimingPoint(
+                timingPointObject.Offset.Value,
+                timingPointObject.NewBpm.Value,
+                objectTick.TrackIndex,
+                objectTick.TrackDivisor,
+                objectTick.TrackTickIndex
+            );
+        }));
 
         var objects = new List<MdeChartObject>(map.GameObjects.Count);
         objects.AddRange(map.GameObjects.Select(gameObject =>
@@ -59,10 +70,15 @@ public class MdeMapParser : MapParser
                 $"{Base36Converter.ToBase36((int)gameObject.LaneModifier)[1]}" +
                 $"{Base36Converter.ToBase36((int)gameObject.LaneType)[1]}";
 
+            var objectTick = gameObject.ObjectTick.Value;
+
             return new MdeChartObject(
                 gameObject.Offset.Value,
                 Base36Converter.ToBase36((int)gameObject.ObjectType),
-                channel
+                channel,
+                objectTick.TrackIndex,
+                objectTick.TrackDivisor,
+                objectTick.TrackTickIndex
             );
         }));
 
@@ -76,28 +92,51 @@ public class MdeMapParser : MapParser
         await File.WriteAllTextAsync(file.FullName, data, Encoding.UTF8);
     }
 
-    private static async Task parseMapContent(FileInfo file, Map map)
+    public static async Task ParseMapContent(FileInfo file, Map map)
     {
         var infoFileData = file.OpenText().BaseStream;
         var chartFormat = await JsonSerializer.DeserializeAsync<MdeChartFormat>(infoFileData);
         if (chartFormat == null) return;
 
+        ParseMapContent(chartFormat, map);
+    }
+
+    public static void ParseMapContent(MdeChartFormat chartFormat, Map map)
+    {
         map.Metadata.InitialLaneSpeed.Value = (LaneSpeed)chartFormat.Metadata.InitialLaneSpeed;
         map.Metadata.InitialScene.Value = (SceneType)chartFormat.Metadata.InitialScene;
+        map.Metadata.InitialBpm.Value = chartFormat.TimingPoints[0].Bpm;
 
-        foreach (var (time, bpm) in chartFormat.TimingPoints)
+        for (var index = 0; index < chartFormat.TimingPoints.Count; index++)
         {
-            map.TimingPoints.Add(new TimingPointObject(time, bpm));
+            var (time, bpm, trackIndex, trackDivisor, trackTickIndex) = chartFormat.TimingPoints[index];
+            var timingPointObject = new TimingPointObject(index, time, bpm);
+
+            if (trackDivisor != 0)
+                timingPointObject.ObjectTick.Value = new ObjectTick(trackIndex, trackDivisor, trackTickIndex);
+
+            map.TimingPoints.Add(timingPointObject);
         }
 
         foreach (var chartObject in chartFormat.Objects)
         {
-            map.GameObjects.Add(new GameObject(
+            var gameObject = new GameObject(
                 chartObject.Offset,
                 (ObjectType)Base36Converter.FromBase36(chartObject.ObjectType),
                 (LaneType)Base36Converter.FromBase36([chartObject.ChannelType[1]]),
                 (LaneModifierType)Base36Converter.FromBase36([chartObject.ChannelType[0]])
-            ));
+            );
+
+            if (chartObject.TrackDivisor != 0)
+            {
+                gameObject.ObjectTick.Value = new ObjectTick(
+                    chartObject.TrackIndex,
+                    chartObject.TrackDivisor,
+                    chartObject.TrackTickIndex
+                );
+            }
+
+            map.GameObjects.Add(gameObject);
         }
     }
 }

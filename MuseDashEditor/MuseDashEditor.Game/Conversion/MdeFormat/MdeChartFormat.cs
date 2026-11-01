@@ -32,11 +32,19 @@ public record MdeChartMetadata(
 
 public record MdeChartTimingPoint(
     double Time,
-    double Bpm
+    double Bpm,
+    // For BMS conversions
+    int TrackIndex,
+    int TrackDivisor,
+    int TrackTickIndex
 );
 
 public record MdeChartObject(
     double Offset,
     string ObjectType,
-    string ChannelType
+    string ChannelType,
+    // For BMS conversions
+    int TrackIndex,
+    int TrackDivisor,
+    int TrackTickIndex
 );

@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Object.MappingObject;
 
@@ -31,8 +32,11 @@ public static class ExtensionMethods
                                                           bool ignoreExact = false)
     {
         var currentMap = dataHolder.CurrentMap.Value;
-        if (currentMap == null) return null;
+        return currentMap == null ? null : GetTimingPointAtTime(time, ignoreExact, currentMap);
+    }
 
+    public static TimingPointObject? GetTimingPointAtTime(double time, bool ignoreExact, Map currentMap)
+    {
         var timingPoints = currentMap.TimingPoints;
         if (timingPoints.Count == 0) return null;
 

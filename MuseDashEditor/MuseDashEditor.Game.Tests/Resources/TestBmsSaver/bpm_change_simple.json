@@ -1,0 +1,50 @@
+{
+  "Metadata": {
+    "InitialLaneSpeed": 3,
+    "InitialScene": 1
+  },
+  "TimingPoints": [
+    {
+      "Time": 0,
+      "Bpm": 120
+    },
+    {
+      "Time": 1000,
+      "Bpm": 60
+    }
+  ],
+  "Objects": [
+    {
+      "Offset": 0,
+      "ObjectType": "01",
+      "ChannelType": "14",
+      "TrackIndex": 0,
+      "TrackDivisor": 4,
+      "TrackTickIndex": 0
+    },
+    {
+      "Offset": 500,
+      "ObjectType": "01",
+      "ChannelType": "14",
+      "TrackIndex": 0,
+      "TrackDivisor": 4,
+      "TrackTickIndex": 1
+    },
+    {
+      "Offset": 1000,
+      "ObjectType": "01",
+      "ChannelType": "14",
+      "TrackIndex": 0,
+      "TrackDivisor": 4,
+      "TrackTickIndex": 2
+    },
+    {
+      "Offset": 2000,
+      "ObjectType": "01",
+      "ChannelType": "14",
+      "TrackIndex": 0,
+      "TrackDivisor": 4,
+      "TrackTickIndex": 3
+    }
+  ]
+}

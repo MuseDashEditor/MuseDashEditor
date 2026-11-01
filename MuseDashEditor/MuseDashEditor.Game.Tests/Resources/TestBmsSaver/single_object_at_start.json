@@ -1,0 +1,19 @@
+{
+  "Metadata": {
+    "InitialLaneSpeed": 3,
+    "InitialScene": 1
+  },
+  "TimingPoints": [
+    {
+      "Time": 0,
+      "Bpm": 200
+    }
+  ],
+  "Objects": [
+    {
+      "Offset": 0,
+      "ObjectType": "0B",
+      "ChannelType": "14"
+    }
+  ]
+}

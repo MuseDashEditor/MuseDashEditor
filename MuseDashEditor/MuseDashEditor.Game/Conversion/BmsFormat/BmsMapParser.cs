@@ -66,7 +66,7 @@ public class BmsMapParser : MapParser
                     var objectData = data[i];
                     if (objectData == 0) continue;
 
-                    var globalIndex = trackId * maxDataLength + i / dataCount * maxDataLength;
+                    var globalIndex = trackId * maxDataLength + i * maxDataLength / dataCount;
 
                     if (globalIndex == 0)
                     {
@@ -74,7 +74,8 @@ public class BmsMapParser : MapParser
                         continue;
                     }
 
-                    if (!map.Metadata.BpmChangeKeys.TryGetValue(objectData, out var bpmChangeValue)) continue;
+                    if (!map.Metadata.BpmChangeKeys.TryGetValue(objectData, out var bpmChangeValue))
+                        continue;
 
                     if (!bpmChangesInTrack.TryAdd(globalIndex, bpmChangeValue))
                         Logger.Log($"Duplicate bpm change at index {globalIndex}", level: LogLevel.Important);
@@ -98,6 +99,8 @@ public class BmsMapParser : MapParser
         });
 
         // 2. Add bpm changes to the timing points in order
+        var tpIndex = 1;
+
         foreach (var (index, bpmChangeValue) in bpmChangesInTrack)
         {
             Logger.Log($"Adding bpm change at index {index} with value {bpmChangeValue}");
@@ -120,7 +123,7 @@ public class BmsMapParser : MapParser
             knownOffsets.Add(index, newOffset);
 
             // 3. Convert back to timing points
-            map.TimingPoints.Add(new TimingPointObject(index, newOffset, bpmChangeValue)
+            map.TimingPoints.Add(new TimingPointObject(tpIndex++, newOffset, bpmChangeValue)
             {
                 ObjectTick =
                 {
@@ -210,7 +213,8 @@ public class BmsMapParser : MapParser
 
         Logger.Log($"Parsing {lines.Length} lines...");
 
-        foreach (var line in lines) parseLineContent(line, map);
+        foreach (var line in lines)
+            parseLineContent(line, map);
     }
 
     private static void parseLineContent(string line, Map map)

@@ -1,0 +1,17 @@
+*---------------------- HEADER FIELD
+
+#PLAYER 3
+#GENRE scene_01
+#TITLE
+#ARTIST
+#LEVELDESIGN
+#BPM 120
+#PLAYLEVEL 1
+#RANK 1
+#LNTYPE 1
+
+*---------------------- MAIN DATA FIELD
+#00001:10
+
+#00014:01010101
+#00015:020202

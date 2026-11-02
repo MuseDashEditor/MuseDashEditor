@@ -1,0 +1,62 @@
+{
+  "Metadata": {
+    "InitialLaneSpeed": 3,
+    "InitialScene": 1
+  },
+  "TimingPoints": [
+    {
+      "Time": 0,
+      "Bpm": 120
+    }
+  ],
+  "Objects": [
+    {
+      "Offset": 0,
+      "ObjectType": "01",
+      "ChannelType": "14",
+      "TrackIndex": 0,
+      "TrackDivisor": 4,
+      "TrackTickIndex": 0
+    },
+    {
+      "Offset": 500,
+      "ObjectType": "01",
+      "ChannelType": "14",
+      "TrackIndex": 0,
+      "TrackDivisor": 4,
+      "TrackTickIndex": 1
+    },
+    {
+      "Offset": 1000,
+      "ObjectType": "01",
+      "ChannelType": "14",
+      "TrackIndex": 0,
+      "TrackDivisor": 4,
+      "TrackTickIndex": 2
+    },
+    {
+      "Offset": 1500,
+      "ObjectType": "01",
+      "ChannelType": "14",
+      "TrackIndex": 0,
+      "TrackDivisor": 4,
+      "TrackTickIndex": 3
+    },
+    {
+      "Offset": 666.666,
+      "ObjectType": "02",
+      "ChannelType": "14",
+      "TrackIndex": 0,
+      "TrackDivisor": 3,
+      "TrackTickIndex": 1
+    },
+    {
+      "Offset": 1333.333,
+      "ObjectType": "02",
+      "ChannelType": "14",
+      "TrackIndex": 0,
+      "TrackDivisor": 3,
+      "TrackTickIndex": 2
+    }
+  ]
+}

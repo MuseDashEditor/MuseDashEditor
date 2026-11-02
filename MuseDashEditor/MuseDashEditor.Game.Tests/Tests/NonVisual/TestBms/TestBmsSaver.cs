@@ -33,7 +33,10 @@ public class TestBmsSaver
                           "two_objects_different_track",
                           "bpm_change_simple",
                           "bpm_change_divisor",
-                          "two_bpm_change_in_one_track"
+                          "two_bpm_change_in_one_track",
+                          "two_objects_different_lanes",
+                          "triplets_and_quadruplets",
+                          "triplets_and_quadruplets_same_track"
                       )]
                       string mapFile)
     {

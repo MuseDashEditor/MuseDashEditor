@@ -30,7 +30,8 @@ public class TestBmsParserAndSaver
                           "two_objects_different_track",
                           "bpm_change_simple",
                           "bpm_change_divisor",
-                          "two_bpm_change_in_one_track"
+                          "two_bpm_change_in_one_track",
+                          "two_bpm_change_in_two_tracks"
                       )]
                       string mapFile)
     {

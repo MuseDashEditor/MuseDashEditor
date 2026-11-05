@@ -39,7 +39,7 @@ public record ChartInfoRaw(
     List<string> searchTags
 )
 {
-    public static readonly ChartInfoRaw Empty = new("No name", "", "No author", "120", "0", "?", "?", "?", "?", "?", "0", "0", "0", "0", "", "", "", []);
+    public static readonly ChartInfoRaw Empty = new("No name", "", "No artist", "120", "0", "Your name", "?", "?", "?", "?", "3.14", "0", "0", "0", "", "", "", []);
 }
 // ReSharper restore InconsistentNaming
 
@@ -58,6 +58,8 @@ public class ChartInfo(ChartInfoRaw raw)
     public readonly Bindable<string> LevelDifficultyBindable = new();
     public readonly Bindable<SceneType> DefaultSceneBindable = new(SceneUtils.GetSceneType(raw.scene));
 
+    private int loadedMapId;
+
     // TODO
     // public string HideBmsMode { get; set; } = hideBmsMode; // TODO: enum
     // public string HideBmsDifficulty { get; set; } = hideBmsDifficulty;
@@ -66,6 +68,8 @@ public class ChartInfo(ChartInfoRaw raw)
 
     public void LoadDataFromMap(int mapId)
     {
+        loadedMapId = mapId;
+
         LevelDesignerBindable.Value = mapId switch
         {
             1 => Raw.levelDesigner1,
@@ -83,5 +87,27 @@ public class ChartInfo(ChartInfoRaw raw)
             4 => Raw.difficulty4,
             _ => LevelDifficultyBindable.Value
         };
+    }
+
+    public ChartInfoRaw ToRaw()
+    {
+        return new ChartInfoRaw(
+            NameBindable.Value,
+            NameRomanizedBindable.Value,
+            AuthorBindable.Value,
+            BpmBindable.Value,
+            $"scene_{(int)DefaultSceneBindable.Value:00}",
+            LevelDesignerBindable.Value,
+            // TODO
+            "", "", "", "",
+            (loadedMapId == 1 ? LevelDifficultyBindable.Value : Raw.difficulty1),
+            (loadedMapId == 2 ? LevelDifficultyBindable.Value : Raw.difficulty2),
+            (loadedMapId == 3 ? LevelDifficultyBindable.Value : Raw.difficulty3),
+            (loadedMapId == 4 ? LevelDifficultyBindable.Value : Raw.difficulty4),
+            Raw.hideBmsMode,
+            Raw.hideBmsDifficulty,
+            Raw.hideBmsMessage,
+            Raw.searchTags
+        );
     }
 }

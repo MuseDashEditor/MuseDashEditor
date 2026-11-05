@@ -54,7 +54,7 @@ public partial class ProjectRow(Storage projectStorage) : Container
             gameHost.CreateTextureLoaderStore(new StorageBackedResourceStore(projectStorage)));
 
         var chartInfoFile = projectStorage.GetStream("info.json");
-        var chartInfoRaw = JsonSerializer.Deserialize<ChartInfoRaw>(chartInfoFile) ?? ChartInfoRaw.Empty;
+        var chartInfoRaw = chartInfoFile != null ? JsonSerializer.Deserialize<ChartInfoRaw>(chartInfoFile) ?? ChartInfoRaw.Empty : ChartInfoRaw.Empty;
 
         InternalChildren =
         [

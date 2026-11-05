@@ -10,6 +10,7 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -31,7 +32,7 @@ public partial class MetadataContainer : CompositeComponent
             {
                 RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(1f, 1f),
-                Colour = FrameworkColour.BlueGreen
+                Colour = MdeColors.Background5
             },
 
             // Title

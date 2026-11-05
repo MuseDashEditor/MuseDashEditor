@@ -16,7 +16,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
+using MuseDashEditor.Game.Conversion.BmsFormat;
 using MuseDashEditor.Game.Conversion.Converter;
 using MuseDashEditor.Game.Conversion.MdeFormat;
 using MuseDashEditor.Game.Data.Chart;
@@ -32,6 +34,9 @@ public partial class ProjectManager : IDependencyInjectionCandidate
 {
     [Resolved]
     protected GameHost Host { get; private set; } = null!;
+
+    [Resolved]
+    protected EditorDataHolder DataHolder { get; private set; } = null!;
 
     public IEnumerable<Storage> GetAllProjects()
     {
@@ -86,6 +91,14 @@ public partial class ProjectManager : IDependencyInjectionCandidate
 
     public static async Task Save(EditorDataHolder dataHolder)
     {
+        var chart = dataHolder.CurrentChart.Value;
+        if (chart is null)
+            return;
+
+        var infoFile = new FileInfo(Path.Combine(chart.Directory.FullName, "info.json"));
+        var data = JsonSerializer.Serialize(chart.ChartInfo.ToRaw());
+        await File.WriteAllTextAsync(infoFile.FullName, data, Encoding.UTF8);
+
         var map = dataHolder.CurrentMap.Value;
         if (map is null)
             return;
@@ -93,7 +106,7 @@ public partial class ProjectManager : IDependencyInjectionCandidate
         switch (map.Type)
         {
             case MapType.Bms:
-                // TODO
+                await BmsMapParser.Save(map.MapFile, map);
                 break;
 
             case MapType.Mdem:
@@ -103,5 +116,19 @@ public partial class ProjectManager : IDependencyInjectionCandidate
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    public async Task<Storage> CreateNewProject(FileInfo audioFile)
+    {
+        var storage = CreateProject();
+
+        var musicFilePath = storage.GetFullPath($"music{audioFile.Extension}");
+        audioFile.CopyTo(musicFilePath);
+
+        DataHolder.CurrentChart.Value.Directory = new DirectoryInfo(storage.GetFullPath("."));
+
+        await Save(DataHolder);
+
+        return storage;
     }
 }

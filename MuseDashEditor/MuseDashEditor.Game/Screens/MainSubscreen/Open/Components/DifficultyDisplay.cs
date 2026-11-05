@@ -39,15 +39,18 @@ public partial class DifficultyDisplay : BasicButton
         Colour = Colour4.White;
 
         var chartInfoRaw = dataHolder.CurrentChart.Value!.ChartInfo.Raw;
-        string difficultyValue = DifficultyName switch
-        {
-            "Easy" => chartInfoRaw.difficulty1,
-            "Hard" => chartInfoRaw.difficulty2,
-            "Master" => chartInfoRaw.difficulty3,
-            "Hidden" => chartInfoRaw.difficulty4,
-            _ => "?"
-        };
         var exists = dataHolder.CurrentChart.Value.Maps.TryGetValue(DifficultyType, out _);
+
+        string difficultyValue = exists
+            ? DifficultyName switch
+            {
+                "Easy" => chartInfoRaw.difficulty1,
+                "Hard" => chartInfoRaw.difficulty2,
+                "Master" => chartInfoRaw.difficulty3,
+                "Hidden" => chartInfoRaw.difficulty4,
+                _ => "?"
+            }
+            : "";
 
         InternalChild = new Container
         {

@@ -25,7 +25,8 @@ public class Chart(
     Dictionary<DifficultyType, Map> maps
 )
 {
-    public DirectoryInfo Directory => directory;
+    public DirectoryInfo Directory { get; set; } = directory;
+
     public ChartInfo ChartInfo => info;
 
     public Dictionary<DifficultyType, Map> Maps => maps;

@@ -26,32 +26,32 @@ public partial class MetadataFieldsContainers : FillFlowContainer<MetadataField>
 
         Children =
         [
-            new MetadataField
+            new MetadataField(this)
             {
                 Label = "Name",
                 FieldGetter = chartInfo => chartInfo.NameBindable
             },
-            new MetadataField
+            new MetadataField(this)
             {
                 Label = "Name romanized",
                 FieldGetter = chartInfo => chartInfo.NameRomanizedBindable
             },
-            new MetadataField
+            new MetadataField(this)
             {
-                Label = "Author",
+                Label = "Artist",
                 FieldGetter = chartInfo => chartInfo.AuthorBindable
             },
-            new MetadataField
+            new MetadataField(this)
             {
                 Label = "Bpm",
                 FieldGetter = chartInfo => chartInfo.BpmBindable
             },
-            new MetadataField
+            new MetadataField(this)
             {
                 Label = "Level designer",
                 FieldGetter = chartInfo => chartInfo.LevelDesignerBindable
             },
-            new MetadataField
+            new MetadataField(this)
             {
                 Label = "Level difficulty",
                 FieldGetter = chartInfo => chartInfo.LevelDifficultyBindable

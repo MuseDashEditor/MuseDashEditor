@@ -11,8 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 using System;
+using MuseDashEditor.Game.Component;
 using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Holder;
+using MuseDashEditor.Game.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,11 +22,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osuTK;
 
 namespace MuseDashEditor.Game.Screens.Editor.SubScreens.Metadata.Components;
 
-public partial class MetadataField : CompositeComponent
+public partial class MetadataField(MetadataFieldsContainers fieldsContainer) : CompositeComponent
 {
     public string Label { private get; init; } = null!;
     public Func<ChartInfo, Bindable<string>> FieldGetter { private get; init; } = null!;
@@ -34,21 +37,30 @@ public partial class MetadataField : CompositeComponent
     [BackgroundDependencyLoader]
     private void load(EditorDataHolder dataHolder)
     {
-        Size = new Vector2(120, 50);
+        AutoSizeAxes = Axes.Y;
+        Width = 300f;
 
         InternalChildren =
         [
-            new Box
+            new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = FrameworkColour.BlueGreenDark,
-                Size = new Vector2(1f, 1f)
+                Masking = true,
+                CornerRadius = 5,
+                CornerExponent = 2.5f,
+                BorderThickness = 2.5f,
+                Child = new Box
+                {
+                    Colour = MdeColors.Dark6,
+                    RelativeSizeAxes = Axes.Both,
+                }
             },
             new FillFlowContainer
             {
-                RelativeSizeAxes = Axes.Both,
-                Size = new Vector2(1f, 1f),
-                Direction = FillDirection.Vertical,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Padding = new MarginPadding(9),
+                Spacing = new Vector2(0, 4),
 
                 Children =
                 [
@@ -56,16 +68,23 @@ public partial class MetadataField : CompositeComponent
                     {
                         Text = Label
                     },
-                    textBox = new BasicTextBox
+                    textBox = new TransparentTextBox
                     {
                         RelativeSizeAxes = Axes.X,
-                        Size = new Vector2(1f, 30)
+                        Size = new Vector2(1f, 60),
+                        TabbableContentContainer = fieldsContainer
                     }
                 ]
             }
         ];
 
         dataHolder.CurrentChart.BindValueChanged(loadNewChart, true);
+    }
+
+    protected override bool OnClick(ClickEvent e)
+    {
+        GetContainingFocusManager()?.ChangeFocus(textBox);
+        return true;
     }
 
     private void loadNewChart(ValueChangedEvent<Chart?> evt)
@@ -76,7 +95,6 @@ public partial class MetadataField : CompositeComponent
         var chartInfo = chart.ChartInfo;
 
         var field = FieldGetter(chartInfo);
-        if (field == null) return;
 
         textBox.Current.BindTo(field);
     }

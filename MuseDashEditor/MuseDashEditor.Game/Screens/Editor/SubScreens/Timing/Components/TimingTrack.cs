@@ -55,7 +55,8 @@ public partial class TimingTrack : Container
             LowColour = MdeColors.Light2,
             MidColour = MdeColors.Light3,
             BaseColour = MdeColors.Light4,
-            Depth = 10
+            Depth = 10,
+            Resolution = 0.85f
         };
         TimingTrackTickDisplay = new TimingTrackTickDisplay
         {

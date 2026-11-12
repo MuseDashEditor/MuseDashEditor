@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using MuseDashEditor.Game.Data.Chart;
 using MuseDashEditor.Game.Data.Holder;
 using MuseDashEditor.Game.Data.Object.MappingObject;
@@ -72,5 +73,13 @@ public static class ExtensionMethods
         }
 
         return nextTimingPoint;
+    }
+
+    [DebuggerHidden]
+    [Conditional("DEBUG")]
+    public static void DebugBreak()
+    {
+        if (Debugger.IsAttached)
+            Debugger.Break();
     }
 }

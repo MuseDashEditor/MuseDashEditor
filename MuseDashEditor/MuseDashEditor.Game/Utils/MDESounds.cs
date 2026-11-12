@@ -53,7 +53,11 @@ public partial class MdeSounds : IDependencyInjectionCandidate
             hitSoundsMixers.Add(hitSoundType, audioMixer);
             hitSoundsMixers[hitSoundType].AddEffect(new CompressorParameters
             {
-                fGain = 0
+                fGain = 0,
+                fAttack = 0.1f,
+                fRatio = 10,
+                fRelease = 50,
+                fThreshold = -5
             });
 
             for (int i = 0; i < concurrent_samples; i++)

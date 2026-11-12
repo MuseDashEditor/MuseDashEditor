@@ -46,6 +46,7 @@ public static class ChartParser
                 Logger.Log($"Multiple files found for difficulty {mapNumber}!", LoggingTarget.Runtime, LogLevel.Important);
             }
 
+            // TODO: parse map only after selecting a difficulty
             var map = await parser.Parse(file);
             if (map == null)
                 continue;

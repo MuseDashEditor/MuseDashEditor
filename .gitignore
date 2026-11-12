@@ -5,3 +5,5 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 MuseDashEditor.sln.DotSettings.user
+
+MuseDashEditor/MuseDashEditor.Game.Tests/Resources/TestBmsParserAndSaver/FullMaps/*

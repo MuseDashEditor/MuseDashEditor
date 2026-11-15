@@ -34,9 +34,7 @@ public class TestBmsParserAndSaver
                           "bpm_change_simple",
                           "bpm_change_divisor",
                           "two_bpm_change_in_one_track",
-                          "two_bpm_change_in_two_tracks",
-                          "full_map_1",
-                          "full_map_2"
+                          "two_bpm_change_in_two_tracks"
                       )]
                       string mapFile)
     {

@@ -188,7 +188,7 @@ public class BmsMapParser : MapParser
                     var elapsedDuration = 240_000 / bpmAtIndex * (index / (double)dataCount);
                     var objectOffset = offsetAtIndex + elapsedDurationBefore + elapsedDuration;
 
-                    if (!Enum.IsDefined(typeof(LaneModifierType), objectData))
+                    if (!Enum.IsDefined(typeof(ObjectType), objectData))
                     {
                         ExtensionMethods.DebugBreak();
                         Logger.Log($"Unknown object: {objectData}", level: LogLevel.Important);

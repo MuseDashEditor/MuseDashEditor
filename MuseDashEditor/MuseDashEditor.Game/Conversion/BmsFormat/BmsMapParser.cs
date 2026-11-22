@@ -12,9 +12,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using MuseDashEditor.Game.Conversion.Parser;
 using MuseDashEditor.Game.Data.Chart;
@@ -24,7 +24,6 @@ using MuseDashEditor.Game.Data.Object.MappingObject;
 using MuseDashEditor.Game.Data.Type;
 using MuseDashEditor.Game.Utils;
 using osu.Framework.Logging;
-using osu.Framework.Utils;
 using MathUtils = MuseDashEditor.Game.Utils.MathUtils;
 
 namespace MuseDashEditor.Game.Conversion.BmsFormat;
@@ -50,30 +49,7 @@ public class BmsMapParser : MapParser
         var bpmChangesInTrack = new SortedDictionary<(int, int, int), double>(BpmChangesInTrackComparer.Instance);
 
         // 1. Parse bpm changes
-        foreach (var (trackId, trackDataDictionary) in map.RawMapData)
-        {
-            foreach (var ((laneModifier, laneType), data) in trackDataDictionary)
-            {
-                if (laneModifier != LaneModifierType.Music) continue;
-                if ((int)laneType != 8) continue;
-
-                var dataCount = data.Length;
-
-                for (var index = 0; index < dataCount; index++)
-                {
-                    var objectData = data[index];
-                    if (objectData == 0) continue;
-
-                    if (!map.Metadata.BpmChangeKeys.TryGetValue(objectData, out var bpmChangeValue))
-                        continue;
-
-                    bpmChangesInTrack.Add((trackId, index, dataCount), bpmChangeValue);
-                }
-            }
-        }
-
-        if (!bpmChangesInTrack.ContainsKey((0, 0, 1)))
-            bpmChangesInTrack[(0, 0, 1)] = map.Metadata.InitialBpm.Value;
+        parseBpmChanges(map, bpmChangesInTrack);
 
         var knownOffsets = new SortedDictionary<(int, int, int), double> { { (0, 0, 1), 0 } };
         map.TimingPoints.Add(new TimingPointObject(0, 0, map.Metadata.InitialBpm.Value)
@@ -106,16 +82,26 @@ public class BmsMapParser : MapParser
 
             // Timing from TP to end of its track + timing of tracks between + timing between beginning of current track and current TP
             double elapsedDurationBefore = 0;
+            var trackLength = 240_000 / bpmAtLastKnownOffset;
 
-            if (lastKnownTrackId < trackId)
+            for (int tempTid = lastKnownTrackId; tempTid < trackId; tempTid++)
             {
-                var fullTracksBetween = trackId - lastKnownTrackId - 1;
-                var remainingTracksTicks = lastKnownOffsetDivisor - lastKnownOffsetIndex;
-                var trackLength = 240_000 / bpmAtLastKnownOffset;
-                elapsedDurationBefore = fullTracksBetween * trackLength + (remainingTracksTicks / (double)lastKnownOffsetDivisor) * trackLength;
+                var trackTimeSig = map.TimeSignatures.FirstOrDefault(timeSigObject => timeSigObject.ObjectTick.Value.TrackIndex == tempTid)?.NewSignature.Value ?? 1;
+
+                if (tempTid == lastKnownTrackId)
+                {
+                    var remainingTracksTicks = lastKnownOffsetDivisor - lastKnownOffsetIndex;
+                    var elapsedDuringStartTrack = (remainingTracksTicks / (double)lastKnownOffsetDivisor) * trackLength * trackTimeSig;
+                    elapsedDurationBefore += elapsedDuringStartTrack;
+                }
+                else
+                {
+                    elapsedDurationBefore += trackLength * trackTimeSig;
+                }
             }
 
-            var elapsedDuration = 240_000 / bpmAtLastKnownOffset * (index / (double)divisor);
+            var currentTrackTimeSig = map.TimeSignatures.FirstOrDefault(timeSigObject => timeSigObject.ObjectTick.Value.TrackIndex == trackId)?.NewSignature.Value ?? 1;
+            var elapsedDuration = 240_000 / bpmAtLastKnownOffset * (index / (double)divisor) * currentTrackTimeSig;
             var newOffset = lastKnownOffsetValue + elapsedDurationBefore + elapsedDuration;
 
             Logger.Log($"Adding offset for index {index} with value {newOffset}");
@@ -145,7 +131,10 @@ public class BmsMapParser : MapParser
             foreach (var ((laneModifier, laneType), data) in trackDataDictionary)
             {
                 if (laneModifier == LaneModifierType.Music)
-                    continue;
+                {
+                    if (laneType is LaneType.Air2 or LaneType.Special2)
+                        continue;
+                }
 
                 var dataCount = data.Length;
 
@@ -153,7 +142,7 @@ public class BmsMapParser : MapParser
                 {
                     var objectData = data[index];
 
-                    if (objectData == 0)
+                    if (objectData is 0 or 36) // 36 = "10" (music)
                         continue;
 
                     // Find last known offset before current index
@@ -171,22 +160,32 @@ public class BmsMapParser : MapParser
                             break;
                     }
 
-                    var (lastKnownOffsetTrackId, lastKnownOffsetIndex, lastKnownOffsetDivisor) = lastKnownOffsetData;
-                    var offsetAtIndex = knownOffsets[lastKnownOffsetData];
-                    var bpmAtIndex = bpmChangesInTrack[lastKnownOffsetData];
+                    var (lastKnownTrackId, lastKnownOffsetIndex, lastKnownOffsetDivisor) = lastKnownOffsetData;
+                    var lastKnownOffsetValue = knownOffsets[lastKnownOffsetData];
+                    var bpmAtLastKnownOffset = bpmChangesInTrack[lastKnownOffsetData];
 
                     double elapsedDurationBefore = 0;
+                    var trackLength = 240_000 / bpmAtLastKnownOffset;
 
-                    if (lastKnownOffsetTrackId < trackId)
+                    for (int tempTid = lastKnownTrackId; tempTid < trackId; tempTid++)
                     {
-                        var fullTracksBetween = trackId - lastKnownOffsetTrackId - 1;
-                        var remainingTracksTicks = lastKnownOffsetDivisor - lastKnownOffsetIndex;
-                        var trackLength = 240_000 / bpmAtIndex;
-                        elapsedDurationBefore = fullTracksBetween * trackLength + (remainingTracksTicks / (double)lastKnownOffsetDivisor) * trackLength;
+                        var trackTimeSig = map.TimeSignatures.FirstOrDefault(timeSigObject => timeSigObject.ObjectTick.Value.TrackIndex == tempTid)?.NewSignature.Value ?? 1;
+
+                        if (tempTid == lastKnownTrackId)
+                        {
+                            var remainingTracksTicks = lastKnownOffsetDivisor - lastKnownOffsetIndex;
+                            var elapsedDuringStartTrack = (remainingTracksTicks / (double)lastKnownOffsetDivisor) * trackLength * trackTimeSig;
+                            elapsedDurationBefore += elapsedDuringStartTrack;
+                        }
+                        else
+                        {
+                            elapsedDurationBefore += trackLength * trackTimeSig;
+                        }
                     }
 
-                    var elapsedDuration = 240_000 / bpmAtIndex * (index / (double)dataCount);
-                    var objectOffset = offsetAtIndex + elapsedDurationBefore + elapsedDuration;
+                    var currentTrackTimeSig = map.TimeSignatures.FirstOrDefault(timeSigObject => timeSigObject.ObjectTick.Value.TrackIndex == trackId)?.NewSignature.Value ?? 1;
+                    var elapsedDuration = 240_000 / bpmAtLastKnownOffset * (index / (double)dataCount) * currentTrackTimeSig;
+                    var objectOffset = lastKnownOffsetValue + elapsedDurationBefore + elapsedDuration;
 
                     if (!Enum.IsDefined(typeof(ObjectType), objectData))
                     {
@@ -229,6 +228,52 @@ public class BmsMapParser : MapParser
         Logger.Log($"Parsed {map.GameObjects.Count} objects");
     }
 
+    private static void parseBpmChanges(Map map, SortedDictionary<(int, int, int), double> bpmChangesInTrack)
+    {
+        foreach (var (trackId, trackDataDictionary) in map.RawMapData)
+        {
+            foreach (var ((laneModifier, laneType), data) in trackDataDictionary)
+            {
+                if (laneModifier != LaneModifierType.Music) continue;
+
+                var dataCount = data.Length;
+
+                for (var index = 0; index < dataCount; index++)
+                {
+                    var objectData = data[index];
+                    if (objectData == 0) continue;
+
+                    double bpmChangeValue;
+
+                    switch ((int)laneType)
+                    {
+                        case 8:
+                        {
+                            if (!map.Metadata.BpmChangeKeys.TryGetValue(objectData, out bpmChangeValue))
+                                continue;
+
+                            break;
+                        }
+
+                        case 3:
+                            bpmChangeValue = Convert.ToInt32(Base36Converter.ToBase36(objectData), 16);
+                            break;
+
+                        default:
+                            continue;
+                    }
+
+                    bpmChangesInTrack.Add((trackId, index, dataCount), bpmChangeValue);
+                }
+            }
+        }
+
+        var mapStartIndex = (0, 0, 1);
+
+        if (!bpmChangesInTrack.ContainsKey(mapStartIndex))
+            bpmChangesInTrack[mapStartIndex] = map.Metadata.InitialBpm.Value;
+    }
+
     public static void ParseMapContent(string content, Map map)
     {
         var lines = content.Split(Environment.NewLine);
@@ -269,9 +314,6 @@ public class BmsMapParser : MapParser
         if (laneDeclaration.Length != 5)
             return;
 
-        if (data.Length % 2 != 0)
-            return;
-
         if (!int.TryParse(laneDeclaration.AsSpan(0, 3), out var trackNumber))
             return;
 
@@ -295,10 +337,33 @@ public class BmsMapParser : MapParser
         var laneModifier = (LaneModifierType)laneModifierValue;
         var laneType = (LaneType)laneTypeValue;
 
+        if (laneModifier == LaneModifierType.Music && laneType == LaneType.Ground) // "02" - Time signature change
+        {
+            if (!float.TryParse(data, CultureInfo.InvariantCulture, out var percent))
+                return;
+
+            map.TimeSignatures.Add(new TimeSignatureObject(trackNumber, trackNumber, 0, percent)
+            {
+                ObjectTick =
+                {
+                    Value = new ObjectTick(
+                        trackNumber,
+                        0,
+                        1
+                    )
+                }
+            });
+            return;
+        }
+
+        if (data.Length % 2 != 0)
+            return;
+
         var dataCount = data.Length / 2;
         var dataArray = new int[dataCount];
 
-        for (var i = 0; i < dataCount; i++) dataArray[i] = Base36Converter.FromBase36(data.AsSpan(i * 2, 2));
+        for (var i = 0; i < dataCount; i++)
+            dataArray[i] = Base36Converter.FromBase36(data.AsSpan(i * 2, 2));
 
         var trackData =
             map.RawMapData.ComputeIfAbsent(trackNumber, () => new Dictionary<(LaneModifierType, LaneType), int[]>());
@@ -346,7 +411,7 @@ public class BmsMapParser : MapParser
 
             case "BPM":
             {
-                if (!double.TryParse(value, out var initialBpmValue))
+                if (!double.TryParse(value, CultureInfo.InvariantCulture, out var initialBpmValue))
                 {
                     Logger.Log($"Invalid BPM value: {value}", level: LogLevel.Important);
                     return;
@@ -357,7 +422,7 @@ public class BmsMapParser : MapParser
             }
         }
 
-        if (key.StartsWith("BPM") && int.TryParse(value, out var bpmValue))
+        if (key.StartsWith("BPM") && double.TryParse(value, CultureInfo.InvariantCulture, out var bpmValue))
         {
             var bpmKey = Base36Converter.FromBase36(key.AsSpan(3, 2));
             map.Metadata.BpmChangeKeys[bpmKey] = bpmValue;

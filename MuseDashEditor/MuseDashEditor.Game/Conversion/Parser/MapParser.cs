@@ -20,14 +20,17 @@ namespace MuseDashEditor.Game.Conversion.Parser;
 
 public abstract class MapParser
 {
+    private static readonly BmsMapParser bms_map_parser = new();
+    private static readonly MdeMapParser mde_map_parser = new();
+
     public abstract Task<Map?> Parse(FileInfo file);
 
     public static MapParser? GetParser(FileInfo file)
     {
         return file.Extension switch
         {
-            ".bms" => new BmsMapParser(),
-            ".mdem" => new MdeMapParser(),
+            ".bms" => bms_map_parser,
+            ".mdem" => mde_map_parser,
             _ => null
         };
     }

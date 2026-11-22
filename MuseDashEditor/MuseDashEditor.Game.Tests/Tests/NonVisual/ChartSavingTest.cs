@@ -37,7 +37,7 @@ public class ChartSavingTest
         var fileInfo = new FileInfo(Path.GetTempFileName());
         Assert.IsNotNull(fileInfo);
 
-        Assert.DoesNotThrowAsync(() => BmsMapParser.Save(fileInfo, map));
+        Assert.DoesNotThrowAsync(() => BmsMapSaver.Save(fileInfo, map));
 
         Console.WriteLine(fileInfo.FullName);
 

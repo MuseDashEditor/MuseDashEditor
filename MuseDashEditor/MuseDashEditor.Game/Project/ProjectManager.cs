@@ -106,7 +106,7 @@ public partial class ProjectManager : IDependencyInjectionCandidate
         switch (map.Type)
         {
             case MapType.Bms:
-                await BmsMapParser.Save(map.MapFile, map);
+                await BmsMapSaver.Save(map.MapFile, map);
                 break;
 
             case MapType.Mdem:

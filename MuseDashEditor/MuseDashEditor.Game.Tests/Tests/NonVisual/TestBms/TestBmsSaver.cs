@@ -60,7 +60,7 @@ public class TestBmsSaver
         MdeMapParser.ParseMapContent(chartFormat, map);
         MapUtils.PreProcessMap(map);
 
-        var saveContent = BmsMapParser.GetSaveContent(map);
+        var saveContent = BmsMapSaver.GetSaveContent(map);
 
         Assert.AreEqual(inputBmsContent.Trim(), saveContent.Trim());
     }

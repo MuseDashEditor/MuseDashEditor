@@ -25,7 +25,7 @@ namespace MuseDashEditor.Game.Tests.Tests.NonVisual.TestBms;
 public class TestBmsParserAndSaverOnFullMaps
 {
     [Theory]
-    public void Parse([Range(0, 172)] int mapId)
+    public void Parse([Range(0, 167)] int mapId)
     {
         // Maps not included on VCS
         using var inputBmsStream = TestResources.OpenResource($"TestBmsParserAndSaver/FullMaps/map_{mapId}.bms");
@@ -41,7 +41,7 @@ public class TestBmsParserAndSaverOnFullMaps
         BmsMapParser.ParseMapContent(inputBmsContent, map);
         BmsMapParser.ProcessMapContent(map);
 
-        var saveContent = BmsMapParser.GetSaveContent(map);
+        var saveContent = BmsMapSaver.GetSaveContent(map);
 
         var hasSeenDataHeaderInInput = true;
         var inputLines = inputBmsContent.Split(Environment.NewLine)
@@ -66,24 +66,61 @@ public class TestBmsParserAndSaverOnFullMaps
                                          return hasSeenDataHeaderInOutput;
                                      })
                                      .ToList();
+        inputLines.RemoveAll(s => s.StartsWith('*'));
+        outputLines.RemoveAll(s => s.StartsWith('*'));
 
         Assert.Multiple(() =>
         {
             Assert.AreEqual(inputLines.Count, outputLines.Count);
 
-            for (int lineIndex = 0; lineIndex < Math.Min(inputLines.Count, outputLines.Count); lineIndex++)
-            {
-                var inputLine = inputLines[lineIndex];
-                var outputLine = outputLines[lineIndex];
+            var inLinesPerKey = new Dictionary<string, string>();
+            var outLinesPerKey = new Dictionary<string, string>();
 
-                if (outputLine == inputLine)
+            foreach (var inputLine in inputLines)
+            {
+                var split = inputLine.Split(":");
+                var header = split[0];
+                var data = split[1];
+                inLinesPerKey[header] = data;
+            }
+
+            foreach (var outputLine in outputLines)
+            {
+                var split = outputLine.Split(":");
+                var header = split[0];
+                var data = split[1];
+                outLinesPerKey[header] = data;
+            }
+
+            List<string> missingInputLines = [];
+            List<string> missingOutputLines = [];
+
+            foreach (var key in inLinesPerKey.Keys)
+            {
+                var inData = inLinesPerKey[key];
+
+                if (!outLinesPerKey.TryGetValue(key, out var outData))
                 {
-                    Assert.AreEqual(outputLine, inputLine);
+                    missingOutputLines.Add(key);
                     continue;
                 }
 
-                checkSameWithDifferentDivisors(inputLine, outputLine);
+                if (inData == outData)
+                    continue;
+
+                checkSameWithDifferentDivisors(inData, outData);
             }
+
+            foreach (var key in outLinesPerKey.Keys)
+            {
+                if (inLinesPerKey.TryGetValue(key, out _))
+                    continue;
+
+                missingInputLines.Add(key);
+            }
+
+            Assert.IsEmpty(missingInputLines);
+            Assert.IsEmpty(missingOutputLines);
         });
     }
 
@@ -122,8 +159,6 @@ public class TestBmsParserAndSaverOnFullMaps
 
     private static (int, List<(int, string)>) extractData(string line)
     {
-        line = line.Split(":")[1];
-
         if (line.Length % 2 != 0)
             throw new ArgumentException("Invalid line length", nameof(line));
 

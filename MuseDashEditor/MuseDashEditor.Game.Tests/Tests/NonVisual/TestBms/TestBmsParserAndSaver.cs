@@ -51,7 +51,7 @@ public class TestBmsParserAndSaver
         BmsMapParser.ParseMapContent(inputBmsContent, map);
         BmsMapParser.ProcessMapContent(map);
 
-        var saveContent = BmsMapParser.GetSaveContent(map);
+        var saveContent = BmsMapSaver.GetSaveContent(map);
 
         var inputLines = inputBmsContent.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.Length > 0).ToList();
         var outputLines = saveContent.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.Length > 0).ToList();

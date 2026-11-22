@@ -259,6 +259,9 @@ public enum ObjectType
     [SceneSwitchObjectData(SceneType.Miku)]
     SceneSwitchMiku = 69, // 1X
 
+    [SceneSwitchObjectData(SceneType.JadeTemple)]
+    SceneSwitchJadeTemple = 70, // 1Y
+
     // DesignObjects
     [DesignObjectData]
     HideNotes = 55, // 1J

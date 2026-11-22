@@ -47,4 +47,8 @@ public enum SceneType
 
     [SceneData("10_miku")]
     Miku = 10,
+
+    // DLC-only variation of 06_oriental
+    [SceneData("11_jade_temple")]
+    JadeTemple = 11,
 }
